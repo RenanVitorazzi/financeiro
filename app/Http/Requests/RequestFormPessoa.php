@@ -26,7 +26,7 @@ class RequestFormPessoa extends FormRequest
         // 'cnpj' => 'required_if:tipoCadastro,==,Pessoa Jurídica',
         // 'cpf' => 'required_if:tipoCadastro,==,Pessoa Física',
         return [
-            'nome' => 'required|max:255|min:6',
+            'nome' => 'required|max:255|min:3',
             'tipoCadastro' => 'required',
             'cpf' => 'cpf',
             'telefone' => 'telefone_com_ddd',

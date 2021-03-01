@@ -13,6 +13,7 @@ class RepresentanteController extends Controller {
     {
         $representantes = Representante::all();
         $message = $request->session()->get('message');
+        
         return view('representante.index', compact('representantes', 'message'));
     }
     

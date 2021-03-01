@@ -27,10 +27,6 @@ class ClienteController extends Controller
 
     public function store(RequestFormPessoa $request)
     {
-        // $request->validate([
-        //     'nome' => 'required|max:255',
-        //     'cpf' => 'required|cpf',
-        // ]); 
         $pessoa = Pessoa::create($request->all());
         Cliente::create([
             'pessoa_id' => $pessoa->id,
@@ -62,6 +58,9 @@ class ClienteController extends Controller
         
         $pessoa->fill($request->all())
             ->save();
+            
+        $cliente->representante_id = $request->representante_id;
+        $cliente->save();
             
         $request
             ->session()
