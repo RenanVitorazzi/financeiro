@@ -1,3 +1,11 @@
 {
-    "/js/cep.js": "/js/cep.js"
+    "/js/bootstrap.js": "/js/bootstrap.js",
+    "/dataTable/buttons.colVis.js": "/dataTable/buttons.colVis.js",
+    "/dataTable/buttons.flash.js": "/dataTable/buttons.flash.js",
+    "/dataTable/buttons.html5.js": "/dataTable/buttons.html5.js",
+    "/dataTable/buttons.print.js": "/dataTable/buttons.print.js",
+    "/style.css": "/style.css",
+    "/js/jquery.js": "/js/jquery.js",
+    "/dataTable.css": "/dataTable.css",
+    "/navbar.css": "/navbar.css"
 }

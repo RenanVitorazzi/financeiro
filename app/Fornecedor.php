@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Venda;
 use Illuminate\Database\Eloquent\Model;
 
 class Fornecedor extends Model {
@@ -13,6 +14,9 @@ class Fornecedor extends Model {
         return $this->belongsTo(Pessoa::class);
     } 
 
+    public function venda() {
+        return $this->hasMany(Venda::class);
+    }
 }
 
 ?>

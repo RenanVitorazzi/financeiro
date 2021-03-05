@@ -3,38 +3,56 @@
 Clientes
 @endsection
 @section('body')
-    <div class="container">
-        <div class="jumbotron"><h1>RELAÇÃO DE CLIENTES</h1></div>
-        @if(Session::has('message'))
-            <p class="alert alert-success">{{ Session::get('message') }}</p>
-        @endif
-        <ul class="d-flex list-group list-group">
-            @forelse ($clientes as $cliente)
-                <li class='list-group-item d-flex justify-content-between'>
-                    <div class='mt-2'>
-                        {{ $cliente->pessoa->nome }} 
-                        <span class="text-muted">({{ $cliente->representante->pessoa->nome ?? 'Sem representante'}})</span>
-                    </div>
-                    <div class='d-flex'>
-                        <a class="btn btn-dark mr-2" title="Editar" href="{{ route('clientes.edit', $cliente->id) }}">
-                            <i class="fas fa-pencil-alt"></i>
-                        </a>
-                        <form method="POST" action="{{ route('clientes.destroy', $cliente->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button class='btn btn-danger' type='submit'> 
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </div>
-                </li>
-                
-            @empty
-                <li class='list-group-item list-group-item-danger'>Nenhum registro criado!</li>
-            @endforelse
-        </ul>
-        <a href="{{ route('clientes.create') }}" class="btn btn-success  float-right mt-2">
-            {{-- <i class='fas fa-plus'></i> --}} Novo
-        </a>
-    </div>
+<div class='mb-2 d-flex justify-content-between'>
+    <h3> Relação de clientes </h3>
+    <x-botao-novo href="{{ route('clientes.create') }}"></x-botao-novo>
+</div>
+@if(Session::has('message'))
+    <p class="alert alert-success">{{ Session::get('message') }}</p>
+@endif
+<x-table id="myTable">
+    <x-table-header>
+        <tr>
+            <th>Nome</th>
+            <th>Representante</th>
+            <th>Ações</th>
+        </tr>
+    </x-table-header>
+    <tbody>
+        @forelse ($clientes as $cliente)
+        <tr>
+            <td>{{ $cliente->pessoa->nome }}</td>
+            <td>{{ $cliente->representante->pessoa->nome ?? 'Sem representante'}}</td>
+            <td class='d-flex justify-content-center'>
+                <a class="btn btn-primary mr-2" title="Visualizar" href="{{ route('clientes.show', $cliente->id) }}">
+                    <i class="fas fa-eye"></i>
+                </a>
+                <a class="btn btn-dark mr-2" title="Editar" href="{{ route('clientes.edit',  $cliente) }}">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
+                <form method="POST" action="{{ route('clientes.destroy', $cliente->id) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button class='btn btn-danger' type='submit'> 
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan='3'>Nenhum registro criado!</td>
+        </tr>
+        @endforelse
+    </tbody>
+</x-table>
 @endsection
+@push('script')
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable( {
+            
+        } );
+    } );
+</script>
+@endpush

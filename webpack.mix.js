@@ -14,4 +14,27 @@ const mix = require('laravel-mix');
 // mix.js('resources/js/app.js', 'public/js')
 //     .sass('resources/sass/app.scss', 'public/css')
 //     .sourceMaps();
-mix.js('resources/views/js/cep.js', 'public/js/cep.js');
+// mix.js('resources/views/js/cep.js', 'public/js/cep.js');
+const webpack = require('webpack');
+
+mix.webpackConfig({
+  plugins: [
+    new webpack.ProvidePlugin({
+        '$': 'jquery',
+        'jQuery': 'jquery',
+        'window.jQuery': 'jquery',
+    }),
+  ]
+});
+
+mix.autoload({
+    jquery: ['$', 'window.$', 'window.jQuery', 'jQuery']
+});
+
+mix
+  .sass('resources/views/scss/styles.scss', 'public/style.css')
+  
+  .copy('node_modules/jquery/dist/jquery.js', 'public/js/jquery.js')
+  .js('node_modules/bootstrap/dist/js/bootstrap.bundle.js', 'public/js/bootstrap.js')
+
+  .styles('resources/views/navbar.css', 'public/navbar.css');

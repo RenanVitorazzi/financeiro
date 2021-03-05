@@ -10,6 +10,7 @@ class ContaCorrenteRepresentante extends Model
 {
     use HasFactory;
     protected $table = 'conta_corrente_representante_controllers';
+    protected $guarded = ['id'];
 
     public function representante() {
         return $this->belongsTo(Representante::class);

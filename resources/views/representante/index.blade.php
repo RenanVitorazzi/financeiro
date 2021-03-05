@@ -19,14 +19,12 @@ Representantes
         @if ($loop->first)
         <div class='row'>  
         @endif
-            <div class="col-md-4 mb-4">
+            <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class='mt-2'>{{ $representante->pessoa->nome }}</div>
                         <div class="d-flex">
-                            <a class="btn btn-primary mr-2" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
-                                <i class="fas fa-balance-scale"></i>
-                            </a>
+                           
                             <a class="btn btn-dark mr-2" title="Editar" href="{{ route('representantes.edit', $representante->id) }}">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
@@ -44,6 +42,13 @@ Representantes
                         <p>Nascimento: {{ date('d/m/Y', strtotime($representante->pessoa->nascimento)) }}</p>
                         <p>Celular: {{ $representante->pessoa->celular }}</p>
                         <p>CEP: {{ $representante->pessoa->cep }}</p>
+                        <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
+                            Conta Corrente <i class="fas fa-balance-scale"></i>
+                        </a>
+                        <p></p>
+                        <a class="btn btn-dark h-100" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
+                            Vendas <i class="fas fa-shopping-cart"></i>
+                        </a>
                     </div>
                 </div>
             </div>

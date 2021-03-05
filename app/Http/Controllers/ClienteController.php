@@ -4,17 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Cliente;
 use App\Http\Requests\RequestFormPessoa;
+use App\Models\Venda;
 use App\Pessoa;
 use App\Representante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
 {
     public function index(Request $request)
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::with(['pessoa', 'representante'])->get();
         $message = $request->session()->get('message');
-
+        // dd($clientes->first()->venda->last()->metodo_pagamento);
         return view('cliente.index', compact('clientes', 'message'));
     }
 
@@ -41,6 +43,23 @@ class ClienteController extends Controller
             );
 
         return redirect()->route('clientes.index');
+    }
+
+    public function show(Cliente $cliente) {
+
+        $vendas = Venda::with(['parcela'])
+            ->where('cliente_id', $cliente->id)
+            // ->paginate(10);
+            ->get();
+
+        // $totalAberto = DB::table('vendas')
+        //     ->selectRaw('sum(peso) as peso, sum(fator) as fator, balanco')
+        //     ->where('cliente_id', $cliente->id)
+        //     ->groupBy('balanco')
+        //     ->orderBy('balanco')
+        //     ->get();
+        //     dd($totalAberto);
+        return view('cliente.show', compact('cliente', 'vendas'));
     }
 
     public function edit($id)
@@ -71,7 +90,7 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index');
     }
 
-    public function destroy (Request $request, $id) 
+    public function destroy(Request $request, $id) 
     {
         Cliente::destroy($id);
 
