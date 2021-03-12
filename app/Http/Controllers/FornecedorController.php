@@ -7,6 +7,7 @@ use App\Fornecedor;
 use App\Pessoa;
 use App\ContaCorrente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FornecedorController extends Controller
 {
@@ -65,13 +66,10 @@ class FornecedorController extends Controller
      */
     public function show($id)
     {
-        $fornecedor = Fornecedor::findOrFail($id);
-        $contasCorrentes = ContaCorrente::where('fornecedor_id', $id)
-            ->orderByDesc('data')
-            ->paginate(5);
-        $totalGeral = ContaCorrente::totalGeral($id);
-
-        return view('fornecedor.show',  compact('fornecedor', 'contasCorrentes','totalGeral'));    
+        $fornecedor = Fornecedor::with(['contaCorrente'])->findOrFail($id);
+        $balanco = ContaCorrente::balanco($id);
+        
+        return view('fornecedor.show',  compact('fornecedor', 'balanco'));    
     }
 
     /**

@@ -4,32 +4,22 @@ namespace App\Http\Controllers;
 
 use App\ContaCorrente;
 use App\Fornecedor;
+use App\Http\Requests\ContaCorrenteRequest;
 use GuzzleHttp\RedirectMiddleware;
 use Illuminate\Http\Request;
 
 class ContaCorrenteController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //retornar lançamentos mensais
-        return ContaCorrente::all();
-        // return view('contaCorrente.index', compact('contaCorrente'));
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        $fornecedores = Fornecedor::all();
-        return view('contaCorrente.create', compact('fornecedores'));
+        $fornecedor = Fornecedor::findOrFail($request->fornecedor_id);
+        
+        return view('contaCorrente.create', compact('fornecedor'));
     }
 
     /**
@@ -38,18 +28,18 @@ class ContaCorrenteController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ContaCorrenteRequest $request)
     {
         ContaCorrente::create(
             $request->all()
         );
 
         $request
-        ->session()
-        ->flash(
-            'message',
-            'Conta corrente criada com sucesso!'
-        );
+            ->session()
+            ->flash(
+                'message',
+                'Conta corrente criada com sucesso!'
+            );
 
         return redirect("/fornecedores/{$request->fornecedor_id}");
     }
@@ -86,10 +76,12 @@ class ContaCorrenteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ContaCorrenteRequest $request, $id)
     {
+
         $contaCorrente = contaCorrente::findOrFail($id);
-        $contaCorrente->fill($request->all())
+        $contaCorrente
+            ->fill($request->all())
             ->save();
         
         $request

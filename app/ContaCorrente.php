@@ -11,19 +11,8 @@ class ContaCorrente extends Model {
     protected $table = 'contas_correntes';
 
     public function fornecedor() {
-        return $this->hasMany(Fornecedor::class);
-    } 
-
-    // protected static function scopeCompra($query) {
-    //     return $query->where('balanco', 'Crédito');
-
-        // $debito = $this->where('balanco', 'Débito')
-        //     ->where('fornecedor_id', $fornecedor_id)
-        //     ->sum('peso')
-        //     ->get();
-
-        
-    // }
+        return $this->belongsTo(Fornecedor::class);
+    }
 
     public function scopeTotalCredito($query, $fornecedor_id)
     {
@@ -35,12 +24,12 @@ class ContaCorrente extends Model {
         return $query->where('balanco', 'Débito')->where('fornecedor_id', $fornecedor_id)->sum('peso');
     }
 
-    public function scopeTotalGeral($query, $fornecedor_id)
+    public function scopeBalanco($query, $fornecedor_id)
     {
-        $debito = $this->where('balanco', 'Débito')->where('fornecedor_id', $fornecedor_id)->sum('peso');
-        $credito = $this->where('balanco', 'Crédito')->where('fornecedor_id', $fornecedor_id)->sum('peso');
-        $total = $credito - $debito;
-        return $total;
+        $debito = $this->totalDebito($fornecedor_id);
+        $credito = $this->totalCredito($fornecedor_id);
+
+        return $credito - $debito;
     }
 }
 

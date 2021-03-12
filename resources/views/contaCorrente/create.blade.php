@@ -8,24 +8,25 @@ Adicionar nova conta
         @csrf
         <div class="row">
             <div class="col-md-4">
-                <x-form-group name="data" type="date" value="{{ date('Y-m-d') }}">Data</x-form-group>
+                <x-form-group name="data" type="date" value="{{ date('Y-m-d') }}" >Data</x-form-group>
+               
             </div>
+            @error('balanco')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
             <div class="col-md-4 form-group">
                 <label for="balanco">Tipo</label>
-                <select name="balanco" id="balanco" class="form-control" autofocus required>
+                <x-select name="balanco" id="balanco" class="form-control" autofocus required class="@error('balanco') is-invalid @enderror">
                     <option></option>
                     <option value='Crédito'> Fechamento </option>
                     <option value='Débito'> Compra </option>
-                </select>
+                </x-select>
             </div>
             <div class="col-md-4 form-group">
                 <label for="fornecedor_id">Fornecedor</label>
-                <select name="fornecedor_id" id="fornecedor_id" class="form-control">
-                    <option></option>
-                    @foreach ($fornecedores as $fornecedor)
-                        <option value="{{ $fornecedor->id }}"> {{ $fornecedor->pessoa->nome }} </option>
-                    @endforeach
-                </select>
+                <x-select name="fornecedor_id" id="fornecedor_id" class="form-control">
+                    <option value="{{ $fornecedor->id }}"> {{ $fornecedor->pessoa->nome }} </option>
+                </x-select>
             </div>
             <div class="col-md-4">
                 <x-form-group name="cotacao">Cotação do dia</x-form-group>
@@ -39,19 +40,12 @@ Adicionar nova conta
         </div> 
         <div class="form-group">
             <label for="observacao">Observação</label>
-            <textarea name="observacao" id="observacao" class="form-control"></textarea>
+            <x-textarea name="observacao" id="observacao" class="form-control"></x-textarea>
         </div>
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class='mt-2'>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
         <input type="submit" class='btn btn-success'>
     </form>
+@endsection
+@section('script')
     <script>
         $("#cotacao, #valor").change( () => {
             let cotacao = parseFloat($("#cotacao").val());

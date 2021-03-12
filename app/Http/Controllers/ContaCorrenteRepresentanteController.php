@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ContaCorrenteRequest;
 use App\Models\ContaCorrenteRepresentante;
 use App\Representante;
 use Illuminate\Http\Request;
@@ -47,11 +48,16 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function show($id)
     {
-        $contaCorrente = ContaCorrenteRepresentante::select('id', 'peso', 'fator', 'balanco', 'data', 'representante_id', 'observacao')
-        ->where('representante_id', $id)
-        ->orderBy('data')
-        ->paginate(10);
-
+        // $contaCorrente = ContaCorrenteRepresentante::select('id', 'peso', 'fator', 'balanco', 'data', 'representante_id', 'observacao')
+        // ->where('representante_id', $id)
+        // ->orderBy('data')
+        // ->paginate(10);
+        // $a = ContaCorrenteRepresentante::totalVenda($id);
+        // dd($a);
+        $contaCorrente = ContaCorrenteRepresentante::with(['representante:nome'])
+            ->where('representante_id', $id)
+            ->get();
+            
         $somaNegativa = ContaCorrenteRepresentante::select(DB::raw('sum( peso ) as peso, sum( fator ) as fator'))
             ->where('representante_id', $id)
             ->where('balanco', '=', 'Reposição')

@@ -17,6 +17,10 @@ class Fornecedor extends Model {
     public function venda() {
         return $this->hasMany(Venda::class);
     }
+
+    public function contaCorrente() {
+        return $this->hasMany(ContaCorrente::class);
+    }
 }
 
 ?>

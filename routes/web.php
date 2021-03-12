@@ -8,6 +8,9 @@ use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\ContaCorrenteController;
 use App\Http\Controllers\ContaCorrenteRepresentanteController;
 use App\Http\Controllers\VendaController;
+use App\Http\Controllers\ChequeController;
+
+Route::get('/cheque', [ChequeController::class, 'index']);
 
 //* Cadastros auxiliares
 Route::resource('clientes', ClienteController::class);

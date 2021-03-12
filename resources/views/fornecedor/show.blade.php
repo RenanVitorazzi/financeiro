@@ -1,22 +1,19 @@
 @extends('layout')
 @section('title')
-Fornecedores
+Conta Corrente - {{ $fornecedor->pessoa->nome }}
 @endsection
 @section('body')
     <div class="container">
-
-        <div class="mb-4">
-            <h3 class='d-inline'>{{ $fornecedor->pessoa->nome }}</h3>
-            <a href="{{ route('conta_corrente.create') }}" class="btn btn-success float-right">
-                Novo <i class='fas fa-plus'></i>
-            </a>
-            
+        <div class="d-flex justify-content-between">
+            <h3>{{ $fornecedor->pessoa->nome }}</h3>
+            <x-botao-novo href="{{ route('conta_corrente.create', ['fornecedor_id' => $fornecedor->id]) }}">
+            </x-botao-novo>
         </div>
-
-        <h3 class="{{ $totalGeral > 0 ? 'text-success' : 'text-danger' }} font-weight-bold d-inline float-right">{{ number_format($totalGeral, 2) }}g</h3> 
-
-        <table class="table text-center table-light" id="tabelaBalanço">
-            <thead class="thead-dark">
+        <h3 class="{{ $balanco > 0 ? 'text-success' : 'text-danger' }} font-weight-bold">
+            {{ number_format($balanco, 2) }}g
+        </h3> 
+        <x-table id="tabelaBalanco">
+            <x-table-header>
                 <tr>
                     <th>Data</th>
                     <th>Quantidade (Gramas)</th>
@@ -24,9 +21,9 @@ Fornecedores
                     <th>Observação</th>
                     <th>Ações</th>
                 </tr>
-            </thead>
+            </x-table-header>
             <tbody>
-                @forelse ($contasCorrentes as $contaCorrente)
+                @forelse ($fornecedor->contaCorrente as $contaCorrente)
                     <tr>
                         <td>{{ date('d/m/Y', strtotime($contaCorrente->data)) }}</td>
                         <td>{{ number_format($contaCorrente->peso, 2)}}</td>
@@ -54,9 +51,11 @@ Fornecedores
                 </tr>
                 @endforelse
             </tbody>
-        </table>
-
-        {{ $contasCorrentes->links() }}
-
+        </x-table>
     </div>
+@endsection
+@section('script')
+<script>
+    $("#tabelaBalanco").dataTable();
+</script>
 @endsection
