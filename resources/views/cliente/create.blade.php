@@ -2,65 +2,48 @@
 @section('title')
 Adicionar cliente
 @endsection
-@push('script')
-    <script type="text/javascript" src="{{ asset('js/cep.js') }}"></script>
-@endpush
 @section('body')
-    <form method="POST" action="{{ route('clientes.store')}}">
-        @csrf
-        <div class="row">
-            <div class="col-md-6">
-                <x-form-group name='nome' autofocus >Nome completo</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <x-form-group name='nascimento' type='date' >Data de nascimento</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="tipoCadastro">Tipo de cadastro</label>
-                    <select type="text" name="tipoCadastro" id="tipoCadastro" class="form-control" required>
-                        <option value='Pessoa Física'> Pessoa Física</option>
-                        <option value='Pessoa Jurídica'> Pessoa Jurídica</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div id='cpfGroup'>
-                    <x-form-group name='cpf'>CPF</x-form-group>
-                </div>
-                <div style='display:none' id='cnpjGroup'>
-                    <x-form-group name='cnpj'>CPNJ</x-form-group>
-                </div>
-            </div>
-        </div> 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('clientes.index') }}">Clientes</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cadastro</li>
+    </ol>
+</nav>
 
-        @include('formEndereco')
+<form method="POST" action="{{ route('clientes.store')}}">
+    @csrf
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="representante">Representante</label>
-                    <select type="text" name="representante" id="representante" class="form-control">
-                        <option></option>
-                        @foreach ($representantes as $representante)
-                            <option value="{{ $representante->id }}">
-                                {{ $representante->pessoa->nome }}
-                            </option>
-                        @endforeach
-                    </select>
+    @include('formGeral')
+
+    @include('formEndereco')
+
+    @include('formContato')
+
+    <div class="card mb-2">
+        <div class="card-body">
+            <h5 class="card-title">Outros</h5>
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="representante">Representante</label>
+                        <select type="text" name="representante" id="representante" class="form-control">
+                            <option></option>
+                            @foreach ($representantes as $representante)
+                                <option value="{{ $representante->id }}">
+                                    {{ $representante->pessoa->nome }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </div> 
-        
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class='mt-2'>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <input type="submit" class='btn btn-success'>
-    </form>
+            </div> 
+        </div>
+    </div>
+    
+    <input type="submit" class='btn btn-success'>
+</form>
+@endsection
+@section('script')
+    <script type="text/javascript" src="{{ asset('js1/cep.js') }}"></script>
 @endsection

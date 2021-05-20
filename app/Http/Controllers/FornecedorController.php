@@ -3,46 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestFormPessoa;
-use App\Fornecedor;
-use App\Pessoa;
-use App\ContaCorrente;
+use App\Models\Fornecedor;
+use App\Models\Pessoa;
+use App\Models\ContaCorrente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
 class FornecedorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
-        $fornecedores = Fornecedor::all();
+        $fornecedores = Fornecedor::with(['pessoa'])
+        ->withSum('contaCorrente', 'peso_agregado')
+        ->get();
+        
         $message = $request->session()->get('message');
         
         return view('fornecedor.index', compact('fornecedores', 'message'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('fornecedor.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(RequestFormPessoa $request)
     {
-        $pessoa = Pessoa::create($request->all());
+        $pessoa = Pessoa::create($request->validated());
 
         Fornecedor::create([
             'pessoa_id' => $pessoa->id,
@@ -58,26 +46,18 @@ class FornecedorController extends Controller
         return redirect()->route('fornecedores.index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $fornecedor = Fornecedor::with(['contaCorrente'])->findOrFail($id);
-        $balanco = ContaCorrente::balanco($id);
+        $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
+
+        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY id) AS saldo 
+        FROM conta_corrente 
+        WHERE fornecedor_id = ? 
+        AND deleted_at IS NULL", [$id]);
         
-        return view('fornecedor.show',  compact('fornecedor', 'balanco'));    
+        return view('fornecedor.show',  compact('fornecedor', 'registrosContaCorrente'));    
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $fornecedor = Fornecedor::findOrFail($id);
@@ -85,13 +65,6 @@ class FornecedorController extends Controller
         return view('fornecedor.edit', compact('fornecedor'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(RequestFormPessoa $request, $id)
     {
         $fornecedor = Fornecedor::findOrFail($id);
@@ -111,29 +84,42 @@ class FornecedorController extends Controller
         return redirect()->route('fornecedores.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         Fornecedor::destroy($id);
-
-        $request
-            ->session()
-            ->flash(
-                'message',
-                'Fornecedor excluído com sucesso!'
-            );
-
-        return redirect()->route('fornecedores.index');
+        
+        return json_encode([
+            'icon' => 'success',
+            'title' => 'Sucesso!',
+            'text' => 'Fornecedor excluído com sucesso!'
+        ]);
     }
 
-    // function contaCorrente(Request $request, $id)
-    // {
-    //     $fornecedor = Fornecedor::findOrFail($id);
-    //     return view('fornecedor.contaCorrente',  compact('fornecedor'));
-    // }
+    public function pdf_fornecedores()
+    {
+        $fornecedores = Fornecedor::with(['pessoa'])
+        ->withSum('contaCorrente', 'peso_agregado')
+        ->get();
+    
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('fornecedor.pdf.fornecedores', compact('fornecedores') );
+        
+        return $pdf->stream();
+    }
+
+    public function pdf_fornecedor($id)
+    {
+        $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
+
+        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY id) AS saldo 
+        FROM conta_corrente 
+        WHERE fornecedor_id = ? 
+        AND deleted_at IS NULL", [$id]);
+        
+        // dd($contas);
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('fornecedor.pdf.relacao_fornecedor', compact('fornecedor', 'registrosContaCorrente') );
+        
+        return $pdf->stream();
+    }
 }

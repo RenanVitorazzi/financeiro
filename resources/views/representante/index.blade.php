@@ -5,48 +5,45 @@ Representantes
 @endsection
 
 @section('body')
-<div class='mb-4'>
-    <h3 class='d-inline' style="color:#212529">Representantes</h3>  
-    <a href="{{ route('representantes.create') }}" class="btn btn-success float-right">
-        Novo <i class='fas fa-plus'></i>
-    </a>
+<div class='mb-2 d-flex justify-content-between'>
+    <h3>Representantes</h3>  
+    <div>
+        <x-botao-imprimir class="mr-2" href="{{ route('relacao_ccr') }}"></x-botao-imprimir>
+        <x-botao-novo href="{{ route('representantes.create') }}"></x-botao-novo>
+    </div>
 </div>
-    @if(Session::has('message'))
-        <p class="alert alert-success">{{ Session::get('message') }}</p>
-    @endif
-    
     @forelse ($representantes as $representante)
         @if ($loop->first)
         <div class='row'>  
         @endif
-            <div class="col-md-6 mb-4">
+            <div class="col-4 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class='mt-2'>{{ $representante->pessoa->nome }}</div>
                         <div class="d-flex">
-                           
-                            <a class="btn btn-dark mr-2" title="Editar" href="{{ route('representantes.edit', $representante->id) }}">
-                                <i class="fas fa-pencil-alt"></i>
-                            </a>
-                            <form method="POST" action="{{ route('representantes.destroy', $representante->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class='btn btn-danger' type='submit'> 
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
+                            <x-botao-editar class="mr-2" href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
+                            @if ($representante->conta_corrente->isEmpty())
+                            <x-botao-excluir action="{{ route('representantes.destroy', $representante->id) }}"></x-botao-excluir>
+                            @endif
                         </div>
                     </div>
                     <div class="card-body">
-                        <p>CPF: {{ $representante->pessoa->cpf }}</p>
-                        <p>Nascimento: {{ date('d/m/Y', strtotime($representante->pessoa->nascimento)) }}</p>
-                        <p>Celular: {{ $representante->pessoa->celular }}</p>
-                        <p>CEP: {{ $representante->pessoa->cep }}</p>
+                        <p>
+                            Peso: 
+                            <span class="{{ $representante->conta_corrente->sum('peso_agregado') < 0 ? 'text-danger' : 'text-success'}}">
+                                {{ number_format($representante->conta_corrente->sum('peso_agregado'), 3, ',', '.') }}
+                            </span>
+                        </p>
+                        <p>
+                            Fator: 
+                            <span class="{{ $representante->conta_corrente->sum('fator_agregado') < 0 ? 'text-danger' : 'text-success'}}">
+                                {{ number_format($representante->conta_corrente->sum('fator_agregado'), 2, ',', '.') }}
+                            </span>
+                        </p>
                         <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
                             Conta Corrente <i class="fas fa-balance-scale"></i>
                         </a>
-                        <p></p>
-                        <a class="btn btn-dark h-100" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
+                        <a class="btn btn-dark" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
                             Vendas <i class="fas fa-shopping-cart"></i>
                         </a>
                     </div>
@@ -58,4 +55,11 @@ Representantes
         @empty
             <div class="alert alert-danger">Nenhum registro criado!</div>
         @endforelse
+@endsection
+@section('script')
+<script>
+@if(Session::has('message'))
+    toastr["success"]("{{ Session::get('message') }}")
+@endif
+</script>
 @endsection

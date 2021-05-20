@@ -2,10 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Venda;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Fornecedor extends Model
+class Fornecedor extends Model 
 {
-    use HasFactory;
+    use SoftDeletes;
+
+    protected $guarded = ['id'];
+    protected $table = 'fornecedores';
+
+    public function pessoa() {
+        return $this->belongsTo(Pessoa::class);
+    } 
+
+    public function venda() {
+        return $this->hasMany(Venda::class);
+    }
+
+    public function contaCorrente() {
+        return $this->hasMany(ContaCorrente::class)->latest();
+    }
 }
+
+?>

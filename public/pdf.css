@@ -1,0 +1,19 @@
+
+table {
+    width:100%;
+    border-collapse: collapse;
+}
+td, th {
+    border: 1px solid black;
+    text-align: center;
+}
+th {
+    background-color:black;
+    color:white;
+}
+tr:nth-child(even) {
+    background-color: #a9acb0;
+}
+h1 {
+    text-align: center;
+}

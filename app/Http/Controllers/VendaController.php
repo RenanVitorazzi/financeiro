@@ -2,121 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use App\Cliente;
+use App\Models\Cliente;
 use App\Http\Requests\SalvarVendaRequest;
 use App\Models\ContaCorrenteRepresentante;
 use App\Models\Parcela;
 use App\Models\Venda;
-use App\Representante;
+use App\Models\Representante;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class VendaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
         $idRepresentante = $request->id;
-        $representantes = Representante::all();
-        $clientes = Cliente::all();
-        return view('venda.create', compact('representantes', 'idRepresentante', 'clientes'));
+        $clientes = Cliente::with('pessoa')->get();
+        $metodo_pagamento = ['À vista', 'Parcelado'];
+        $forma_pagamento = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Depósito'];
+
+        return view('venda.create', compact('idRepresentante', 'clientes', 'metodo_pagamento', 'forma_pagamento'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(SalvarVendaRequest $request)
-    {   
-        if (!$request->parcelas) {
-            $request->request->add(['parcelas' => 1]);
-        }
-        
-        $venda = Venda::create($request->all());
+    {
+        $venda = Venda::create([
+            'data_venda' => $request->data_venda,
+            'cliente_id' => $request->cliente_id,
+            'representante_id' => $request->representante_id,
+            'peso' => $request->peso,
+            'fator' => $request->fator,
+            'cotacao_fator' => $request->cotacao_fator,
+            'cotacao_peso' => $request->cotacao_peso,
+            'valor_total' => $request->valor_total,
+            'metodo_pagamento' => $request->metodo_pagamento,
+        ]);
 
-        if ($request->metodo_pagamento === 'Cheque') {
-            foreach ($request->data_parcela as $key => $value) {
-                Parcela::create([
-                    'venda_id' => $venda->id,
-                    'valor_parcela' => $request->valor_parcela[$key],
-                    'data_parcela' => $value,
-                ]);
-            }
+        foreach ($request->data_parcela as $key => $value) {
+            Parcela::create([
+                'venda_id' => $venda->id,
+                'forma_pagamento' => $request->forma_pagamento[$key],
+                'nome_cheque' => $request->nome_cheque[$key],
+                'numero_cheque' => $request->numero_cheque[$key],
+                'data_parcela' => $value,
+                'valor_parcela' => $request->valor_parcela[$key],
+                'observacao' => $request->observacao[$key],
+            ]);
         }
         
         return redirect("/venda/{$request->representante_id}");
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\venda  $venda
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        // $chequesMes = DB::table('parcelas')
-        //     ->whereMonth('data_parcela', date('m'))
-        //     ->whereNull('deleted_at')
-        //     ->sum('valor_parcela');
-
         $vendas = Venda::with('parcela')
             ->where('representante_id', $id)
-            ->where('balanco', 'Venda')
             ->where('enviado_conta_corrente', null)
-            ->orderByDesc('id')
+            ->latest()
             ->get();
-            // ->paginate(5, ['*'], 'vendas');
-
-        // $abertos = Venda::with('parcela')
-        //     ->where('representante_id', $id)
-        //     ->where('balanco', 'Aberto')
-        //     ->orWhere('balanco', 'Devolução')
-        //     ->orderByDesc('id')
-        //     ->paginate(5, ['*'], 'abertos');
 
         $representante = Representante::findOrFail($id);
+
         return view('venda.show', compact('vendas', 'representante'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\venda  $venda
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $venda = Venda::findOrFail($id);
-        $representantes = Representante::all();
-        $clientes = Cliente::all();
+        $representantes = Representante::with('pessoa')->get();
+        $clientes = Cliente::with('pessoa')->get();
         
         return view('venda.edit', compact('representantes', 'venda', 'clientes'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\venda  $venda
-     * @return \Illuminate\Http\Response
-     */
     public function update(SalvarVendaRequest $request, $id)
     {  
         $venda = Venda::findOrFail($id);
@@ -173,46 +129,32 @@ class VendaController extends Controller
         return redirect("/venda/{$request->representante_id}");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\venda  $venda
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $venda = Venda::findOrFail($id);
-        $representante_id = $venda->representante_id;
-        $venda->delete();
-        $request
-            ->session() 
-            ->flash(
-                'message',
-                'Venda deletada com sucesso!'
-            );
-        return redirect("/venda/{$representante_id}");
+        Venda::destroy($id);
+
+        return json_encode([
+            'icon' => 'success',
+            'title' => 'Sucesso!',
+            'text' => 'Fornecedor excluído com sucesso!'
+        ]);
     }
 
     public function enviarContaCorrente (Request $request) {
-        $vendas = Venda::find($request->vendas_id);
-        
-        $valor_total_vendas = $vendas->sum('valor_total');
-        $valor_total_peso = $vendas->sum('peso');
-        $valor_total_fator = $vendas->sum('fator');
-        
+        $vendas = Venda::findOrFail($request->vendas_id);
+
         foreach ($vendas as $key => $venda) {
             $venda->update([
                 'enviado_conta_corrente' => 1
             ]);
         }
 
-        $hoje = date('Y-m-d');
-
         ContaCorrenteRepresentante::create([
-            'valor_total' => $valor_total_vendas,
-            'fator' => $valor_total_fator,
-            'peso' => $valor_total_peso,
-            'data' => $hoje,
+            'fator' => $vendas->sum('fator'),
+            'peso' => $vendas->sum('peso'),
+            'fator_agregado' => $vendas->sum('fator'),
+            'peso_agregado' => $vendas->sum('peso'),
+            'data' => date('Y-m-d'),
             'balanco' => 'Venda',
             'representante_id' => $vendas->first()->representante_id
         ]);

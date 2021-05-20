@@ -2,56 +2,46 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\VendaRepresentante;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule as ValidationRule;
 
 class SalvarVendaRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        $metodos = ['Cheque', 'Dinheiro', 'Depósito', 'Nota Promissória', null];
-        
+        $metodos = ['À vista', 'Parcelado'];
+        $forma_pagamento = ['Dinheiro', 'Cheque', 'Nota Promissória', 'Transferência Bancária', 'Depósito', 'Boleto'];
+
         return [
-            'data_venda' => 'required|date',
-            'cliente_id' => 'required|integer',
-            'balanco' => 'required',
-            'representante_id' => 'required|integer',
-            'peso' => 'required_if:balanco,Venda|numeric|min:0|nullable',
-            'fator' => 'required_if:balanco,Venda|numeric|min:0|nullable',
-            'cotacao_peso' => 'required_if:balanco,Venda|numeric|min:0|nullable',
-            'cotacao_fator' => 'required_if:balanco,Venda|numeric|min:0|nullable',
-            'valor_total' => 'required_if:balanco,Venda|numeric|min:0|nullable',
-            'metodo_pagamento' => ValidationRule::in($metodos),
-            'data_parcela' => 'required_if:metodo_pagamento,Cheque|array|nullable',
-            'data_parcela.*' => 'required_if:metodo_pagamento,Cheque|date|nullable',
-            'valor_parcela' => 'required_if:metodo_pagamento,Cheque|array|nullable',
-            'valor_parcela.*' => 'required_if:metodo_pagamento,Cheque|numeric|nullable'
+            'data_venda' => ['required', 'date', 'date_format:Y-m-d'],
+            'cliente_id' => ['required', 'integer'],
+            'representante_id' => ['required', 'integer'],
+            'peso' => ['required_without:fator', 'numeric', 'min:0', 'nullable'],
+            'fator' => ['required_without:peso', 'numeric', 'min:0', 'nullable'],
+            'cotacao_peso' => ['required_with:peso', 'numeric', 'min:0', 'nullable'],
+            'cotacao_fator' => ['required_with:fator', 'numeric', 'min:0', 'nullable'],
+            'valor_total' => ['required', 'numeric', 'min:0'],
+            'metodo_pagamento' => ['required', ValidationRule::in($metodos)],
+            'data_parcela' => ['required', 'array', 'nullable', 'min:1'],
+            'data_parcela.*' => ['required', 'date', 'nullable', 'date_format:Y-m-d'],
+            'valor_parcela' => ['required', 'array', 'nullable', 'min:1'],
+            'valor_parcela.*' => ['required', 'numeric', 'nullable', 'min:0'],
+            'forma_pagamento' => ['required', 'array', 'nullable', 'min:1'],
+            'forma_pagamento.*' => ['required', ValidationRule::in($forma_pagamento)],
+            'observacao' => ['array', 'nullable'],
+            'observacao.*' => ['nullable', 'string', 'max:255'],
+            'numero_cheque' => ['array', 'nullable'],
+            'numero_cheque.*' => ['nullable', 'string', 'max:255'],
+            'nome_cheque' => ['array', 'nullable'],
+            'nome_cheque.*' => ['required_if:forma_pagamento,Cheque', 'nullable', 'string', 'max:255'],
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'required' => 'O campo :attribute é obrigatório',
-            'integer' => 'O campo :attribute precisar ser inteiro',
-            'numeric' => 'O campo :attribute precisar ser numérico',
-            'min' => 'O campo :attribute precisar ter valor :min no mínimo',
-        ];
-    }
 }

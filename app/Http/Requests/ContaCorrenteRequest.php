@@ -25,10 +25,13 @@ class ContaCorrenteRequest extends FormRequest
     {
         return [
             'data' => 'required',
+            'fornecedor_id' => 'required|numeric',
             'balanco' => 'required',
-            'cotacao' => 'nullable|numeric|min:1|required_if:balanco,Débito',
-            'peso' => 'required_if:balanco,Crédito|numeric|min:1|nullable',
-            'observacao' => 'required|string',
+            'cotacao' => 'nullable|numeric|min:0',
+            'peso' => 'numeric|min:0|nullable|required_if:balanco,Débito',
+            'observacao' => 'nullable|string',
+            'anexo' => 'nullable|array|',
+            'anexo.*' => 'file|mimes:jpg,png,application/pdf,pdf|max:3000',
         ];
     }
 }

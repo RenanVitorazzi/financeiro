@@ -1,59 +1,56 @@
 @extends('layout')
 @section('title')
-Relação de cheques
+Carteira de cheques
 @endsection
 @section('body')
-    <div class="container">
-        <div class="d-flex justify-content-between">
-            <h3>Relação de cheques</h3>
-            {{-- <x-botao-novo href="{{ route('conta_corrente.create', ['fornecedor_id' => $fornecedor->id]) }}">
-            </x-botao-novo> --}}
-        </div>
-        {{-- <h3 class="{{ $balanco > 0 ? 'text-success' : 'text-danger' }} font-weight-bold">
-            {{ number_format($balanco, 2) }}g
-        </h3>  --}}
-        <x-table id="tabelaBalanco">
-            <x-table-header>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Representante</th>
-                    <th>Data</th>
-                    <th>Valor</th>
-                    <th>Detalhes</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </x-table-header>
-            <tbody>
-                @forelse ($cheques as $cheque)
-                    <tr>
-                        <td>{{ $cheque->cliente }}</td>
-                        <td>{{ $cheque->representante }}</td>
-                        <td>{{ date('d/m/Y', strtotime($cheque->data_parcela)) }}</td>
-                        <td>R$ {{ number_format($cheque->valor_parcela,2, ',', '.') }}</td>
-                        <td>{{ $cheque->numero_cheque }} {{ $cheque->observacao}}</td>
-                        <td>{{ $cheque->status }}</td>
-                        <td>
-                            <a class="btn btn-dark" title="Editar" href="{{ route("conta_corrente.edit", $cheque->id) }}">
-                                <span class="fas fa-pencil-alt"></span>
-                            </a>
-                            <form method="POST" action="{{ route("conta_corrente.destroy", $cheque->id) }}" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" title="Excluir">
-                                    <span class="fas fa-trash-alt"></span>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                <tr>
-                    <td colspan=4>Nenhum registro</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </x-table>
-    </div>
+<div class='mb-2 d-flex justify-content-between'>
+    <h3> Cheques </h3>
+    <x-botao-novo href="{{ route('cheques.create') }}"></x-botao-novo>
+</div>
+       
+<x-table id="tabelaBalanco">
+    <x-table-header>
+        <tr>
+            <th>Cliente</th>
+            <th>Titular do cheque</th>
+            <th>Representante</th>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Detalhes</th>
+            <th>Ações</th>
+        </tr>
+    </x-table-header>
+    <tbody>
+        @forelse ($cheques as $cheque)
+            <tr class="{{ ($cheque->data_parcela < date('d-m-Y')) ? 'table-danger' : '' }}">
+                <td>{{ $cheque->venda_id ? $cheque->cliente : 'Não informado' }}
+                </td>
+                <td>{{  $cheque->nome_cheque  }}</td>
+                <td>{{ $cheque->venda_id ? $cheque->representante : $cheque->representante->pessoa->nome}}</td>
+                <td>{{ date('d/m/Y', strtotime($cheque->data_parcela)) }}</td>
+                <td>R$ {{ number_format($cheque->valor_parcela,2, ',', '.') }}</td>
+                <td>
+                    <span class="{{ $arrayCores[$cheque->status] }}">
+                        {{ $cheque->status }}
+                        @if ($cheque->status == 'Devolvido')
+                            {{"(Motivo: $cheque->motivo_devolucao)" }}
+                        @endif
+                    </span>
+                </td>
+                <td>{{ $cheque->numero_cheque }} {{ $cheque->observacao}}</td>
+                <td>
+                    <x-botao-editar href="{{ route('cheques.edit', $cheque->id) }}"></x-botao-editar>
+                </td>
+            </tr>
+        @empty
+        <tr>
+            <td colspan=7>Nenhum registro</td>
+        </tr>
+        @endforelse
+    </tbody>
+</x-table>
+
 @endsection
 @section('script')
 <script>

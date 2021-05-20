@@ -4,14 +4,11 @@ Clientes
 @endsection
 @section('body')
 <div class='mb-2 d-flex justify-content-between'>
-    <h3> Relação de clientes </h3>
+    <h3> Clientes </h3>
     <x-botao-novo href="{{ route('clientes.create') }}"></x-botao-novo>
 </div>
-@if(Session::has('message'))
-    <p class="alert alert-success">{{ Session::get('message') }}</p>
-@endif
 <x-table id="myTable">
-    <x-table-header>
+    <x-table-header> 
         <tr>
             <th>Nome</th>
             <th>Representante</th>
@@ -27,32 +24,88 @@ Clientes
                 <a class="btn btn-primary mr-2" title="Visualizar" href="{{ route('clientes.show', $cliente->id) }}">
                     <i class="fas fa-eye"></i>
                 </a>
-                <a class="btn btn-dark mr-2" title="Editar" href="{{ route('clientes.edit',  $cliente) }}">
-                    <i class="fas fa-pencil-alt"></i>
-                </a>
-                <form method="POST" action="{{ route('clientes.destroy', $cliente->id) }}">
-                    @csrf
-                    @method('DELETE')
-                    <button class='btn btn-danger' type='submit'> 
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
+                <x-botao-editar class="mr-2" href="{{ route('clientes.edit', $cliente->id) }}"></x-botao-editar>
+                <x-botao-excluir action="{{ route('clientes.destroy', $cliente->id) }}"></x-botao-excluir>
             </td>
         </tr>
         @empty
         <tr>
-            <td colspan='3'>Nenhum registro criado!</td>
+            <td colspan='3'>Nenhum registro!</td>
         </tr>
         @endforelse
     </tbody>
-</x-table>
+</x-table> 
 @endsection
-@push('script')
+@section('script')
 <script>
+    @if(Session::has('message'))
+        toastr["success"]("{{ Session::get('message') }}")
+    @endif
+    
     $(document).ready( function () {
         $('#myTable').DataTable( {
-            
+            buttons: [ 
+                {
+                    extend: 'excel',
+                    className: "btn-dark",
+                    text: 'Excel',
+                    exportOptions: {
+                    columns: [ 0, 1],
+                    trim: true,
+                    format: {
+                        body: function ( data, row, column, node ) {
+                        return $(node).text().trim();
+                        }
+                    }
+                    },
+                    customize: function(xlsx) {
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    $('row c', sheet).each( function () {
+                        $(this).attr( 's', '55' );
+                    });
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: "btn-dark",
+                    exportOptions: {
+                    columns: [ 0, 1 ],
+                    format: {
+                        body: function ( data, row, column, node ) {
+                            data = data
+                            .replace(/<.*?>/g, "");
+                            return data;
+                        }
+                    },
+                    stripHtml:      true,
+                    stripNewlines:  true,
+                    decodeEntities: false,
+                    trim:           true,
+                    }, 
+                    customize : function(doc){
+                    var colCount = new Array();
+                    $('.table').find('tbody tr:first-child td').each(function(){
+                        if($(this).attr('colspan')){
+                        for(var i=1;i<=$(this).attr('colspan');$i++){
+                            colCount.push('*');
+                        }
+                        }else{ colCount.push('*'); }
+                    });
+                    colCount.splice(-1,1)
+                    doc.content[1].table.widths = colCount;
+                    },
+                },
+                {
+                    extend: 'print',
+                    className: "btn-dark",
+                    text: 'Imprimir',
+                    exportOptions: {
+                    columns: [ 0, 1],
+                    stripHtml: false
+                    }
+                }
+            ]
         } );
     } );
 </script>
-@endpush
+@endsection

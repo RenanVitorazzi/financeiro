@@ -1,6 +1,5 @@
 <select {{ $attributes->merge(([
-    'class' => $errors->has($attributes['name']) ? 'is-invalid form-control' : 'form-control' , 
-    'type' => 'text', 
+    'class' => $errors->has($attributes['name']) ? 'is-invalid form-control' : 'form-control' ,
     'id' => $attributes['name']
 ])) }}>
     {{ $slot }}

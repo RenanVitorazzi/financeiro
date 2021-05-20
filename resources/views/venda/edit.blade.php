@@ -117,7 +117,7 @@ Adicionar conta corrente (representante)
         <input type="submit" class='btn btn-success'>
     </form>
 @endsection
-@push('script')
+@section('script')
 <script>
     $("#metodo_pagamento").change( (e) => {
         let metodo = $(e.target).val()
@@ -237,4 +237,4 @@ Adicionar conta corrente (representante)
         $("#valor_total").val(totalCompra)
     }
 </script>
-@endpush
+@endsection

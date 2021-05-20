@@ -1,4 +1,4 @@
-<form method="POST" action="{{ $attributes['action'] }}" class="d-inline">
+<form method="POST" action="{{ $attributes['action'] }}" class="d-inline" onsubmit="confirmarExclusao(event, this)">
     @csrf
     @method('DELETE')
     <button type="submit" class="btn btn-danger" title="Excluir">

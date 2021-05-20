@@ -3,31 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestFormPessoa;
-use App\Pessoa;
-use App\Representante;
+use App\Models\ContaCorrenteRepresentante;
+use App\Models\Pessoa;
+use App\Models\Representante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 class RepresentanteController extends Controller {
     
-    public function index(Request $request) 
+    public function index(Request $request)
     {
-        $representantes = Representante::all();
+        $representantes = Representante::with('pessoa', 'conta_corrente', 'venda')->get();
         $message = $request->session()->get('message');
         
         return view('representante.index', compact('representantes', 'message'));
     }
     
-    public function create() 
+    public function create()
     {
         return view('representante.create');
     }
 
-    public function store(RequestFormPessoa $request) 
+    public function store(RequestFormPessoa $request)
     {
-        $pessoa = Pessoa::create($request->all());
-        Representante::create([
-            'pessoa_id' => $pessoa->id
-        ]);
+        DB::transaction(function () use ($request) {
+            $pessoa = Pessoa::create($request->validated());
+    
+            Representante::create([
+                'pessoa_id' => $pessoa->id
+            ]);
+        });
+
         $request
             ->session()
             ->flash(
@@ -37,19 +44,19 @@ class RepresentanteController extends Controller {
         return redirect()->route('representantes.index');
     }
 
-    public function edit($id) 
+    public function edit($id)
     {
         $representante = Representante::findOrFail($id);
 
         return view('representante.edit', compact('representante'));
     }
 
-    public function update (RequestFormPessoa $request, $id) 
+    public function update (RequestFormPessoa $request, $id)
     {
         $representante = Representante::findOrFail($id);
         $pessoa = Pessoa::findOrFail($representante->pessoa_id);
         
-        $pessoa->fill($request->all())
+        $pessoa->fill($request->validated())
             ->save();
             
         $request
@@ -58,20 +65,34 @@ class RepresentanteController extends Controller {
                 'message',
                 'Representante atualizado com sucesso!'
             );
+
         return redirect()->route('representantes.index');
     }
 
-    public function destroy (Request $request, $id) {
+    public function destroy (Request $request, $id)
+    {
 
         Representante::destroy($id);
-
+        
         $request
-            ->session()
+            ->session() 
             ->flash(
                 'message',
-                'Representante excluído com sucesso!'
+                'Registro deletado com sucesso!'
             );
+
         return redirect()->route('representantes.index');
+    }
+
+    public function impresso()
+    {
+        $representantes = Representante::with('pessoa', 'conta_corrente')->get();
+        $contaCorrenteGeral = ContaCorrenteRepresentante::get();
+        
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('representante.pdf.impresso', compact('representantes', 'contaCorrenteGeral') );
+            
+        return $pdf->stream();
     }
 } 
 

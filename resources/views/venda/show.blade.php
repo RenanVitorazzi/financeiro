@@ -1,30 +1,28 @@
 @extends('layout')
 
 @section('title')
-Vendas - {{$representante->pessoa->nome}}
+Vendas - {{$representante->pessoa->nome}} 
 @endsection
 
 @section('body')
-<div class='mb-4'>
-    <h3 class='d-inline' style="color:#212529">Vendas - {{ $representante->pessoa->nome}}</h3>  
-    <x-botao-novo href="{{ route('venda.create', ['id' => $representante->id]) }}"></x-botao-novo>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Vendas</li>
+    </ol>
+</nav>
+<div class='mb-2 d-flex justify-content-between'>
+    <h3>Vendas - {{ $representante->pessoa->nome}}</h3> 
+    <div> 
+        <x-botao-imprimir class="mr-2"></x-botao-imprimir>
+        <x-botao-novo href="{{ route('venda.create', ['id' => $representante->id]) }}"></x-botao-novo>
+    </div>
 </div>
-    @if(Session::has('message'))
-        <p class="alert alert-success">{{ Session::get('message') }}</p>
-    @endif
-    {{-- <div class='alert alert-success'>
-        Valor total de cheques para o mês: <b>{{ number_format($chequesMes, 2) }}</b>
-    </div>  --}}
-    {{-- <div>
-        <h3 class="{{ $balancoFator > 0 ? 'text-success' : 'text-danger' }} font-weight-bold float-right">
-            Fator: {{ number_format($balancoFator, 2) }}g
-        </h3> 
-    </div> --}}
-  
+@if(Session::has('message'))
+<div class="alert alert-success">{{ Session::get('message') }}</div>
+@endif
     <x-table>
-        {{-- <x-table-header>
-            <th colspan=7>Vendas </th>
-        </x-table-header> --}}
         <x-table-header>
             <th>
                 <input type="checkbox" id="checkAll">
@@ -60,7 +58,7 @@ Vendas - {{$representante->pessoa->nome}}
                     @endforeach
                 </td>
                 <td>
-                    <x-botao-editar href='{{ route("venda.edit", $venda->id) }}'></x-botao-editar>
+                    {{-- <x-botao-editar href='{{ route("venda.edit", $venda->id) }}'></x-botao-editar> --}}
                     <x-botao-excluir action='{{ route("venda.destroy", $venda->id) }}'></x-botao-excluir>
                 </td>
             </tr>
@@ -69,54 +67,18 @@ Vendas - {{$representante->pessoa->nome}}
             <tr><td colspan="7" class="table-danger">Nenhum registro criado</td></tr>
             @endforelse
         </tbody>
-        {{-- <tfoot class="thead-dark"><th colspan=7>TOTAL: 300000 </th></tfoot> --}}
     </x-table>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <div id="enviarCC" class="btn btn-primary">
         Enviar para o conta corrente
     </div>
-    {{-- <x-table>
-        <x-table-header>
-            <tr>
-                <th colspan=6> Abertos </th>
-            </tr>
-        </x-table-header>
-        <x-table-header>
-            <tr>
-                <th>Data</th>
-                <th>Cliente</th>
-                <th>Balanço</th>
-                <th>Peso</th>
-                <th>Fator</th>
-                <th>Ações</th>
-            </tr>
-        </x-table-header>
-        <tbody>
-            @forelse ($abertos as $aberto)
-            <tr>
-                <td>{{ date('d/m/Y', strtotime($aberto->data_aberto)) }}</td>
-                <td>{{ $aberto->cliente->pessoa->nome }}</td>
-                <td class="{{ $aberto->balanco !== 'Devolução' ? 'text-danger' : 'text-success' }}">
-                    <b>{{ $aberto->balanco }}</b>
-                    <i class="fas {{ $aberto->balanco !== 'Devolução' ? 'fa-angle-down' : 'fa-angle-up' }}"></i>
-                </td>
-                <td>{{ number_format($aberto->peso, 2) }}</td>
-                <td>{{ number_format($aberto->fator, 2) }}</td>
-                <td>
-                    <x-botao-editar href='{{ route("venda.edit", $aberto->id) }}'></x-botao-editar>
-                    <x-botao-excluir action='{{ route("venda.destroy", $aberto->id) }}'></x-botao-excluir>
-                </td>
-            </tr>
-
-            @empty
-            <tr><td colspan="6" class="table-danger">Nenhum registro criado</td></tr>
-            @endforelse
-        </tbody>
-    </x-table>
-    {{ $abertos->links() }} --}}
 @endsection
-@push('script')
+@section('script')
 <script>
+    @if(Session::has('message'))
+        toastr["success"]("{{ Session::get('message') }}")
+    @endif
+    
     $("#checkAll").click( (e) => {
         let state = $(e.target).prop('checked');
         $("input[name='id_venda[]']").each(function (index,element) {
@@ -152,7 +114,7 @@ Vendas - {{$representante->pessoa->nome}}
     function enviarCC() {
         let arrayId = [];
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $("input[name='id_venda[]']").each(function (index,element) {
+        $("input[name='id_venda[]']:checked").each(function (index,element) {
             arrayId.push( $( element ).val() );
         })
 
@@ -162,7 +124,8 @@ Vendas - {{$representante->pessoa->nome}}
             data: { vendas_id: arrayId, _token: CSRF_TOKEN },
             dataType: 'json'
         }).done( (response) => {
-            
+            console.log(response);
+            // console.log(arrayId);
             Swal.fire({
                 title: 'Sucesso!',          
                 icon: 'success'
@@ -181,4 +144,4 @@ Vendas - {{$representante->pessoa->nome}}
         })
     }
 </script>
-@endpush
+@endsection

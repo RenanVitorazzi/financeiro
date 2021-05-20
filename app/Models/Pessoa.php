@@ -2,10 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pessoa extends Model
-{
-    use HasFactory;
+class Pessoa extends Model {
+
+    protected $guarded = ['id'];
+    
+    public function representante() {
+        return $this->hasOne(Representante::class);
+    }
+
+    public function cliente() {
+        return $this->hasOne(Cliente::class);
+    }
 }
+
+?>

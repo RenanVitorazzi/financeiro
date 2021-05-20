@@ -13,14 +13,16 @@ class CreateContaCorrenteRepresentanteControllersTable extends Migration
      */
     public function up()
     {
-        Schema::create('conta_corrente_representante_controllers', function (Blueprint $table) {
+        Schema::create('conta_corrente_representante', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->decimal('fator', 8, 2);
-            $table->decimal('peso', 8, 2);
             $table->date('data');
             $table->enum('balanco', ['Reposição', 'Venda', 'Devolução']);
+            $table->decimal('fator', 9, 2);
+            $table->decimal('peso', 9, 3);
+            $table->decimal('fator_agregado', 9, 2);
+            $table->decimal('peso_agregado', 9, 3);
             $table->foreignId('representante_id')->constrained('representantes');
             $table->longText('observacao')->nullable();
         });
@@ -33,6 +35,6 @@ class CreateContaCorrenteRepresentanteControllersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('conta_corrente_representante_controllers');
+        Schema::dropIfExists('conta_corrente_representante');
     }
 }

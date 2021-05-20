@@ -18,31 +18,33 @@ class CreateVendasTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->date('data_venda');
-            $table->decimal('peso', 8, 2)->nullable();
+            $table->decimal('peso', 8, 3)->nullable();
             $table->decimal('fator', 8, 2)->nullable();
             $table->decimal('cotacao_peso', 8, 2)->nullable();
             $table->decimal('cotacao_fator', 8, 2)->nullable();
             $table->decimal('valor_total', 8, 2)->nullable();
-
-            $table->integer('parcelas')->nullable();
-            $table->enum('metodo_pagamento', ['Dinheiro', 'Cheque', 'Nota Promissória', 'Cartão Crédito', 'Cartão Débito', 'Depósito', 'Boleto', 'Aberto'])->nullable();
-            $table->enum('balanco', ['Devolução', 'Venda', 'Acerto', 'Aberto']);
             
+            $table->enum('metodo_pagamento', ['À vista', 'Parcelado', 'Aberto', 'Parcelado com entrada'])->nullable();
             $table->longText('observacao')->nullable();
+            $table->boolean('enviado_conta_corrente')->nullable();
             $table->foreignId('representante_id')->constrained('representantes');
             $table->foreignId('cliente_id')->constrained('clientes');
         });
 
         Schema::create('parcelas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('venda_id')->constrained('vendas');
+            $table->foreignId('venda_id')->nullable()->constrained('vendas');
             $table->date('data_parcela');
             $table->string('nome_cheque')->nullable();
             $table->string('numero_cheque')->nullable();
             $table->decimal('valor_parcela', 8, 2);
-            $table->enum('status', ['Pago', 'Sustado', 'Adiado', 'Aguardando', 'Devolvido'])->default('Aguardando');
-            $table->string('motivo_devolucao')->nullable();
+            $table->enum('forma_pagamento', ['Dinheiro', 'Cheque', 'Nota Promissória', 'Cartão de Crédito', 'Cartão de Débito', 'Transferência Bancária', 'Depósito', 'Boleto', 'Aberto']);
+            $table->enum('status', ['Pago', 'Sustado', 'Adiado', 'Aguardando', 'Devolvido', 'Resgatado'])->default('Aguardando');
+            $table->string('motivo')->nullable();
             $table->longText('observacao')->nullable();
+            $table->foreignId('parceiro_id')->nullable()->constrained('parceiros');
+            $table->foreignId('representante_id')->nullable()->constrained('representantes');
+            $table->softDeletes();  
         });
 
     }
@@ -54,7 +56,7 @@ class CreateVendasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vendas');
         Schema::dropIfExists('parcelas');
+        Schema::dropIfExists('vendas');
     }
 }

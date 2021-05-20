@@ -15,13 +15,10 @@ class CriarTabelaParceiros extends Migration
     {
         Schema::create('parceiros', function (Blueprint $table) {
             $table->id();
-            $table->string('situacao')->nullable();
-            $table->integer('porcentagem_padrao');
-            $table->integer('pessoa_id');
+            $table->decimal('porcentagem_padrao', 3, 2);
             $table->timestamps();
-            $table->foreign('pessoa_id')
-                ->references('id')
-                ->on('pessoas');
+            $table->softDeletes();
+            $table->foreignId('pessoa_id')->constrained();
         });
     }
 

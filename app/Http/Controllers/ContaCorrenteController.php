@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\ContaCorrente;
-use App\Fornecedor;
+use App\Models\ContaCorrente;
+use App\Models\Fornecedor;
 use App\Http\Requests\ContaCorrenteRequest;
-use GuzzleHttp\RedirectMiddleware;
+use App\Models\ContaCorrenteAnexos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ContaCorrenteController extends Controller
 {
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
         $fornecedor = Fornecedor::findOrFail($request->fornecedor_id);
@@ -22,17 +18,29 @@ class ContaCorrenteController extends Controller
         return view('contaCorrente.create', compact('fornecedor'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(ContaCorrenteRequest $request)
     {
-        ContaCorrente::create(
+        if ($request->balanco == 'Débito') {
+            $peso_agregado = -$request->peso;
+        } else {
+            $peso_agregado = $request->peso;
+        }
+        
+        $request->request->add(['peso_agregado' => $peso_agregado]);
+        
+        $contaCorrente = ContaCorrente::create(
             $request->all()
         );
+
+        if ($request->hasFile('anexo')) {
+            foreach ($request->file('anexo') as $file) {
+                ContaCorrenteAnexos::create([
+                    'nome' => $file->getClientOriginalName(),
+                    'conta_corrente_id' => $contaCorrente->id,
+                    'path' => $file->store('conta_corrente/' . $contaCorrente->id, 'public'),
+                ]);
+            }
+        }
 
         $request
             ->session()
@@ -44,42 +52,26 @@ class ContaCorrenteController extends Controller
         return redirect("/fornecedores/{$request->fornecedor_id}");
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $contaCorrente = contaCorrente::findOrFail($id);
-        $fornecedores = Fornecedor::all();
+        $fornecedores = Fornecedor::with('pessoa')->get();
         
         return view("contaCorrente.edit", compact("contaCorrente", "fornecedores"));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(ContaCorrenteRequest $request, $id)
     {
-
         $contaCorrente = contaCorrente::findOrFail($id);
+        
+        if ($request->balanco == 'Débito') {
+            $peso_agregado = -$request->peso;
+        } else {
+            $peso_agregado = $request->peso;
+        }
+
+        $request->request->add(['peso_agregado' => $peso_agregado]);
+        
         $contaCorrente
             ->fill($request->all())
             ->save();
@@ -94,26 +86,22 @@ class ContaCorrenteController extends Controller
         return redirect("/fornecedores/{$request->fornecedor_id}");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $contaCorrente = ContaCorrente::findOrFail($id);
-        $fornecedor_id = $contaCorrente->fornecedor_id;
         
+        if (ContaCorrenteAnexos::where('conta_corrente_id', $id)->exists()) {
+            ContaCorrenteAnexos::where('conta_corrente_id', $id)->delete();
+            Storage::disk('public')->deleteDirectory('conta_corrente/' . $id);
+        }
+
         $contaCorrente->delete();
-
-        $request
-            ->session()
-            ->flash(
-                'message',
-                'Conta corrente excluído com sucesso!'
-            );
-
-        return redirect("/fornecedores/{$fornecedor_id}");
+        
+        return json_encode([
+            'icon' => 'success',
+            'title' => 'Sucesso!',
+            'text' => 'Fornecedor excluído com sucesso!',
+        ]);
+        
     }
 }

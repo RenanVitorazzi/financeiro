@@ -9,9 +9,27 @@
   
   <link rel="stylesheet" href="{{ asset('dataTable.css')}}">
   <link rel="stylesheet" href="{{ asset('navbar.css')}}">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 </head>
 <body>
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" id="modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="page-wrapper chiller-theme toggled">
   <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
     <i class="fas fa-bars"></i>
@@ -19,27 +37,25 @@
   <nav id="sidebar" class="sidebar-wrapper">
     <div class="sidebar-content">
       <div class="sidebar-brand">
-        <a href="#">dl metais</a>
-        {{-- <div id="close-sidebar">
+        <a href="{{ route('home') }}">
+            {{-- dl metais --}}
+            <img src="{{ asset('dl_logo.png') }}"></img>
+        </a>
+        <div id="close-sidebar">
           <i class="fas fa-times"></i>
-        </div> --}}
+        </div>
       </div>
-      {{-- <div class="sidebar-header">
+      <div class="sidebar-header">
         <div class="user-pic">
           <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg"
             alt="User picture">
         </div>
         <div class="user-info">
-          <span class="user-name">Jhon
-            <strong>Smith</strong>
-          </span>
-          <span class="user-role">Administrator</span>
-          <span class="user-status">
-            <i class="fa fa-circle"></i>
-            <span>Online</span>
-          </span>
+          <span class="user-name">{{ auth()->user()->name }}</span>
+          <span class="user-role">Administrador</span>
+          <span class="user-role">{{ auth()->user()->id }}</span>
         </div>
-      </div> --}}
+      </div> 
       <!-- sidebar-header  -->
       {{-- <div class="sidebar-search">
         <div>
@@ -56,14 +72,13 @@
       <!-- sidebar-search  -->
       <div class="sidebar-menu">
         <ul>
-          <li class="header-menu">
+          {{-- <li class="header-menu">
             <span>General</span>
-          </li>
-          <li class="sidebar-dropdown">
+          </li> --}}
+          {{-- <li class="sidebar-dropdown">
             <a href="#">
               <i class="fa fa-tachometer-alt"></i>
               <span>Cadastros</span>
-              {{-- <span class="badge badge-pill badge-warning">New</span> --}}
             </a>
             <div class="sidebar-submenu">
               <ul>
@@ -81,28 +96,49 @@
                 </li>
               </ul>
             </div>
+          </li> --}}
+          
+          <li @if(route('fornecedores.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('fornecedores.index') }}">
+              <i class="fas fa-industry"></i>
+              <span>Fornecedores</span>
+            </a>
+          </li>
+          <li @if(route('parceiros.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('parceiros.index') }}">
+              <i class="fas fa-handshake"></i>
+              <span>Parceiros</span>
+            </a>
+          </li>
+          <li @if(route('representantes.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('representantes.index') }}">
+              <i class="fas fa-users"></i>
+              <span>Representantes</span>
+            </a>
+          </li>
+          <li @if(route('clientes.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('clientes.index') }}">
+              <i class="fas fa-hand-holding-usd"></i>
+              <span>Clientes</span>
+            </a>
           </li>
           <li class="sidebar-dropdown">
             <a href="#">
-              <i class="fa fa-shopping-cart"></i>
-              <span>Fornecedores</span>
-              {{-- <span class="badge badge-pill badge-danger">3</span> --}}
+              <i class="fas fa-dollar-sign"></i>
+              <span>Financeiro</span>
             </a>
             <div class="sidebar-submenu">
               <ul>
                 <li>
-                  <a href="#">Products</a>
+                  <a href="{{ route('cheques.index') }}">Carteira de cheques</a>
                 </li>
                 <li>
-                  <a href="#">Orders</a>
-                </li>
-                <li>
-                  <a href="#">Credit cart</a>
+                  <a href="{{ route('troca_cheques.index') }}">Troca de cheques</a>
                 </li>
               </ul>
             </div>
           </li>
-          <li class="sidebar-dropdown">
+          {{-- <li class="sidebar-dropdown">
             <a href="#">
               <i class="far fa-gem"></i>
               <span>Components</span>
@@ -172,7 +208,6 @@
             <a href="#">
               <i class="fa fa-book"></i>
               <span>Documentation</span>
-              {{-- <span class="badge badge-pill badge-primary">Beta</span> --}}
             </a>
           </li>
           <li>
@@ -180,13 +215,7 @@
               <i class="fa fa-calendar"></i>
               <span>Calendar</span>
             </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-folder"></i>
-              <span>Examples</span>
-            </a>
-          </li>
+          </li> --}}
         </ul>
       </div>
       <!-- sidebar-menu  -->
@@ -205,30 +234,47 @@
         <i class="fa fa-cog"></i>
         <span class="badge-sonar"></span>
       </a> --}}
-      <a href="#">
+      <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">
         <i class="fa fa-power-off"></i>
       </a>
+      <form action="{{ route('logout') }}" method="POST" class="d-none" id="logout-form">@csrf</form>
     </div>
   </nav>
   <!-- sidebar-wrapper  -->
   <main class="page-content">
-    @yield('body')
+    <div class="card">
+      <div class="card-body">
+        @yield('body')
+      </div>
+    </div>
   </main>
-  <script src="{{ asset('js/jquery.js') }}"></script>
-  <script src="{{ asset('js/bootstrap.js') }}"></script>
+</body>
+  {{-- <script src="{{ asset('js/jquery.js') }}"></script> --}}
+  {{-- <script src="{{ asset('js/bootstrap.js') }}"></script> --}}
   {{-- <script src="{{ asset('js/dataTable.js') }}"></script> --}}
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-  <script src="https://kit.fontawesome.com/609d32acbf.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{{ asset('fontawesome-free-5.15.3-web/css/all.css') }}">
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
+  <script src="{{ asset('js1/confirmarExclusao.js') }}"></script>
+  
   <!--DataTable-->
   <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-colvis-1.6.5/b-flash-1.6.5/b-html5-1.6.5/b-print-1.6.5/datatables.min.js"></script> --}}
- 
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-colvis-1.6.5/b-flash-1.6.5/b-html5-1.6.5/b-print-1.6.5/datatables.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script>
-jQuery(function ($) {
+toastr.options = {
+    "progressBar": true,
+    "closeButton": true,
+}
+
+$(function() {
 
   $(".sidebar-dropdown > a").click(function() {
     $(".sidebar-submenu").slideUp(200);
@@ -250,77 +296,76 @@ jQuery(function ($) {
   });
 
   // Disable search and ordering by default
-  $.extend( $.fn.dataTable.defaults, {
-    language: {
-      "url": "//cdn.datatables.net/plug-ins/1.10.22/i18n/Portuguese-Brasil.json"
-    },
-    dom: "<'row'<'col-md-4'l><'col-md-4'B><'col-md-4'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
-    buttons: [ 
-      {
-        extend: 'excel',
-        className: "btn-dark",
-        text: 'Excel',
-        exportOptions: {
-          columns: [ 0, 1, 2, 3 ],
-          trim: true,
-          format: {
-            body: function ( data, row, column, node ) {
-              return $(node).text().trim();
-            }
-          }
-        },
-        customize: function(xlsx) {
-          var sheet = xlsx.xl.worksheets['sheet1.xml'];
-          $('row c', sheet).each( function () {
-              $(this).attr( 's', '55' );
-          });
-        }
-      },
-      {
-        extend: 'pdf',
-        className: "btn-dark",
-        exportOptions: {
-          columns: [ 0, 1, 2, 3 ],
-          format: {
-            body: function ( data, row, column, node ) {
-                data = data
-                .replace(/<.*?>/g, "");
-                return data;
-            }
-          },
-          stripHtml:      true,
-          stripNewlines:  true,
-          decodeEntities: false,
-          trim:           true,
-        }, 
-        customize : function(doc){
-          var colCount = new Array();
-          $('.table').find('tbody tr:first-child td').each(function(){
-            if($(this).attr('colspan')){
-              for(var i=1;i<=$(this).attr('colspan');$i++){
-                  colCount.push('*');
-              }
-            }else{ colCount.push('*'); }
-          });
-          colCount.splice(-1,1)
-          doc.content[1].table.widths = colCount;
-        },
-      },
-      {
-        extend: 'print',
-        className: "btn-dark",
-        text: 'Imprimir',
-        exportOptions: {
-          columns: [ 0, 1, 2, 3 ],
-          stripHtml: false
-        }
-      }
-    ]
-  });
+//   $.extend( $.fn.dataTable.defaults, {
+//     language: {
+//       "url": "//cdn.datatables.net/plug-ins/1.10.22/i18n/Portuguese-Brasil.json"
+//     },
+//     dom: "<'row'<'col-md-4'l><'col-md-4'B><'col-md-4'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+//     buttons: [ 
+//       {
+//         extend: 'excel',
+//         className: "btn-dark",
+//         text: 'Excel',
+//         exportOptions: {
+//           columns: [ 0, 1, 2, 3 ],
+//           trim: true,
+//           format: {
+//             body: function ( data, row, column, node ) {
+//               return $(node).text().trim();
+//             }
+//           }
+//         },
+//         customize: function(xlsx) {
+//           var sheet = xlsx.xl.worksheets['sheet1.xml'];
+//           $('row c', sheet).each( function () {
+//               $(this).attr( 's', '55' );
+//           });
+//         }
+//       },
+//       {
+//         extend: 'pdf',
+//         className: "btn-dark",
+//         exportOptions: {
+//           columns: [ 0, 1, 2, 3 ],
+//           format: {
+//             body: function ( data, row, column, node ) {
+//                 data = data
+//                 .replace(/<.*?>/g, "");
+//                 return data;
+//             }
+//           },
+//           stripHtml:      true,
+//           stripNewlines:  true,
+//           decodeEntities: false,
+//           trim:           true,
+//         }, 
+//         customize : function(doc){
+//           var colCount = new Array();
+//           $('.table').find('tbody tr:first-child td').each(function(){
+//             if($(this).attr('colspan')){
+//               for(var i=1;i<=$(this).attr('colspan');$i++){
+//                   colCount.push('*');
+//               }
+//             }else{ colCount.push('*'); }
+//           });
+//           colCount.splice(-1,1)
+//           doc.content[1].table.widths = colCount;
+//         },
+//       },
+//       {
+//         extend: 'print',
+//         className: "btn-dark",
+//         text: 'Imprimir',
+//         exportOptions: {
+//           columns: [ 0, 1, 2, 3 ],
+//           stripHtml: false
+//         }
+//       }
+//     ]
+//   });
 
 });
 </script>
 @yield('script')
 
-</body>
 </html>

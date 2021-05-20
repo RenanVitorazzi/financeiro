@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Cliente;
+use App\Models\Cliente;
+use App\Models\Pessoa;
+use App\Models\Representante;
 use App\Http\Requests\RequestFormPessoa;
 use App\Models\Venda;
-use App\Pessoa;
-use App\Representante;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
 {
@@ -16,20 +16,21 @@ class ClienteController extends Controller
     {
         $clientes = Cliente::with(['pessoa', 'representante'])->get();
         $message = $request->session()->get('message');
-        // dd($clientes->first()->venda->last()->metodo_pagamento);
+        
         return view('cliente.index', compact('clientes', 'message'));
     }
 
     public function create()
     {
-        $representantes = Representante::all();
+        $representantes = Representante::with(['pessoa'])->get();
         
         return view('cliente.create', compact('representantes'));
     }
 
     public function store(RequestFormPessoa $request)
     {
-        $pessoa = Pessoa::create($request->all());
+        $pessoa = Pessoa::create($request->validated());
+
         Cliente::create([
             'pessoa_id' => $pessoa->id,
             'representante_id' => $request->representante
@@ -49,16 +50,8 @@ class ClienteController extends Controller
 
         $vendas = Venda::with(['parcela'])
             ->where('cliente_id', $cliente->id)
-            // ->paginate(10);
             ->get();
 
-        // $totalAberto = DB::table('vendas')
-        //     ->selectRaw('sum(peso) as peso, sum(fator) as fator, balanco')
-        //     ->where('cliente_id', $cliente->id)
-        //     ->groupBy('balanco')
-        //     ->orderBy('balanco')
-        //     ->get();
-        //     dd($totalAberto);
         return view('cliente.show', compact('cliente', 'vendas'));
     }
 
@@ -75,7 +68,7 @@ class ClienteController extends Controller
         $cliente = Cliente::findOrFail($id);
         $pessoa = Pessoa::findOrFail($cliente->pessoa_id);
         
-        $pessoa->fill($request->all())
+        $pessoa->fill($request->validated())
             ->save();
             
         $cliente->representante_id = $request->representante_id;
@@ -90,17 +83,31 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index');
     }
 
-    public function destroy(Request $request, $id) 
+    public function destroy($id) 
     {
         Cliente::destroy($id);
 
-        $request
-            ->session()
-            ->flash(
-                'message',
-                'Cliente excluído com sucesso!'
-            );
-        return redirect()->route('clientes.index');
+        return json_encode([
+            'icon' => 'success',
+            'title' => 'Sucesso!',
+            'text' => 'Fornecedor excluído com sucesso!'
+        ]);
+    }
+
+    public function procurarCliente(Request $request)
+    {
+        $clientes = Cliente::query()
+            ->with('pessoa')
+            ->whereHas('pessoa', function (Builder $query) use ($request) {
+                $query->where('nome', 'like', '%'.$request->dado.'%');
+                $query->orWhere('cpf', 'like', $request->dado);
+            })
+            ->where('representante_id', $request->representante_id)
+            ->get();
+
+        return json_encode([
+            'clientes' => $clientes
+        ]);
     }
     
 }

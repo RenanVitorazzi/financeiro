@@ -7,17 +7,13 @@ use Illuminate\Database\Seeder;
 
 class UsersTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         User::create([
-            'name' => 'a',
-            'name' => 'Admin@admin.com',
-            'name' => bcrypt('a'),
-        ])
+            'name' => 'renan',
+            'email' => 'renan.vitorazzi1@gmail.com',
+            'password' => bcrypt('renan'),
+            'is_admin' => 1,
+        ]);
     }
 }

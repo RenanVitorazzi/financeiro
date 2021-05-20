@@ -23,26 +23,25 @@ class RequestFormPessoa extends FormRequest
      */
     public function rules()
     {
-        // 'cnpj' => 'required_if:tipoCadastro,==,Pessoa Jurídica',
-        // 'cpf' => 'required_if:tipoCadastro,==,Pessoa Física',
         return [
-            'nome' => 'required|max:255|min:3',
+            'nome' => 'required|max:255|min:3|string',
             'tipoCadastro' => 'required',
             'cpf' => 'cpf',
-            'telefone' => 'telefone_com_ddd',
-            'celular' => 'celular_com_ddd',
             'cnpj' => 'cnpj',
             'cep' => 'formato_cep',
-            'complemento' => 'max:255',
+            'estado' => 'string|nullable',
+            'municipio' => 'string|nullable',
+            'bairro' => 'string|nullable',
+            'logradouro' => 'nullable',
+            'numero' => 'nullable',
+            'complemento' => 'max:255|nullable',
+            'telefone' => 'telefone_com_ddd',
+            'celular' => 'celular_com_ddd',
+            'telefone2' => 'telefone_com_ddd',
+            'celular2' => 'celular_com_ddd',
+            'email' => 'email:rfc,dns|nullable|',
+            'representante_id' => 'nullable'
         ];
     }
 
-    public function messages() 
-    {
-        return [
-            'required' => 'O campo :attribute é obrigatório',
-            'min' => 'O :attribute deve conter ao menos :min caracteres',
-            'max' => 'O :attribute deve conter no máximo :max caracteres'
-        ];
-    }
 }

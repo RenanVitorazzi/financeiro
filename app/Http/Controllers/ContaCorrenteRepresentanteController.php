@@ -2,97 +2,95 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ContaCorrenteRequest;
 use App\Models\ContaCorrenteRepresentante;
-use App\Representante;
+use App\Models\Representante;
+use App\Http\Requests\ContaCorrenteRepresentanteRequest;
+use App\Models\ContaCorrenteRepresentanteAnexos as ModelsContaCorrenteRepresentanteAnexos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
 class ContaCorrenteRepresentanteController extends Controller
 {
-
-    public function index()
+    public function create(Request $request)
     {
-        //
+        $representante = Representante::with('pessoa')->find($request->representante_id);
+        $balanco = ['Reposição', 'Venda', 'Devolução'];
+
+        return view('conta_corrente_representante.create', compact('representante', 'balanco'));
     }
 
-    public function create()
+    public function store(ContaCorrenteRepresentanteRequest $request)
     {
-        $representantes = Representante::all();
-        return view('conta_corrente_representante.create', compact('representantes'));
-    }
+        if ($request->balanco == 'Venda') {
+            $peso_agregado = $request->peso;
+            $fator_agregado = $request->fator;
+        } else {
+            $peso_agregado = -$request->peso;
+            $fator_agregado = -$request->fator;
+        }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'fator' => 'required|numeric|min:0',
-            'peso' => 'required|numeric|min:0',
-            'data' => 'required',
-            'balanco' => 'required',
-            'representante_id' => 'required',
-        ]);
+        $request->request->add(['peso_agregado' => $peso_agregado]);
+        $request->request->add(['fator_agregado' => $fator_agregado]);
 
-        ContaCorrenteRepresentante::create(
-            $request->all()
-        );
-
+        $contaCorrente = ContaCorrenteRepresentante::create($request->all());
+        
+        if ($request->hasFile('anexo')) {
+            foreach ($request->file('anexo') as $file) {
+                ModelsContaCorrenteRepresentanteAnexos::create([
+                    'nome' => $file->getClientOriginalName(),
+                    'conta_corrente_id' => $contaCorrente->id,
+                    'path' => $file->store('conta_corrente_representante/' . $contaCorrente->id, 'public'),
+                ]);
+            }
+        }
+        
         $request
-        ->session()
-        ->flash(
-            'message',
-            'Conta corrente criada com sucesso!'
-        );
+            ->session()
+            ->flash(
+                'message',
+                'Registro criado com sucesso!'
+            );
 
-        return redirect("/conta_corrente_representante/{$request->representante_id}");
+        return redirect()->route("conta_corrente_representante.show", $contaCorrente->representante_id);
     }
 
     public function show($id)
     {
-        // $contaCorrente = ContaCorrenteRepresentante::select('id', 'peso', 'fator', 'balanco', 'data', 'representante_id', 'observacao')
-        // ->where('representante_id', $id)
-        // ->orderBy('data')
-        // ->paginate(10);
-        // $a = ContaCorrenteRepresentante::totalVenda($id);
-        // dd($a);
-        $contaCorrente = ContaCorrenteRepresentante::with(['representante:nome'])
-            ->where('representante_id', $id)
-            ->get();
-            
-        $somaNegativa = ContaCorrenteRepresentante::select(DB::raw('sum( peso ) as peso, sum( fator ) as fator'))
-            ->where('representante_id', $id)
-            ->where('balanco', '=', 'Reposição')
-            ->get();
+        $contaCorrente = DB::select("SELECT cc.*,
+            sum(cc.peso_agregado) OVER (ORDER BY cc.id) as saldo_peso,
+            sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
+            FROM conta_corrente_representante cc
+            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
+            ORDER BY id desc",
+            [$id]
+        );
 
-        $somaPositiva = ContaCorrenteRepresentante::select(DB::raw('sum( peso ) as peso, sum( fator ) as fator'))
-            ->where('representante_id', $id)
-            ->where('balanco', '<>', 'Reposição')
-            ->get();
-
-        $balancoPeso = $somaPositiva[0]->peso - $somaNegativa[0]->peso;
-        $balancoFator = $somaPositiva[0]->fator - $somaNegativa[0]->fator;
+        $representante = Representante::with('pessoa')->findOrFail($id);
         
-        $representante = Representante::findOrFail($id);
-
-        return view('representante.show', compact('contaCorrente', 'representante', 'balancoPeso', 'balancoFator'));
+        return view('representante.show', compact('contaCorrente', 'representante'));
     }
 
     public function edit($id)
     {
-        $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
-        $representantes = Representante::all();
+        $contaCorrente = ContaCorrenteRepresentante::with('representante')->findOrFail($id);
+        $balanco = ['Reposição', 'Venda', 'Devolução'];
 
-        return view('conta_corrente_representante.edit', compact('contaCorrente', 'representantes'));
+        return view('conta_corrente_representante.edit', compact('contaCorrente', 'balanco'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ContaCorrenteRepresentanteRequest $request, $id)
     {  
-        $request->validate([
-            'fator' => 'required|numeric|min:0',
-            'peso' => 'required|numeric|min:0',
-            'data' => 'required',
-            'balanco' => 'required',
-            'representante_id' => 'required',
-        ]);
+        if ($request->balanco == 'Reposição') {
+            $peso_agregado = -$request->peso;
+            $fator_agregado = -$request->fator;
+        } else {
+            $peso_agregado = $request->peso;
+            $fator_agregado = $request->fator;
+        }
+
+        $request->request->add(['peso_agregado' => $peso_agregado]);
+        $request->request->add(['fator_agregado' => $fator_agregado]);
 
         $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
         $contaCorrente
@@ -103,27 +101,45 @@ class ContaCorrenteRepresentanteController extends Controller
             ->session() 
             ->flash(
                 'message',
-                'Conta corrente atualizada com sucesso!'
+                'Registro atualizado com sucesso!'
             );
 
-        return redirect("/conta_corrente_representante/{$request->representante_id}");
-
+        return redirect()->route("conta_corrente_representante.show", $request->representante_id);
     }
 
     public function destroy(Request $request, $id)
     {
         $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
+
         $representante_id = $contaCorrente->representante_id;
-        
         $contaCorrente->delete();
 
         $request
             ->session()
             ->flash(
                 'message',
-                'Conta corrente excluído com sucesso!'
+                'Registro excluído com sucesso!'
             );
 
-        return redirect("/conta_corrente_representante/{$representante_id}");
+        return redirect()->route("conta_corrente_representante.show", $representante_id);
+    }
+
+    public function impresso($id)
+    {
+        $contaCorrente = DB::select("SELECT cc.*,
+            sum(cc.peso_agregado) OVER (ORDER BY cc.id) as saldo_peso,
+            sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
+            FROM conta_corrente_representante cc
+            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
+            ORDER BY id desc",
+            [$id]
+        );
+
+        $representante = Representante::with('pessoa')->findOrFail($contaCorrente[0]->representante_id);
+        
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('conta_corrente_representante.pdf.impresso', compact('contaCorrente', 'representante') );
+            
+        return $pdf->stream();
     }
 }

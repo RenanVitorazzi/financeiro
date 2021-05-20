@@ -13,7 +13,13 @@ class Parcela extends Model
 
     use HasFactory, SoftDeletes;
 
-    public function venda() {
+    public function venda() 
+    {
         return $this->belongsTo(Venda::class);
     } 
+
+    public function representante()
+    {
+        return $this->belongsTo(Representante::class);
+    }
 }

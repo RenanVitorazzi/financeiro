@@ -15,17 +15,10 @@ class CreateClientesTable extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->string('situacao')->nullable();
-            $table->integer('pessoa_id');
+            $table->foreignId('pessoa_id')->constrained();
+            $table->foreignId('representante_id')->nullable()->constrained();
+            $table->softDeletes();
             $table->timestamps();
-            $table->integer('representante_id')->nullable();
-            $table->foreign('pessoa_id')
-                ->references('id')
-                ->on('pessoas');
-
-            $table->foreign('representante_id')
-                ->references('id')
-                ->on('representantes');
         });
     }
 

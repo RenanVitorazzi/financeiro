@@ -15,12 +15,9 @@ class CriarTabelaRepresentantes extends Migration
     {
         Schema::create('representantes', function (Blueprint $table) {
             $table->id();
-            $table->string('situacao')->nullable();
-            $table->integer('pessoa_id');
+            $table->foreignId('pessoa_id')->constrained();
             $table->timestamps();
-            $table->foreign('pessoa_id')
-                ->references('id')
-                ->on('pessoas');
+            $table->softDeletes();
         });
     }
 
@@ -31,6 +28,6 @@ class CriarTabelaRepresentantes extends Migration
      */
     public function down()
     {
-        Schema::drop('representantes');
+        Schema::dropIfExists('representantes');
     }
 }

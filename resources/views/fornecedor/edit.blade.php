@@ -1,63 +1,60 @@
 @extends('layout')
 @section('title')
-Adicionar representante
+Editar fornecedor
 @endsection
-@push('script')
-    <script type="text/javascript" src="{{ asset('js/cep.js') }}"></script>
-@endpush
-
 @section('body')
-    <form method="POST" action="{{ route('fornecedores.update', $fornecedor->id)}}">
-        @csrf
-        @method('PUT')
-        <div class="row">
-            <div class="col-md-6">
-                <x-form-group name='nome' value='{{ $fornecedor->pessoa->nome }}'>Nome completo</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <x-form-group name='nascimento' type='date' value='{{ $fornecedor->pessoa->nascimento }}'>Data de nascimento</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="tipoCadastro">Tipo de cadastro</label>
-                    <select type="text" name="tipoCadastro" id="tipoCadastro" class="form-control" required>
-                        {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Física') ? 'selected' : '' }}
-                        {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Jurídica') ? 'selected' : '' }}
-                        <option value='Pessoa Física'  > Pessoa Física</option>
-                        <option value='Pessoa Jurídica' > Pessoa Jurídica</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div id='cpfGroup'>
-                    <x-form-group name='cpf' value='{{ $fornecedor->pessoa->cpf }}'>CPF</x-form-group>
-                </div>
-                <div style='display:none' id='cnpjGroup'>
-                    <x-form-group name='cnpj' value='{{ $fornecedor->pessoa->cnpj }}'>CPNJ</x-form-group>
-                </div>
-            </div>
-        </div> 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('fornecedores.index') }}">Fornecedores</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Editar</li>
+    </ol>
+</nav>
 
-        <div>
-            <div class='row'>
-                <div class="col-6">
-                    <x-form-group name='cep' value='{{ $fornecedor->pessoa->cep }}'>CEP</x-form-group>
-                    
-                    <div class='form-group'>
-                        <label for='municipio'>Município</label>
-                        <select class='form-control' name='municipio' id='municipio'>
-                            @if (isset($fornecedor->pessoa->municipio))
-                                <option value='{{ $fornecedor->pessoa->municipio }}'></option>
-                            @endif
-                        </select>
-                    </div>
-        
-                    <x-form-group name='bairro' value='{{ $fornecedor->pessoa->bairro }}'>Bairro</x-form-group>
+<form method="POST" action="{{ route('fornecedores.update', $fornecedor->id)}}">
+    @csrf
+    @method('PUT')
+    <div class="card mb-2">
+        <div class="card-body">
+            <h5 class="card-title">Dados Gerais</h5>
+            <div class="row">
+                <div class="col-4">
+                    <x-form-group name='nome' value="{{ $fornecedor->pessoa->nome }}">Nome</x-form-group>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="tipoCadastro">Tipo de cadastro</label>
+                        <x-select name="tipoCadastro" required>
+                            <option value='Pessoa Física' {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Física') ? 'selected' : '' }} > Pessoa Física</option>
+                            <option value='Pessoa Jurídica' {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Jurídica') ? 'selected' : '' }} > Pessoa Jurídica</option>
+                        </x-select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Jurídica') ? 'style=display:none' : '' }} id='cpfGroup'>
+                        <x-form-group name='cpf' value='{{ $fornecedor->pessoa->cpf }}'>CPF</x-form-group>
+                    </div>
+                    <div {{ ($fornecedor->pessoa->tipoCadastro == 'Pessoa Jurídica') ? '' : 'style=display:none' }} id='cnpjGroup'>
+                        <x-form-group name='cnpj' value='{{ $fornecedor->pessoa->cnpj }}'>CPNJ</x-form-group>
+                    </div>
+                </div>
+            </div> 
+        </div> 
+    </div> 
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Endereço</h5>
+            <div class='row'>
+                <div class="col-4">
+                    <x-form-group name='cep' value="{{ $fornecedor->pessoa->cep }}">CEP</x-form-group>
+    
+                    <x-form-group name='bairro' value="{{ $fornecedor->pessoa->bairro }}">Bairro</x-form-group>
+                </div>
+                <div class="col-4">
                     <div class='form-group'>
                         <label for='estado'>Estado</label>
-                        <select class='form-control' name='estado' id='estado'>
+                        <x-select name='estado'>
                             <option></option>
                             <option {{ ($fornecedor->pessoa->estado == 'AC') ? 'selected' : '' }} value="AC">Acre</option>
                             <option {{ ($fornecedor->pessoa->estado == 'AL') ? 'selected' : '' }} value="AL">Alagoas</option>
@@ -86,33 +83,68 @@ Adicionar representante
                             <option {{ ($fornecedor->pessoa->estado == 'SP') ? 'selected' : '' }} value="SP">São Paulo</option>
                             <option {{ ($fornecedor->pessoa->estado == 'SE') ? 'selected' : '' }} value="SE">Sergipe</option>
                             <option {{ ($fornecedor->pessoa->estado == 'TO') ? 'selected' : '' }} value="TO">Tocantins</option>
-                        </select>
+                        </x-select>
                     </div>
-                    <x-form-group name='logradouro' value='{{ $fornecedor->pessoa->logradouro }}'>Logradouro</x-form-group>
-                    <x-form-group name='numero' value='{{ $fornecedor->pessoa->numero }}'>Número</x-form-group>
-                </div>   
+                    
+                    <x-form-group name='logradouro' value="{{ $fornecedor->pessoa->logradouro }}">Logradouro</x-form-group>
+                
+                </div>
+            
+                <div class="col-4">
+                    <div class='form-group'>
+                        <label for='municipio'>Município</label>
+                        <x-select name='municipio'>
+                            @if ($fornecedor->pessoa->municipio)
+                                <option value="{{ $fornecedor->pessoa->municipio }}">{{ $fornecedor->pessoa->municipio }}</option>
+                            @endif
+                        </x-select>
+                    </div>
+                    <x-form-group name='numero' value="{{ $fornecedor->pessoa->numero }}">Número</x-form-group>
+                </div>
+            
             </div>
-            <x-form-group name='complemento' value='{{ $fornecedor->pessoa->complemento }}'>Complemento</x-form-group>
+            <x-form-group name='complemento' value="{{ $fornecedor->pessoa->complemento }}">Complemento</x-form-group>
         </div>  
+    </div>  
 
-        <div class="row">
-            <div class="col-md-6">
-                <x-form-group name='telefone' value='{{ $fornecedor->pessoa->telefone }}'>Telefone com DDD</x-form-group>
+    <div class="card mt-2 mb-2">
+        <div class="card-body">
+            <h5 class="card-title">Contato</h5>
+            <div class="row">
+                <div class="col-4">
+                    <x-form-group name="telefone" value="{{$fornecedor->pessoa->telefone }}" placeholder="(00)0000-0000">
+                        Telefone
+                    </x-form-group>
+                </div>
+                <div class="col-4">
+                    <x-form-group name="celular" value="{{$fornecedor->pessoa->celular }}" placeholder="(00)00000-0000">
+                        Celular
+                    </x-form-group>
+                </div>
+                <div class="col-4">
+                    <x-form-group name="email" type="email" value="{{$fornecedor->pessoa->email }}">
+                        E-mail
+                    </x-form-group>
+                </div>
             </div>
-            <div class="col-md-6">
-                <x-form-group name='celular' value='{{ $fornecedor->pessoa->celular }}'>Celular com DDD</x-form-group>
+            <div class="row">
+                <div class="col-4">
+                    <x-form-group name="telefone2" value="{{ $fornecedor->pessoa->telefone2 }}" placeholder="(00)0000-0000">
+                        Segundo Telefone
+                    </x-form-group>
+                </div>
+                <div class="col-4">
+                    <x-form-group name="celular2" value="{{ $fornecedor->pessoa->celular2 }}" placeholder="(00)00000-0000">
+                        Segundo Celular
+                    </x-form-group>
+                </div>
             </div>
         </div>
+    </div>
 
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class='mt-2'>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <input type="submit" class='btn btn-success'>
-    </form>
+    <input type="submit" class='btn btn-success'>
+</form>
+@endsection
+@section('script')
+    <script type="text/javascript" src="{{ asset('js1/cep.js') }}"></script>
 @endsection

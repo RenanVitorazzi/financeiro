@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Cliente;
-use App\Representante;
+use App\Models\Cliente;
+use App\Models\Representante;
 use App\Models\Parcela;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

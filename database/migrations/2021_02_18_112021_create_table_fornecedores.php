@@ -15,12 +15,9 @@ class CreateTableFornecedores extends Migration
     {
         Schema::create('fornecedores', function (Blueprint $table) {
             $table->id();
-            $table->string('situacao')->nullable();
-            $table->integer('pessoa_id');
+            $table->foreignId('pessoa_id')->constrained();
             $table->timestamps();
-            $table->foreign('pessoa_id')
-                ->references('id')
-                ->on('pessoas');
+            $table->softDeletes();
         });
     }
 

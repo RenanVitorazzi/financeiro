@@ -1,56 +1,82 @@
 @extends('layout')
-
 @section('title')
 Representantes
 @endsection
-
 @section('body')
-<div class='mb-4'>
-    <h3 class='d-inline' style="color:#212529">Conta Corrente - {{ $representante->pessoa->nome }}</h3>  
-    <x-botao-novo href="{{ route('conta_corrente_representante.create') }}"></x-botao-novo>
-</div>
-    @if(Session::has('message'))
-        <p class="alert alert-success">{{ Session::get('message') }}</p>
-    @endif
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        <li class="breadcrumb-item active">Conta Corrente {{ $representante->pessoa->nome }} </li>
+    </ol>
+</nav>
+
+<div class='mb-2 d-flex justify-content-between'>
+    <h3>Conta Corrente - {{ $representante->pessoa->nome }}</h3>
     <div>
-        <h3 class="{{ $balancoPeso > 0 ? 'text-success' : 'text-danger' }} font-weight-bold d-inline">
-            Peso: {{ number_format($balancoPeso, 2) }}g
-        </h3> 
-        <h3 class="{{ $balancoFator > 0 ? 'text-success' : 'text-danger' }} font-weight-bold float-right">
-            Fator: {{ number_format($balancoFator, 2) }}g
-        </h3> 
+        @if (count($contaCorrente) > 0)
+        <x-botao-imprimir class="mr-2" href="{{ route('impresso_ccr', ['id' => $representante->id]) }}"></x-botao-imprimir>
+        @endif
+        <x-botao-novo href="{{ route('conta_corrente_representante.create', ['representante_id' => $representante->id]) }}"></x-botao-novo>
     </div>
-  
-    <x-table>
-        <x-table-header>
-            <th>Data</th>
-            <th>Peso</th>
-            <th>Fator</th>
-            <th>Balanço</th>
-            <th>Observação</th>
-            <th>Ações</th>
-        </x-table-header>
-        <tbody>
-            @forelse ($contaCorrente as $registro)
+</div>
+<div>
+    @if (count($contaCorrente) > 0)
+        <h3 class="{{ $contaCorrente[0]->saldo_peso > 0 ? 'text-success' : 'text-danger' }} font-weight-bold d-inline">
+            Peso: {{ number_format($contaCorrente[0]->saldo_peso, 3, ',', '.') }}g
+        </h3> 
+        <h3 class="{{ $contaCorrente[0]->saldo_fator > 0 ? 'text-success' : 'text-danger' }} font-weight-bold float-right">
+            Fator: {{ number_format($contaCorrente[0]->saldo_fator, 2, ',', '.') }}
+        </h3> 
+    @endif
+</div>
+
+<x-table>
+    <x-table-header>
+        <th>Data</th>
+        <th>Relação</th>
+        <th>Balanço</th>
+        <th>Observação</th>
+        <th>Saldo</th>
+        <th>Ações</th>
+    </x-table-header>
+    <tbody>
+        @forelse ($contaCorrente as $registro)
             <tr>
                 <td>{{ date('d/m/Y', strtotime($registro->data)) }}</td>
-                <td>{{ number_format($registro->peso, 2)}}</td>
-                <td>{{ number_format($registro->fator, 2)}}</td>
+                <td>
+                    <div>Peso: {{ number_format($registro->peso, 3, ',', '.') }}</div>
+                    <div>Fator: {{ number_format($registro->fator, 2, ',', '.') }}</div>
+                </td>
                 <td class="{{ $registro->balanco == 'Reposição' ? 'text-danger' : 'text-success' }}">
                     <b>{{ $registro->balanco }}</b>
                     <i class="fas {{ $registro->balanco == 'Reposição' ? 'fa-angle-down' : 'fa-angle-up' }}"></i>
                 </td>
                 <td>{{ $registro->observacao }}</td>
                 <td>
+                    <div>Peso: {{ number_format($registro->saldo_peso, 3, ',', '.') }}</div>
+                    <div>Fator: {{ number_format($registro->saldo_fator, 2, ',', '.') }}</div>
+                </td>
+                <td>
+                    <a class="btn btn-dark" href="{{ route('ccr_anexo.index', ['id' => $registro->id]) }}" title="Anexos">
+                        <i class="fas fa-file-image"></i>
+                    </a>
                     <x-botao-editar href='{{ route("conta_corrente_representante.edit", $registro->id) }}'></x-botao-editar>
                     <x-botao-excluir action='{{ route("conta_corrente_representante.destroy", $registro->id) }}'></x-botao-excluir>
                 </td>
             </tr>
-            @empty
+        @empty
             <tr>
                 <td colspan="6" class="table-danger">Nenhum registro criado</td>
             </tr>
-            @endforelse
-        </tbody>
-    </x-table>
+        @endforelse
+    </tbody>
+</x-table>
+@endsection
+@section('script')
+<script>
+@if(Session::has('message'))
+    toastr["success"]("{{ Session::get('message') }}")
+@endif
+</script>
 @endsection

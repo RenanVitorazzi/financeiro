@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestFormPessoa;
-use App\Parceiro;
-use App\Pessoa;
+use App\Models\Parceiro;
+use App\Models\Pessoa;
 use Illuminate\Http\Request;
 
 class ParceiroController extends Controller
 {
     public function index(Request $request) 
     {
-        $parceiros = Parceiro::all();
+        $parceiros = Parceiro::with('pessoa')->get();
         $message = $request->session()->get('message');
         
         return view('parceiro.index', compact('parceiros', 'message'));
@@ -24,13 +24,14 @@ class ParceiroController extends Controller
 
     public function store(RequestFormPessoa $request) 
     {
+        
         $request->validate([
-            'porcentagem_padrao' => 'required|numeric',
+            'porcentagem_padrao' => 'required|numeric|min:0|max:100',
         ]);
-
+        
         $pessoa = Pessoa::create($request->all());
 
-        Parceiro::create([
+        $parceiro = Parceiro::create([
             'pessoa_id' => $pessoa->id,
             'porcentagem_padrao' => $request->porcentagem_padrao
         ]);
@@ -74,18 +75,15 @@ class ParceiroController extends Controller
         return redirect()->route('parceiros.index');
     }
 
-    public function destroy (Request $request, $id) 
+    public function destroy ($id) 
     {
         Parceiro::destroy($id);
 
-        $request
-            ->session()
-            ->flash(
-                'message',
-                'Parceiro excluído com sucesso!'
-            );
-
-        return redirect()->route('parceiros.index');
+        return json_encode([
+            'icon' => 'success',
+            'title' => 'Sucesso!',
+            'text' => 'Fornecedor excluído com sucesso!'
+        ]);
     }
 }
 
