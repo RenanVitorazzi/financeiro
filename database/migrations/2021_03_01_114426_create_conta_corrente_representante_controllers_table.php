@@ -19,10 +19,10 @@ class CreateContaCorrenteRepresentanteControllersTable extends Migration
             $table->softDeletes();
             $table->date('data');
             $table->enum('balanco', ['Reposição', 'Venda', 'Devolução']);
-            $table->decimal('fator', 9, 2);
-            $table->decimal('peso', 9, 3);
-            $table->decimal('fator_agregado', 9, 2);
-            $table->decimal('peso_agregado', 9, 3);
+            $table->decimal('fator', 10, 2);
+            $table->decimal('peso', 11, 3);
+            $table->decimal('fator_agregado', 10, 2);
+            $table->decimal('peso_agregado', 11, 3);
             $table->foreignId('representante_id')->constrained('representantes');
             $table->longText('observacao')->nullable();
         });

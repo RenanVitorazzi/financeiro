@@ -75,15 +75,18 @@ class ParceiroController extends Controller
         return redirect()->route('parceiros.index');
     }
 
-    public function destroy ($id) 
+    public function destroy (Request $request, $id) 
     {
         Parceiro::destroy($id);
+        
+        $request
+        ->session()
+        ->flash(
+            'message',
+            'Parceiro excluído com sucesso!'
+        );
 
-        return json_encode([
-            'icon' => 'success',
-            'title' => 'Sucesso!',
-            'text' => 'Fornecedor excluído com sucesso!'
-        ]);
+        return redirect()->route('parceiros.index');
     }
 }
 

@@ -19,12 +19,12 @@ class CreateContaCorrentes extends Migration
             $table->softDeletes();
             $table->date('data')->nullable();
             $table->enum('balanco', ['Débito', 'Crédito']);
-            $table->decimal('peso', 8, 3)->nullable();
-            $table->decimal('valor', 8, 2)->nullable();
-            $table->decimal('cotacao', 8, 2)->nullable();
+            $table->decimal('peso', 11, 3)->nullable();
+            $table->decimal('valor', 10, 2)->nullable();
+            $table->decimal('cotacao', 10, 2)->nullable();
             $table->longText('observacao')->nullable();
             $table->foreignId('fornecedor_id')->constrained('fornecedores');
-            $table->decimal('peso_agregado', 8, 3)->nullable();
+            $table->decimal('peso_agregado', 11, 3)->nullable();
         });
     }
 

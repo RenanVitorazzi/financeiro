@@ -34,6 +34,7 @@
   <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
     <i class="fas fa-bars"></i>
   </a>
+  
   <nav id="sidebar" class="sidebar-wrapper">
     <div class="sidebar-content">
       <div class="sidebar-brand">
@@ -51,9 +52,8 @@
             alt="User picture">
         </div>
         <div class="user-info">
-          <span class="user-name">{{ auth()->user()->name }}</span>
-          <span class="user-role">Administrador</span>
-          <span class="user-role">{{ auth()->user()->id }}</span>
+          <span class="user-name"><b>{{ auth()->user()->name }}</b></span>
+          <span class="user-role">{{ auth()->user()->is_admin ? 'Administrador' : 'Representante' }}</span>
         </div>
       </div> 
       <!-- sidebar-header  -->
@@ -75,29 +75,7 @@
           {{-- <li class="header-menu">
             <span>General</span>
           </li> --}}
-          {{-- <li class="sidebar-dropdown">
-            <a href="#">
-              <i class="fa fa-tachometer-alt"></i>
-              <span>Cadastros</span>
-            </a>
-            <div class="sidebar-submenu">
-              <ul>
-                <li>
-                  <a href="{{ route('fornecedores.index') }}">Fornecedores</a>
-                </li>
-                <li>
-                  <a href="{{ route('representantes.index') }}">Representantes</a>
-                </li>
-                <li>
-                  <a href="{{ route('clientes.index') }}">Clientes</a>
-                </li>
-                <li>
-                  <a href="{{ route('parceiros.index') }}">Parceiros</a>
-                </li>
-              </ul>
-            </div>
-          </li> --}}
-          
+          @if(auth()->user()->is_admin)        
           <li @if(route('fornecedores.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('fornecedores.index') }}">
               <i class="fas fa-industry"></i>
@@ -116,12 +94,14 @@
               <span>Representantes</span>
             </a>
           </li>
+          @endif
           <li @if(route('clientes.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('clientes.index') }}">
               <i class="fas fa-hand-holding-usd"></i>
               <span>Clientes</span>
             </a>
           </li>
+          @if(auth()->user()->is_admin)
           <li class="sidebar-dropdown">
             <a href="#">
               <i class="fas fa-dollar-sign"></i>
@@ -135,87 +115,36 @@
                 <li>
                   <a href="{{ route('troca_cheques.index') }}">Troca de cheques</a>
                 </li>
-              </ul>
-            </div>
-          </li>
-          {{-- <li class="sidebar-dropdown">
-            <a href="#">
-              <i class="far fa-gem"></i>
-              <span>Components</span>
-            </a>
-            <div class="sidebar-submenu">
-              <ul>
                 <li>
-                  <a href="#">General</a>
+                  <a href="{{ route('procura_cheque') }}">Procurar cheque</a>
                 </li>
                 <li>
-                  <a href="#">Panels</a>
-                </li>
-                <li>
-                  <a href="#">Tables</a>
-                </li>
-                <li>
-                  <a href="#">Icons</a>
-                </li>
-                <li>
-                  <a href="#">Forms</a>
+                  <a href="{{ route('adiamentos.index') }}">Adiar cheque</a>
                 </li>
               </ul>
             </div>
           </li>
-          <li class="sidebar-dropdown">
-            <a href="#">
-              <i class="fa fa-chart-line"></i>
-              <span>Charts</span>
-            </a>
-            <div class="sidebar-submenu">
-              <ul>
-                <li>
-                  <a href="#">Pie chart</a>
-                </li>
-                <li>
-                  <a href="#">Line chart</a>
-                </li>
-                <li>
-                  <a href="#">Bar chart</a>
-                </li>
-                <li>
-                  <a href="#">Histogram</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="sidebar-dropdown">
-            <a href="#">
-              <i class="fa fa-globe"></i>
-              <span>Maps</span>
-            </a>
-            <div class="sidebar-submenu">
-              <ul>
-                <li>
-                  <a href="#">Google maps</a>
-                </li>
-                <li>
-                  <a href="#">Open street map</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="header-menu">
-            <span>Extra</span>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-book"></i>
-              <span>Documentation</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-calendar"></i>
-              <span>Calendar</span>
-            </a>
-          </li> --}}
+          @endif
+          @if(auth()->user()->is_representante)
+            <li @if(route('venda.show', auth()->user()->is_representante) == Request::url()) class="ativo" @endif>
+                <a href="{{ route('venda.show', auth()->user()->is_representante) }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Vendas</span>
+                </a>
+            </li>
+            <li @if(route('conta_corrente_representante.show', auth()->user()->is_representante) == Request::url()) class="ativo" @endif>
+                <a href="{{ route('conta_corrente_representante.show', auth()->user()->is_representante) }}">
+                <i class="fas fa-balance-scale"></i>
+                <span>Conta Corrente</span>
+                </a>
+            </li>
+            <li @if(route('cheques.index') == Request::url()) class="ativo" @endif>
+                <a href="{{ route('cheques.index') }}">
+                <i class="fas fa-money-check-alt"></i>
+                <span>Carteira de cheques</span>
+                </a>
+            </li>
+          @endif
         </ul>
       </div>
       <!-- sidebar-menu  -->
@@ -249,25 +178,28 @@
     </div>
   </main>
 </body>
-  {{-- <script src="{{ asset('js/jquery.js') }}"></script> --}}
-  {{-- <script src="{{ asset('js/bootstrap.js') }}"></script> --}}
-  {{-- <script src="{{ asset('js/dataTable.js') }}"></script> --}}
-  
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="{{ asset('js1/jquery.js') }}"></script>
+  <script src="{{ asset('js1/popper.js') }}"></script>
+  <script src="{{ asset('js1/bootstrap.js') }}"></script>
+  <script src="{{ asset('js1/toastr.js') }}"></script>
+  <script src="{{ asset('js1/alert.js') }}"></script>
 
   <link rel="stylesheet" href="{{ asset('fontawesome-free-5.15.3-web/css/all.css') }}">
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script src="{{ asset('js1/confirmarExclusao.js') }}"></script>
   
   <!--DataTable-->
-  <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-colvis-1.6.5/b-flash-1.6.5/b-html5-1.6.5/b-print-1.6.5/datatables.min.js"></script> 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+  <script src="{{ asset('js1/dataTable/datatables.min.js') }}"></script>
+  {{-- <script src="{{ asset('js1/dataTable/pdfmake.min.js') }}"></script>
+  <script src="{{ asset('js1/dataTable/pdfmake_fonts.min.js') }}"></script>
+  <script src="{{ asset('js1/dataTable/pdf_zip.min.js') }}"></script>
+   --}}
+  <script src="{{ asset('js1/mask.min.js') }}"></script>
+  
+  {{-- <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script> --}}
+  {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script> --}}
+  {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script> --}}
+  {{-- <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-colvis-1.6.5/b-flash-1.6.5/b-html5-1.6.5/b-print-1.6.5/datatables.min.js"></script>  --}}
+  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script> --}}
 <script>
 toastr.options = {
     "progressBar": true,
@@ -295,74 +227,16 @@ $(function() {
     $(".page-wrapper").addClass("toggled");
   });
 
-  // Disable search and ordering by default
-//   $.extend( $.fn.dataTable.defaults, {
-//     language: {
-//       "url": "//cdn.datatables.net/plug-ins/1.10.22/i18n/Portuguese-Brasil.json"
-//     },
-//     dom: "<'row'<'col-md-4'l><'col-md-4'B><'col-md-4'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
-//     buttons: [ 
-//       {
-//         extend: 'excel',
-//         className: "btn-dark",
-//         text: 'Excel',
-//         exportOptions: {
-//           columns: [ 0, 1, 2, 3 ],
-//           trim: true,
-//           format: {
-//             body: function ( data, row, column, node ) {
-//               return $(node).text().trim();
-//             }
-//           }
-//         },
-//         customize: function(xlsx) {
-//           var sheet = xlsx.xl.worksheets['sheet1.xml'];
-//           $('row c', sheet).each( function () {
-//               $(this).attr( 's', '55' );
-//           });
-//         }
-//       },
-//       {
-//         extend: 'pdf',
-//         className: "btn-dark",
-//         exportOptions: {
-//           columns: [ 0, 1, 2, 3 ],
-//           format: {
-//             body: function ( data, row, column, node ) {
-//                 data = data
-//                 .replace(/<.*?>/g, "");
-//                 return data;
-//             }
-//           },
-//           stripHtml:      true,
-//           stripNewlines:  true,
-//           decodeEntities: false,
-//           trim:           true,
-//         }, 
-//         customize : function(doc){
-//           var colCount = new Array();
-//           $('.table').find('tbody tr:first-child td').each(function(){
-//             if($(this).attr('colspan')){
-//               for(var i=1;i<=$(this).attr('colspan');$i++){
-//                   colCount.push('*');
-//               }
-//             }else{ colCount.push('*'); }
-//           });
-//           colCount.splice(-1,1)
-//           doc.content[1].table.widths = colCount;
-//         },
-//       },
-//       {
-//         extend: 'print',
-//         className: "btn-dark",
-//         text: 'Imprimir',
-//         exportOptions: {
-//           columns: [ 0, 1, 2, 3 ],
-//           stripHtml: false
-//         }
-//       }
-//     ]
-//   });
+//   Disable search and ordering by default
+  $.extend( $.fn.dataTable.defaults, {
+    language: {
+      "url": "//cdn.datatables.net/plug-ins/1.10.22/i18n/Portuguese-Brasil.json"
+    },
+    dom: "<'row'<'col-md-4'l><'col-md-4'B><'col-md-4'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+    buttons: [
+        'print', 'excel', 'pdf'
+    ],
+  });
 
 });
 </script>

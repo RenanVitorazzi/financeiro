@@ -17,11 +17,14 @@ class TrocaCheque extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
+            $table->string('titulo')->nullable();
             $table->date('data_troca');
             $table->foreignId('parceiro_id')->nullable()->constrained('parceiros');
-            $table->decimal('valor_bruto', 8, 2)->nullable();
-            $table->decimal('valor_liquido', 8, 2)->nullable();
-            $table->decimal('valor_juros', 8, 2)->nullable();
+            $table->decimal('taxa_juros', 10, 2);
+            $table->decimal('valor_bruto', 10, 2)->nullable();
+            $table->decimal('valor_liquido', 10, 2)->nullable();
+            $table->decimal('valor_juros', 10, 2)->nullable();
+            $table->longText('observacao')->nullable();
         });
 
         Schema::create('trocas_parcelas', function (Blueprint $table) {
@@ -29,8 +32,8 @@ class TrocaCheque extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->integer('dias');
-            $table->decimal('valor_liquido', 8, 2);
-            $table->decimal('valor_juros', 8, 2);
+            $table->decimal('valor_liquido', 10, 2);
+            $table->decimal('valor_juros', 10, 2);
             $table->foreignId('parcela_id')->constrained('parcelas');
             $table->foreignId('troca_id')->constrained('trocas');
         });

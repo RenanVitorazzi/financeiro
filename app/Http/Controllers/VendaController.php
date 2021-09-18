@@ -14,12 +14,12 @@ class VendaController extends Controller
 {
     public function create(Request $request)
     {
-        $idRepresentante = $request->id;
-        $clientes = Cliente::with('pessoa')->get();
+        $representante_id = $request->id;
+        $clientes = Cliente::all();
         $metodo_pagamento = ['À vista', 'Parcelado'];
         $forma_pagamento = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Depósito'];
 
-        return view('venda.create', compact('idRepresentante', 'clientes', 'metodo_pagamento', 'forma_pagamento'));
+        return view('venda.create', compact('representante_id', 'clientes', 'metodo_pagamento', 'forma_pagamento'));
     }
 
     public function store(SalvarVendaRequest $request)
@@ -45,20 +45,26 @@ class VendaController extends Controller
                 'data_parcela' => $value,
                 'valor_parcela' => $request->valor_parcela[$key],
                 'observacao' => $request->observacao[$key],
+                'representante_id' => $venda->representante_id,
             ]);
         }
         
-        return redirect("/venda/{$request->representante_id}");
+        return redirect()->route('venda.show', $venda->representante_id);
     }
 
     public function show(Request $request, $id)
     {
+        if (auth()->user()->is_representante && auth()->user()->is_representante != $id) {
+            abort(403);
+        }
+        
         $vendas = Venda::with('parcela')
             ->where('representante_id', $id)
             ->where('enviado_conta_corrente', null)
-            ->latest()
+            // ->latest()
+            ->orderBy('data_venda')
             ->get();
-
+        // dd($vendas);
         $representante = Representante::findOrFail($id);
 
         return view('venda.show', compact('vendas', 'representante'));
@@ -67,10 +73,13 @@ class VendaController extends Controller
     public function edit($id)
     {
         $venda = Venda::findOrFail($id);
+        //TODO criar filtro para que o representante só consiga colocar a própria venda
         $representantes = Representante::with('pessoa')->get();
         $clientes = Cliente::with('pessoa')->get();
-        
-        return view('venda.edit', compact('representantes', 'venda', 'clientes'));
+        $metodo_pagamento = ['À vista', 'Parcelado'];
+        $forma_pagamento = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Depósito'];
+
+        return view('venda.edit', compact('representantes', 'venda', 'clientes', 'forma_pagamento', 'metodo_pagamento'));
     }
 
     public function update(SalvarVendaRequest $request, $id)
@@ -129,27 +138,25 @@ class VendaController extends Controller
         return redirect("/venda/{$request->representante_id}");
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Venda::destroy($id);
+        $venda = Venda::findOrFail($id);
+        $venda->delete();
 
-        return json_encode([
-            'icon' => 'success',
-            'title' => 'Sucesso!',
-            'text' => 'Fornecedor excluído com sucesso!'
-        ]);
+        $request
+            ->session() 
+            ->flash(
+                'message',
+                'Venda excluída com sucesso!'
+            );
+
+        return redirect()->route('venda.show', $venda->representante_id);
     }
 
     public function enviarContaCorrente (Request $request) {
-        $vendas = Venda::findOrFail($request->vendas_id);
+        $vendas = Venda::find($request->vendas_id);
 
-        foreach ($vendas as $key => $venda) {
-            $venda->update([
-                'enviado_conta_corrente' => 1
-            ]);
-        }
-
-        ContaCorrenteRepresentante::create([
+        $contaCorrente = ContaCorrenteRepresentante::create([
             'fator' => $vendas->sum('fator'),
             'peso' => $vendas->sum('peso'),
             'fator_agregado' => $vendas->sum('fator'),
@@ -158,9 +165,15 @@ class VendaController extends Controller
             'balanco' => 'Venda',
             'representante_id' => $vendas->first()->representante_id
         ]);
-        
+
+        Venda::whereIn('id', $request->vendas_id)->update([
+            'enviado_conta_corrente' => $contaCorrente->id
+        ]);
+
+        // return redirect()->route('venda.show', $vendas->first()->representante_id);
         return json_encode([
-           'representante_id' => $vendas->first()->representante_id,
+           'contaCorrente' => $contaCorrente,
+           'route' => route('conta_corrente_representante.show', $contaCorrente->representante_id)
         ]);
     }
 }

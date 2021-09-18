@@ -7,7 +7,7 @@ Adicionar cheque
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('clientes.index') }}">Clientes</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('cheques.index') }}">Cheques</a></li>
         <li class="breadcrumb-item active" aria-current="page">Cadastro</li>
     </ol>
 </nav>
@@ -15,12 +15,12 @@ Adicionar cheque
 <form method="POST" action="{{ route('cheques.store')}}">
     @csrf
 
-    <div class="form-group row">
-        <div class="col-6">
+    <div class="row">
+        <div class="col-6 form-group">
             <label for="quantidade_cheques">Quantidade de cheques</label>
             <x-input name="quantidade_cheques" type="number" value="{{ old('quantidade_cheques') }}"></x-input>
         </div>
-        <div class="col-6">
+        <div class="col-6 form-group">
             <label for="representante_id">Representante</label>
             <x-select name="representante_id">
                 <option></option>
@@ -28,6 +28,17 @@ Adicionar cheque
                     <option value="{{ $representante->id }}" {{ old('representante_id') == $representante->id ? 'selected' : '' }}>{{ $representante->pessoa->nome }}</option>
                 @endforeach
             </x-select>
+        </div>
+        <div class="col-6 form-group">
+            <label for="nova_troca">Criar troca?</label>
+            <x-select type="checkbox" name="nova_troca" type="number">
+                <option value="Não" {{ old('nova_troca') == 'Não' ? 'selected' : '' }}>Não</option>
+                <option value="Sim" {{ old('nova_troca') == 'Sim' ? 'selected' : '' }}>Sim</option>
+            </x-select>
+        </div>
+        <div class="col-6 form-group" id="taxa_group" style="{{ old('nova_troca') == 'Sim' ? 'display:block' : 'display:none' }}">
+            <label for="taxa_juros">Taxa de juros (%)</label>
+            <x-input name="taxa_juros" type="number" step="0.01" value="{{ old('taxa_juros') }}"></x-input>
         </div>
     </div>
     <div id="campo_tabela">
@@ -162,6 +173,13 @@ Adicionar cheque
         
         return arrayNome
     }
+
+    function trocaListener() {
+        $("#nova_troca").change( () => {
+            $("#taxa_group").toggle() 
+        })
+    }
     
+    trocaListener()
 </script>
 @endsection

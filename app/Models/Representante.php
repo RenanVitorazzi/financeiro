@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -27,6 +28,15 @@ class Representante extends Model
     public function venda()
     {
         return $this->hasMany(Venda::class);
+    }
+
+    protected static function booted()
+    {
+        if (auth()->user()->is_representante && !auth()->user()->is_admin) {
+            static::addGlobalScope('user', function (Builder $builder) {
+                $builder->where('id', auth()->user()->is_representante);
+            });
+        }
     }
 }
 

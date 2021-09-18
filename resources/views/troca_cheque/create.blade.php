@@ -1,20 +1,40 @@
 @extends('layout')
 @section('title')
-Carteira de cheques
+Nova troca de cheques
 @endsection
 @section('body')
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('troca_cheques.index') }}">Troca de cheques</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Nova troca</li>
+    </ol>
+</nav>
     <div class="container">
         <div class="d-flex justify-content-between">
-            <h3>Carteira de cheques</h3>
+            <h3>Trocar cheques</h3>
         </div>
-        <form action="{{ route('trocar') }}" id="formTrocaCheques">
-            <meta name="csrf-token" content="{{ csrf_token() }}">
-            <x-table id="tabelaCheques">
+        <form action="{{ route('troca_cheques.store') }}" method="POST" id="formTrocaCheques">
+            
+            @csrf
+
+            <div class="row">
+                <div class="form-group col-6">
+                    <label for="titulo">Título</label>
+                    <x-input name="titulo" value="{{ old('titulo') ?: 'Troca '.date('d/m/Y') }}"></x-input>
+                </div>
+                <div class="col-6">
+                    <x-form-group type='date' name="data_troca" value="{{ date('Y-m-d')}}">Data da troca</x-form-group>
+                </div>
+            </div>            
+
+            <x-table id="tabelaCheques" class="table-striped">
                 <x-table-header>
                     <tr>
                         <th><input type="checkbox" id="selecionaTodos"></th>
-                        <th>Cliente</th>
+                        <th>Titular</th>
                         <th>Representante</th>
+                        <th>Número</th>
                         <th>Data</th>
                         <th>Valor</th>
                     </tr>
@@ -25,10 +45,11 @@ Carteira de cheques
                             <td>
                                 <input type="checkbox" name="cheque_id[]" value="{{ $cheque->id }}">
                             </td>
-                            <td>{{ $cheque->cliente }}</td>
-                            <td>{{ $cheque->representante }}</td>
-                            <td>{{ date('d/m/Y', strtotime($cheque->data_parcela)) }}</td>
-                            <td>R$ {{ number_format($cheque->valor_parcela,2, ',', '.') }}</td>
+                            <td>{{ $cheque->nome_cheque }}</td>
+                            <td>{{ $cheque->representante->pessoa->nome }}</td>
+                            <td>{{ $cheque->numero_cheque }}</td>
+                            <td>@data($cheque->data_parcela)</td>
+                            <td>@moeda($cheque->valor_parcela)</td>
                         </tr>
                     @empty
                     <tr>
@@ -38,29 +59,41 @@ Carteira de cheques
                 </tbody>
             </x-table>
             <div class="row">
+                
                 <div class="col-6">
-                    <x-form-group type='date' name="data_troca" value="{{ date('Y-m-d')}}">Informe a data</x-form-group>
-                </div>
-                <div class="col-6">
-                    <label for="parceiro_id">Informe o parceiro</label>
+                    <label for="parceiro_id">Parceiro</label>
                     <x-select name="parceiro_id">
+                        <option value=""></option>
                         @foreach ($parceiros as $parceiro)
-                            <option value="{{ $parceiro->id }} "> {{ $parceiro->pessoa->nome }} ({{ $parceiro->porcentagem_padrao }}%)</option>
+                            <option data-porcentagem="{{ $parceiro->porcentagem_padrao }}" value="{{ $parceiro->id }} "> {{ $parceiro->pessoa->nome }} ({{ $parceiro->porcentagem_padrao }}%)</option>
                         @endforeach
                     </x-select>
                 </div>
+                
+                <div class="form-group col-6">
+                    <label for="taxa_juros">Taxa (%)</label>
+                    <x-input name="taxa_juros" type="number" value="{{ old('taxa_juros') }}" max="100" step="0.01"></x-input>
+                </div>
+
+                <div class="form-group col-12">
+                    <label for="observacao">Observação</label>
+                    <x-text-area name="observacao">{{ old('observacao') }}</x-text-area>
+                </div>
+                
             </div>
-            
-            <button class="btn btn-success" id="trocarCheques" type="submit">
-                Trocar <i class="ml-2 fas fa-money-bill-wave"></i>
-            </button>
+            @error('cheque_id')
+                <div class="alert alert-danger">{{$message}}</div>
+            @enderror
+            <input class="btn btn-success" id="trocarCheques" type="submit">
             
         </form>
     </div>
 @endsection
 @section('script')
 <script>
-    $("#tabelaCheques").dataTable();
+    $("#tabelaCheques").DataTable({
+        "lengthMenu": [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ]
+    });
 
     $("#selecionaTodos").click( (e) => {
         let status = $(e.target).prop("checked");
@@ -70,64 +103,29 @@ Carteira de cheques
     })
 
     $("#formTrocaCheques").submit( (event) => {
-        event.preventDefault();
+        event.preventDefault()
 
         let data = $("#data_troca").val()
-        let parceiro_id = $("#parceiro_id").val()
         let qtdCheques = $("input[name='cheque_id[]']:checked").length
 
-        // if (!data || !parceiro_id || qtdCheques === 0) {
-        //     Swal.fire({
-        //         title: 'Erro!',
-        //         text: 'Informe no mínimo a data, o parceiro e um cheque',
-        //         icon: 'error'
-        //     })
+        if (!data || qtdCheques === 0) {
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Informe no mínimo a data e um cheque',
+                icon: 'error'
+            })
 
-        //     return
-        // }
-
-        trocaCheque()
+            return
+        }
+        console.log($("input[name='cheque_id[]']:checked"));
+        $("#formTrocaCheques")[0].submit()
     });
 
-    function trocaCheque() {
-        
-        $.ajax({
-            type: 'POST',
-            url: "{{ route('trocar') }}",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: $("#formTrocaCheques").serialize(),
-            dataType: 'json',
-            beforeSend: () => {
-                Swal.showLoading()
-            },
-            success: (response) => {
-                console.log(response)
-                return
-                Swal.fire({
-                    title: 'Sucesso!',          
-                    icon: 'success'
-                }).then((result) => {
-                    // document.location.reload(true)
-                })
-            },
-            error: (jqXHR, textStatus, errorThrown) => {
-                
-                var response = JSON.parse(jqXHR.responseText)
-                var errorString = ''
-                $.each( response.errors, function( key, value) {
-                    errorString += '<div>' + value + '</div>'
-                });
-               
-                Swal.fire({
-                    title: 'Erro',
-                    icon: 'error',
-                    html: errorString
-                })
-            }
-        });
-    }
+    $("#parceiro_id").change( (e) => {
+        let porcentagem_troca = $(e.target).find('option:selected').data("porcentagem") 
+        console.log(porcentagem_troca);
+        $("#taxa_juros").val(porcentagem_troca)
+    })
 
 </script>
 @endsection

@@ -26,12 +26,6 @@
     h1 {
         text-align: center;
     }
-    .peso {
-        display: inline-block;
-    }
-    .fator {
-        float:right;
-    }
 </style>
 <body>
     <h1>
@@ -50,8 +44,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>{{ number_format($contaCorrente[0]->saldo_peso, 3, ',', '.') }}</td>
-                <td>{{ number_format($contaCorrente[0]->saldo_fator, 2, ',', '.') }}</td>
+                <td>@peso($contaCorrente[0]->saldo_peso)</td>
+                <td>@fator($contaCorrente[0]->saldo_fator)</td>
             </tr>
         </tbody>
     </table>
@@ -69,18 +63,16 @@
         <tbody>
             @forelse ($contaCorrente as $registro)
                 <tr>
-                    <td>{{ date('d/m/Y', strtotime($registro->data)) }}</td>
+                    <td>@data($registro->data)</td>
                     <td>
-                        <div>Peso: {{ number_format($registro->peso, 3, ',', '.') }}</div>
-                        <div>Fator: {{ number_format($registro->fator, 2, ',', '.') }}</div>
+                        <div>Peso: @peso($registro->peso)</div>
+                        <div>Fator: @fator($registro->fator)</div>
                     </td>
-                    <td>
-                        {{ $registro->balanco }}
-                    </td>
+                    <td>{{ $registro->balanco }}</td>
                     <td>{{ $registro->observacao }}</td>
                     <td>
-                        <div>Peso: {{ number_format($registro->saldo_peso, 3, ',', '.') }}</div>
-                        <div>Fator: {{ number_format($registro->saldo_fator, 2, ',', '.') }}</div>
+                        <div>Peso: @peso($registro->saldo_peso)</div>
+                        <div>Fator: @fator($registro->saldo_fator)</div>
                     </td>
                 </tr>
             @empty

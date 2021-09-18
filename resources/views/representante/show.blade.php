@@ -1,12 +1,14 @@
 @extends('layout')
 @section('title')
-Representantes
+Conta Corrente {{ $representante->pessoa->nome }} 
 @endsection
 @section('body')
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        @if (!auth()->user()->is_representante)
         <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        @endif
         <li class="breadcrumb-item active">Conta Corrente {{ $representante->pessoa->nome }} </li>
     </ol>
 </nav>
@@ -23,10 +25,10 @@ Representantes
 <div>
     @if (count($contaCorrente) > 0)
         <h3 class="{{ $contaCorrente[0]->saldo_peso > 0 ? 'text-success' : 'text-danger' }} font-weight-bold d-inline">
-            Peso: {{ number_format($contaCorrente[0]->saldo_peso, 3, ',', '.') }}g
+            Peso: @peso($contaCorrente[0]->saldo_peso)g
         </h3> 
         <h3 class="{{ $contaCorrente[0]->saldo_fator > 0 ? 'text-success' : 'text-danger' }} font-weight-bold float-right">
-            Fator: {{ number_format($contaCorrente[0]->saldo_fator, 2, ',', '.') }}
+            Fator: @fator($contaCorrente[0]->saldo_fator)
         </h3> 
     @endif
 </div>
@@ -43,10 +45,10 @@ Representantes
     <tbody>
         @forelse ($contaCorrente as $registro)
             <tr>
-                <td>{{ date('d/m/Y', strtotime($registro->data)) }}</td>
+                <td>@data($registro->data)</td>
                 <td>
-                    <div>Peso: {{ number_format($registro->peso, 3, ',', '.') }}</div>
-                    <div>Fator: {{ number_format($registro->fator, 2, ',', '.') }}</div>
+                    <div>Peso: @peso($registro->peso)</div>
+                    <div>Fator: @fator($registro->fator)</div>
                 </td>
                 <td class="{{ $registro->balanco == 'Reposição' ? 'text-danger' : 'text-success' }}">
                     <b>{{ $registro->balanco }}</b>
@@ -54,8 +56,8 @@ Representantes
                 </td>
                 <td>{{ $registro->observacao }}</td>
                 <td>
-                    <div>Peso: {{ number_format($registro->saldo_peso, 3, ',', '.') }}</div>
-                    <div>Fator: {{ number_format($registro->saldo_fator, 2, ',', '.') }}</div>
+                    <div>Peso: @peso($registro->saldo_peso)</div>
+                    <div>Fator: @fator($registro->saldo_fator)</div>
                 </td>
                 <td>
                     <a class="btn btn-dark" href="{{ route('ccr_anexo.index', ['id' => $registro->id]) }}" title="Anexos">

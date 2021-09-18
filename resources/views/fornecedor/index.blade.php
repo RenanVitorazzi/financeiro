@@ -3,7 +3,13 @@
 Fornecedores
 @endsection
 @section('body')
-
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Fornecedores</li>
+        {{-- <li class="breadcrumb-item active" aria-current="page">Cadastro</li> --}}
+    </ol>
+</nav>
 <div class='mb-2 d-flex justify-content-between'>
     <h3> Fornecedores </h3>
     <div>
@@ -18,10 +24,10 @@ Fornecedores
             <li class='list-group-item d-flex justify-content-between'>
                 <div class='mt-2'>
                     <span>{{ $fornecedor->pessoa->nome }}</span>
-                    <span class="font-weight-bold ml-2 badge {{ $fornecedor->conta_corrente_sum_peso_agregado > 0 ? 'badge-success' : 'badge-danger' }}">{{ number_format($fornecedor->conta_corrente_sum_peso_agregado, 3) }}</span>
+                    <span class="font-weight-bold ml-2 badge badge-pill {{ $fornecedor->conta_corrente_sum_peso_agregado < 0 ? 'badge-danger' : 'badge-dark' }}">@peso($fornecedor->conta_corrente_sum_peso_agregado)</span>
                 </div>
                 <div class='d-flex'>
-                    <a class="btn btn-primary mr-2" title="Conta corrente" href="{{ route('fornecedores.show', $fornecedor->id) }}">
+                    <a class="btn btn-dark mr-2" title="Conta corrente" href="{{ route('fornecedores.show', $fornecedor->id) }}">
                         <i class="fas fa-chart-area"></i>
                     </a>
                     <x-botao-editar class="mr-2" href="{{ route('fornecedores.edit', $fornecedor->id) }}"></x-botao-editar>

@@ -14,7 +14,7 @@ class TrocaParcela extends Model
 
     public function parcelas() 
     {
-        return $this->hasMany(Parcela::class, 'id', 'parcela_id');
+        return $this->hasOne(Parcela::class, 'id', 'parcela_id');
     }
 
     public function trocas()
@@ -22,4 +22,8 @@ class TrocaParcela extends Model
         return $this->belongsTo(Troca::class, 'troca_id');
     }
 
+    public function adiamento()
+    {
+        return $this->hasMany(TrocaAdiamento::class, 'troca_parcela_id');
+    }
 }

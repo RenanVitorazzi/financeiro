@@ -1,9 +1,18 @@
 @extends('layout')
 @section('title')
-Adicionar conta corrente (representante)
+Editar vendas
 @endsection
-
 @section('body')
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        @if (!auth()->user()->is_representante)
+        <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        @endif
+        <li class="breadcrumb-item"><a href="{{ route('venda.show', $venda->representante_id) }}">Vendas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Editar</li>
+    </ol>
+</nav>
     <form method="POST" action="{{ route('venda.update', $venda->id)}}">
         @csrf
         @method('PUT')
@@ -22,16 +31,16 @@ Adicionar conta corrente (representante)
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-6 form-group">
+            {{-- <div class="col-md-6 form-group">
                 <label for="balanco">Tipo</label>
-                <select name="balanco" id="balanco" class="form-control" required>
-                    {{-- <option></option> --}}
-                    {{-- <option value='Acerto' {{ $venda->balanco == 'Acerto' ? 'selected': '' }}> Acerto </option> --}}
+                <x-select name="balanco" required>
+                    <option></option>
+                    <option value='Acerto' {{ $venda->balanco == 'Acerto' ? 'selected': '' }}> Acerto </option>
                     <option value='Venda' {{ $venda->balanco == 'Venda' ? 'selected': '' }}> Venda </option>
-                    {{-- <option value='Devolução' {{ $venda->balanco == 'Devolução' ? 'selected': '' }}> Devolução </option> --}}
+                    <option value='Devolução' {{ $venda->balanco == 'Devolução' ? 'selected': '' }}> Devolução </option>
                     <option value='Aberto' {{ $venda->balanco == 'Aberto' ? 'selected': '' }}> Aberto </option>
-                </select>
-            </div>
+                </x-select>
+            </div> --}}
             
             <div class="col-md-6 form-group">
                 <label for="representante_id">Representante</label>
@@ -46,31 +55,40 @@ Adicionar conta corrente (representante)
                 </select>
             </div>
 
-            <div class="col-md-6">
-                <x-form-group name="fator" type="number" value="{{ $venda->fator }}">Fator</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <x-form-group name="cotacao_fator" type="number" value="{{ $venda->cotacao_fator }}">Cotação Fator</x-form-group>
-            </div>
-            
-            <div class="col-md-6">
-                <x-form-group name="peso" type="number" value="{{ $venda->peso }}">Peso</x-form-group>
-            </div>
-            <div class="col-md-6">
-                <x-form-group name="cotacao_peso" type="number" value="{{ $venda->cotacao_peso}}">Cotação Peso</x-form-group>
-            </div>
-            
-            <div class="col-md-6">
-                <x-form-group name="valor_total" type="number" value="{{ $venda->valor_total}}">Valor Total da Compra</x-form-group>
-            </div>
-            <div class="col-md-6 form-group">
+            <x-table class="table-striped table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Peso</td>
+                        <td><x-input type="number" name="peso" step="0.001" value="{{ $venda->peso}}"></x-input></td>
+                        <td><x-input type="number" name="cotacao_peso" step="0.01" value="{{ $venda->cotacao_peso}}"></x-input></td>
+                    </tr>
+                    <tr>
+                        <td>Fator</td>
+                        <td><x-input type="number" name="fator" step="0.01" value="{{ $venda->fator}}"></x-input></td>
+                        <td><x-input type="number" name="cotacao_fator" step="0.01" value="{{ $venda->cotacao_fator}}"></x-input></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>Total</td>
+                        <td><x-input name="valor_total" type="number" step="0.01" value="{{ $venda->valor_total }}" ></x-input></td>
+                    </tr>
+                </tbody>
+            </x-table>
+
+            <div class="col-sm-6 col-md-4 col-lg-3 form-group">
                 <label for="metodo_pagamento">Método de Pagamento</label>
-                <select class="form-control" name="metodo_pagamento" id="metodo_pagamento">
+                <x-select name="metodo_pagamento" required>
                     <option value=""></option>
-                    <option  {{ $venda->metodo_pagamento == 'Dinheiro' ? 'selected': '' }} value="Dinheiro">Dinheiro</option>
-                    <option  {{ $venda->metodo_pagamento == 'Cheque' ? 'selected': '' }} value="Cheque">Cheque</option>
-                    <option  {{ $venda->metodo_pagamento == 'Nota Promissória' ? 'selected': '' }} value="Nota Promissória">Nota Promissória</option>
-                </select>
+                    @foreach ($metodo_pagamento as $metodo)
+                        <option  {{ $venda->metodo_pagamento == $metodo ? 'selected' : '' }} value="{{ $metodo }}">{{ $metodo }}</option>
+                    @endforeach
+                </x-select> 
             </div>
         </div> 
         <div id="campoQtdParcelas" class="row">

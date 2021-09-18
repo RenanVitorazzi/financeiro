@@ -24,10 +24,13 @@ class TrocaChequesRequest extends FormRequest
     public function rules()
     {
         return [
-            "data_troca" => "required|date",
-            "parceiro_id" => "required|numeric",
-            "cheque_id" => "required|array|min:0",
-            "cheque_id.*" => "numeric"
+            "titulo" => ["string", "nullable"],
+            "data_troca" => ["required", "date"],
+            "parceiro_id" => ["nullable", "numeric"],
+            "cheque_id" => ["required", "array", "min:1"],
+            "cheque_id.*" => ["required", "numeric"],
+            "observacao" => ["string", "nullable"],
+            "taxa_juros" => ["required", "numeric", "min:0", "max:100"],
         ];
     }
     

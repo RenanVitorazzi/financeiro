@@ -39,13 +39,19 @@
             @forelse ($fornecedores as $fornecedor)
                 <tr>
                     <td>{{ $fornecedor->pessoa->nome }}</td>
-                    <td>{{ number_format($fornecedor->conta_corrente_sum_peso_agregado, 3) }}</td>
-                </tr>   
+                    <td>@peso($fornecedor->conta_corrente_sum_peso_agregado)</td>
+                </tr>
             @empty
                 <tr>
                     <td colspan=2>Nenhum registro</td>
                 </tr>
             @endforelse
+            <tfoot>
+                <tr>
+                    <td><b>Total</b></td>
+                    <td><b>@peso($fornecedores->sum('conta_corrente_sum_peso_agregado'))</b></td>
+                </tr>
+            </tfoot>
         </tbody>
     </table>
 </body>

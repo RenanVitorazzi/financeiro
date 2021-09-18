@@ -6,7 +6,9 @@ Anexos
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        @if (!auth()->user()->is_representante)
         <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        @endif
         <li class="breadcrumb-item">
             <a href="{{ route('conta_corrente_representante.show', $contaCorrente->representante_id) }}">
                 Conta Corrente {{ $contaCorrente->representante->pessoa->nome }} 

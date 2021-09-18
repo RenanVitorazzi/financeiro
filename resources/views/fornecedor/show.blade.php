@@ -37,14 +37,14 @@ Conta Corrente - {{ $fornecedor->pessoa->nome }}
     <tbody>
         @forelse ($registrosContaCorrente as $contaCorrente)
             <tr>
-                <td>{{ date('d/m/Y', strtotime($contaCorrente->data)) }}</td>
-                <td>{{ number_format($contaCorrente->peso, 3) }}</td>
+                <td>@data($contaCorrente->data)</td>
+                <td>@peso($contaCorrente->peso)</td>
                 <td class="{{ $contaCorrente->balanco == 'Crédito' ? 'text-success' : 'text-danger' }}">
                     <b>{{ $contaCorrente->balanco }}</b>
                     <i class="fas {{ $contaCorrente->balanco == 'Crédito' ? 'fa-angle-up' : 'fa-angle-down' }}"></i>
                 </td>
                 <td>{{ $contaCorrente->observacao }}</td>
-                <td class="{{ $contaCorrente->balanco > 0 ? 'text-success' : 'text-danger' }}">{{ number_format($contaCorrente->saldo, 3) }}</td>
+                <td class="{{ $contaCorrente->balanco > 0 ? 'text-success' : 'text-danger' }}">@peso($contaCorrente->saldo)</td>
                 <td>
                     <a class="btn btn-dark mr-2" href="{{ route('conta_corrente_anexo.index', ['id' => $contaCorrente->id]) }}" title="Anexos">
                         <i class="fas fa-file-image"></i>
@@ -55,7 +55,7 @@ Conta Corrente - {{ $fornecedor->pessoa->nome }}
             </tr>
         @empty
             <tr class="table-danger">
-                <td colspan=5>Nenhum registro</td>
+                <td colspan=6>Nenhum registro</td>
             </tr>
         @endforelse
     </tbody>

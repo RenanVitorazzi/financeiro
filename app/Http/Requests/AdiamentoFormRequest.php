@@ -24,14 +24,12 @@ class AdiamentoFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'taxa' => 'required|numeric|min:0',
-            'data_cheque' => 'required|date|date_format:Y-m-d',
-            'data' => 'required|date|date_format:Y-m-d|after:data_cheque',
-            'juros_adicionais' => 'required|numeric|min:0',
-            'juros_novos' => 'required|numeric|min:0',
-            'cheque_id' => 'required|numeric',
-            'troca_parcela_id' => 'required|numeric',
-            'observacao' => 'nullable',
+            'nova_data' => ['required','date','date_format:Y-m-d','after:parcela_data'],
+            'taxa_juros' => ['required','numeric','min:0'],
+            'juros_totais' => ['required','numeric','min:0'],
+            'parcela_data' => ['required','date','date_format:Y-m-d'],
+            'parcela_id' => ['required','numeric'],
+            'observacao' => ['nullable'],
         ];
     }
 }

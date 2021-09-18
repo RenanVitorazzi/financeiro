@@ -6,7 +6,9 @@ Adicionar conta corrente (representante)
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        @if (!auth()->user()->is_representante)
         <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
+        @endif
         <li class="breadcrumb-item"><a href="{{ route('conta_corrente_representante.show', $representante->id) }}">Conta Corrente {{ $representante->pessoa->nome }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">Novo</li>
     </ol>

@@ -19,9 +19,9 @@ class TrocaAdiamento extends Migration
             $table->softDeletes();
             $table->date('data');
             $table->float('dias_totais');
-            $table->decimal('adicional_juros', 8, 2);
-            $table->decimal('juros_totais', 8, 2);
-            $table->decimal('taxa', 8, 2);
+            $table->decimal('adicional_juros', 10, 2);
+            $table->decimal('juros_totais', 10, 2);
+            $table->decimal('taxa', 10, 2);
             $table->longText('observacao')->nullable();
             $table->foreignId('troca_parcela_id')->constrained('trocas_parcelas');
             $table->foreignId('parcela_id')->constrained();

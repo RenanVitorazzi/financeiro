@@ -3,30 +3,23 @@
 Adicionar vendas
 @endsection
 @section('body')
-{{-- <style>
-    .card-hover:hover,
-    .card-hover:focus-within {
-        transform: scale(1.05);
-    }
-    .card-hover {
-        transition: transform 100ms ease;
-    }
-</style> --}}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        @if (!auth()->user()->is_representante)
         <li class="breadcrumb-item"><a href="{{ route('representantes.index') }}">Representantes</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('venda.show', $idRepresentante) }}">Vendas</a></li>
+        @endif
+        <li class="breadcrumb-item"><a href="{{ route('venda.show', $representante_id) }}">Vendas</a></li>
         <li class="breadcrumb-item active" aria-current="page">Novo</li>
     </ol>
 </nav>
 <form method="POST" action="{{ route('venda.store')}}">
     @csrf
     <div class="row">
-        <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="col-6">
             <x-form-group name="data_venda" type="date" autofocus value="{{ date('Y-m-d') }}" required>Data</x-form-group>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3 form-group">
+        </div> 
+        <div class="col-6 form-group">
             <label for="cliente_id">Cliente</label>
             <div class="d-flex">
                 <x-select name="cliente_id" required>
@@ -44,26 +37,38 @@ Adicionar vendas
         </div>
         
         <input type="hidden" name="balanco" value="Venda">
-        <input type="hidden" name="representante_id" id="representante_id" value="{{ $idRepresentante }}">
-      
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="fator" type="number" step="0.01" value="{{ old('fator') }}">Fator</x-form-group>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="peso" type="number" step="0.001" value="{{ old('peso') }}">Peso</x-form-group>
-        </div>
+        <input type="hidden" name="representante_id" id="representante_id" value="{{ $representante_id }}">
         
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="cotacao_fator" type="number" step="0.01" value="{{ old('cotacao_fator') }}">Cotação Fator</x-form-group>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="cotacao_peso" type="number" step="0.01" value="{{ old('cotacao_peso') }}">Cotação Peso</x-form-group>
-        </div>
-        
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="valor_total" type="number" value="{{ old('valor_total') }}">Valor Total da Compra</x-form-group>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3 form-group">
+        <x-table class="table-striped table-bordered table-dark">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Quantidade</th>
+                    <th>Valor</th>
+                    {{-- <th>Total</th> --}}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Peso</td>
+                    <td><x-input type="number" name="peso" step="0.001" value="{{ old('peso') }}"></x-input></td>
+                    <td><x-input type="number" name="cotacao_peso" step="0.01" value="{{ old('cotacao_peso') }}"></x-input></td>
+                </tr>
+                <tr>
+                    <td>Fator</td>
+                    <td><x-input type="number" name="fator" step="0.01" value="{{ old('fator') }}"></x-input></td>
+                    <td><x-input type="number" name="cotacao_fator" step="0.01" value="{{ old('cotacao_fator') }}"></x-input></td>
+                </tr>
+                <tr>
+                    <td colspan='2'>Total</td>
+                    {{-- <td></td> --}}
+                    <td><x-input name="valor_total" type="number" step="0.01" value="{{ old('valor_total') }}" ></x-input></td>
+                    {{-- <td><x-input type="number" name="cotacao_fator" required></x-input></td> --}}
+                </tr>
+            </tbody>
+        </x-table>
+
+        <div class="col-4 form-group">
             <label for="metodo_pagamento">Método de Pagamento</label>
             <x-select name="metodo_pagamento" required>
                 <option value=""></option>
@@ -72,9 +77,17 @@ Adicionar vendas
                 @endforeach
             </x-select> 
         </div>
+        <div class="col-4 form-group d-none" id="groupDiaVencimento">
+            <label for="dia_vencimento">Dia de vencimento</label>
+            <x-input name="dia_vencimento" type="number"></x-input>
+        </div>
+        <div class="col-4 form-group d-none" id="groupParcelas">
+            <label for="parcelas">Quantidade de parcelas</label>
+            <x-input name="parcelas" type="number"></x-input>
+        </div>
     </div> 
     
-    <div id="campoQtdParcelas" class="row">
+    {{-- <div id="campoQtdParcelas" class="row">
         @if (old('metodo_pagamento') == 'Parcelado')
         <div class="col-sm-6 col-md-4 col-lg-3">
             <x-form-group name="prazo" type="number" value="{{ old('prazo') }}">Prazo</x-form-group>
@@ -144,7 +157,7 @@ Adicionar vendas
             </div>
         </div>
         @endif
-    </div>
+    </div> --}}
     <div id="infoCheques" class="row">
         @if (old('metodo_pagamento') == 'Parcelado')
             @foreach (old('parcelas') as $item)
@@ -201,7 +214,7 @@ Adicionar vendas
 @endsection
 @section('script')
 <script>
-    const CAMPO_PARCELAS = $("#campoQtdParcelas")
+    // const CAMPO_PARCELAS = $("#campoQtdParcelas")
     const FORMA_PAGAMENTO = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Depósito']
     let option = `<option></option>`
 
@@ -213,6 +226,9 @@ Adicionar vendas
         let htmlPagamento = "";
         
         if (forma_pagamento == 'À vista') {
+            $("#groupDiaVencimento").addClass('d-none')
+            $("#groupParcelas").addClass('d-none')
+
             let valor = $("#valor_total").val()
 
             htmlPagamento = `
@@ -263,38 +279,47 @@ Adicionar vendas
             $("#infoCheques").html(htmlPagamento)
             listenerFormaPagamentoParcela()
         } else if (forma_pagamento == 'Parcelado') {
-            htmlPagamento = `
-                <div class='form-group col-sm-6 col-md-4 col-lg-3'>
-                    <label for="prazo">Período de prazo</label>
-                    <input class="form-control" id="prazo" name="prazo" type="number" value=30>
-                </div>
-                <div class='form-group col-sm-6 col-md-4 col-lg-3'>
-                    <label for="parcelas">Quantidade de parcelas</label>
-                    <input class="form-control" id="parcelas" type="number">
-                </div>
-            `
-            CAMPO_PARCELAS.html(htmlPagamento)
+            $("#groupDiaVencimento").removeClass('d-none')
+            $("#groupParcelas").removeClass('d-none')
         }
-    }
-
-    function resetarHtmlPagamento() {
-        $("#campoQtdParcelas").html("")
-        $("#infoCheques").html("")
     }
 
     $("#metodo_pagamento").change( (e) => {
         let metodo = $(e.target).val()
 
-        resetarHtmlPagamento()
+        $("#infoCheques").html("")
         tipoPagamento(metodo)
 
         htmlParcelas()
     })
 
+    function calcularDataVencimento (index, dataVenda, diaVencimento) {
+        let dataVendaObj = new Date(dataVenda)
+        
+        let ultimoDiaDoMes = new Date(
+            dataVendaObj.getFullYear(), 
+            dataVendaObj.getMonth() + index + 1,
+            0
+        )
+        
+        let dataVencimentoObj = (diaVencimento > ultimoDiaDoMes.getDate()) 
+        ? ultimoDiaDoMes 
+        : new Date(
+            dataVendaObj.getFullYear(), 
+            dataVendaObj.getMonth() + index,
+            diaVencimento
+        ) 
+
+        return dataVencimentoObj.getFullYear() + '-' 
+        + (adicionaZero(dataVencimentoObj.getMonth()+1).toString()) + "-"
+        + adicionaZero(dataVencimentoObj.getDate().toString());
+    
+    }
+
     function htmlParcelas () {
         $("#parcelas").change ( (e) => {
             let parcelas = $(e.target).val() || 1
-            let prazo = $("#prazo").val()
+            let diaVencimento = $("#dia_vencimento").val()
             let dataVenda = $("#data_venda").val()
             let valorTotal = $("#valor_total").val() || 0
             let proximaData
@@ -307,22 +332,20 @@ Adicionar vendas
                     'Erro!',
                     'Informe a data da venda!',
                     'error'
-                )
-                $("#infoCheques").html('')
-                return
+                ).then((result) => {
+                    $("#infoCheques").html('')
+                    $("#data_venda").focus()
+                    return
+                })
             }
             
             for (let index = 0; index < parcelas; index++) {
-                if (dataVenda && prazo) {
-                    if (!proximaData) {
-                        proximaData = addDays(dataVenda, prazo)
-                    } else {
-                        proximaData = addDays(proximaData, prazo)
-                    }
-                }
-                let btnCopiarDados = ''
-
-                btnCopiarDados = (index == 0) ? '<div class="btn btn-dark copiarDadosPagamento"><span class="fas fa-clone"></span></div>' : ''
+                
+                let dataVencimento = calcularDataVencimento(index, dataVenda, diaVencimento)
+                
+                let btnCopiarDados = (index == 0) 
+                ? '<div class="btn btn-dark copiarDadosPagamento">Copiar</div>' 
+                : ''
 
                 html += `
                     <div class="col-md-4 col-sm-6 col-lg-3">
@@ -356,11 +379,11 @@ Adicionar vendas
 
                                 <div class="form-group">
                                     <label for="data_parcela[${index}]">Data da Parcela</label>
-                                    <input type="date" name="data_parcela[${index}]" id="data_parcela[${index}]" class="form-control" value="${proximaData}">
+                                    <input type="date" name="data_parcela[${index}]" id="data_parcela[${index}]" class="form-control" value="${dataVencimento}">
                                 </div>
                                 <div class="form-group">
                                     <label for="valor_parcela[${index}]">Valor</label>
-                                    <input type="number" name="valor_parcela[${index}]" id="valor_parcela[${index}]" class="form-control primeiroInputValor" value="${campoValorTratado}">
+                                    <input type="number" step="0.01" name="valor_parcela[${index}]" id="valor_parcela[${index}]" class="form-control primeiroInputValor" value="${campoValorTratado}">
                                 </div>
                                 <div class="form-group">
                                     <label for="observacao[${index}]">Observação</label>
@@ -395,17 +418,17 @@ Adicionar vendas
         calcularTotalVenda(cotacao_fator, cotacao_peso, fator, peso)
     })
 
-    function addDays(date, days) {
-        let arrDate = date.split("-")
-        let daysFiltered = parseInt(days)
+    // function addDays(date, days) {
+    //     let arrDate = date.split("-")
+    //     let daysFiltered = parseInt(days)
 
-        var result = new Date(arrDate[0], arrDate[1]-1, arrDate[2])
-        result.setDate(result.getDate() + daysFiltered);
+    //     var result = new Date(arrDate[0], arrDate[1]-1, arrDate[2])
+    //     result.setDate(result.getDate() + daysFiltered);
     
-        return result.getFullYear() + '-' 
-        + (adicionaZero(result.getMonth()+1).toString()) + "-"
-        + adicionaZero(result.getDate().toString());
-    }
+    //     return result.getFullYear() + '-' 
+    //     + (adicionaZero(result.getMonth()+1).toString()) + "-"
+    //     + adicionaZero(result.getDate().toString());
+    // }
 
     function adicionaZero(numero){
         if (numero <= 9) 
@@ -419,8 +442,9 @@ Adicionar vendas
         let totalFator = cotacao_fator * fator
         let totalPeso = cotacao_peso * peso
         let totalCompra = totalFator + totalPeso
-
-        $("#valor_total").val(totalCompra)
+        let valorTotalCompraTratado = totalCompra.toFixed(2)
+        
+        $("#valor_total").val(valorTotalCompraTratado)
     }
 
     $(".procurarCliente").click( () => {
@@ -431,7 +455,7 @@ Adicionar vendas
 
         $(".modal-body").html(`
             <form id="formProcurarCliente" method="GET" action="{{ route('procurarCliente') }}">
-                <input type="hidden" name="representante_id" value="{{ $idRepresentante }}">
+                <input type="hidden" name="representante_id" value="{{ $representante_id }}">
                 <div class="d-flex justify-content-between">
                     <input class="form-control" id="dado" name="dado" placeholder="Informe o cpf ou nome do Cliente">
                     <button type="submit" class="btn btn-dark ml-2">
@@ -540,7 +564,6 @@ Adicionar vendas
     }
 
     function listenerFormaPagamentoParcela () {
-        console.log('dfsd');
         $("select[name^='forma_pagamento']").each( (index, element) => {
             $(element).change( (e) => {
                 let select = $(e.target)

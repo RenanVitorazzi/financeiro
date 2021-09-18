@@ -22,7 +22,7 @@ class ClienteController extends Controller
 
     public function create()
     {
-        $representantes = Representante::with(['pessoa'])->get();
+        $representantes = Representante::with('pessoa')->get();
         
         return view('cliente.create', compact('representantes'));
     }
@@ -83,15 +83,18 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index');
     }
 
-    public function destroy($id) 
+    public function destroy(Request $request, $id) 
     {
         Cliente::destroy($id);
 
-        return json_encode([
-            'icon' => 'success',
-            'title' => 'Sucesso!',
-            'text' => 'Fornecedor excluído com sucesso!'
-        ]);
+        $request
+        ->session()
+        ->flash(
+            'message',
+            'Cliente excluído com sucesso!'
+        );
+
+        return redirect()->route('clientes.index');
     }
 
     public function procurarCliente(Request $request)

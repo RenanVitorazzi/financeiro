@@ -110,8 +110,6 @@ class ContaCorrenteRepresentanteController extends Controller
     public function destroy(Request $request, $id)
     {
         $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
-
-        $representante_id = $contaCorrente->representante_id;
         $contaCorrente->delete();
 
         $request
@@ -121,7 +119,7 @@ class ContaCorrenteRepresentanteController extends Controller
                 'Registro excluído com sucesso!'
             );
 
-        return redirect()->route("conta_corrente_representante.show", $representante_id);
+        return redirect()->route("conta_corrente_representante.show", $contaCorrente->representante_id);
     }
 
     public function impresso($id)

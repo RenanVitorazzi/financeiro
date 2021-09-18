@@ -22,22 +22,22 @@ Representantes
                         <div class='mt-2'>{{ $representante->pessoa->nome }}</div>
                         <div class="d-flex">
                             <x-botao-editar class="mr-2" href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
-                            @if ($representante->conta_corrente->isEmpty())
+                            {{-- @if ($representante->conta_corrente->isEmpty())
                             <x-botao-excluir action="{{ route('representantes.destroy', $representante->id) }}"></x-botao-excluir>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
                     <div class="card-body">
                         <p>
                             Peso: 
                             <span class="{{ $representante->conta_corrente->sum('peso_agregado') < 0 ? 'text-danger' : 'text-success'}}">
-                                {{ number_format($representante->conta_corrente->sum('peso_agregado'), 3, ',', '.') }}
+                                @peso($representante->conta_corrente->sum('peso_agregado'))
                             </span>
                         </p>
                         <p>
                             Fator: 
                             <span class="{{ $representante->conta_corrente->sum('fator_agregado') < 0 ? 'text-danger' : 'text-success'}}">
-                                {{ number_format($representante->conta_corrente->sum('fator_agregado'), 2, ',', '.') }}
+                                @fator($representante->conta_corrente->sum('fator_agregado'))
                             </span>
                         </p>
                         <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">

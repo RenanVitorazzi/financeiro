@@ -23,6 +23,8 @@ class ChequeRepresentanteRequest extends FormRequest
             'valor_parcela.*' => ['required', 'numeric'],
             'data_parcela' => ['array', 'min:1'],
             'data_parcela.*' => ['required', 'date'],
+            'nova_troca' => ['required'],
+            'taxa_juros' => ['required_if:nova_troca,sim', 'min:0', 'max:100', 'nullable'],
         ];
     }
 }

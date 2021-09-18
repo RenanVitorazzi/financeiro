@@ -84,15 +84,19 @@ class FornecedorController extends Controller
         return redirect()->route('fornecedores.index');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         Fornecedor::destroy($id);
+        ContaCorrente::where('fornecedor_id', $id)->delete();
         
-        return json_encode([
-            'icon' => 'success',
-            'title' => 'Sucesso!',
-            'text' => 'Fornecedor excluído com sucesso!'
-        ]);
+        $request
+        ->session()
+        ->flash(
+            'message',
+            'Fornecedor excluído com sucesso!'
+        );
+
+        return redirect()->route('fornecedores.index');
     }
 
     public function pdf_fornecedores()

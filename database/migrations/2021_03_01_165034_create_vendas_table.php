@@ -18,11 +18,11 @@ class CreateVendasTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->date('data_venda');
-            $table->decimal('peso', 8, 3)->nullable();
-            $table->decimal('fator', 8, 2)->nullable();
-            $table->decimal('cotacao_peso', 8, 2)->nullable();
-            $table->decimal('cotacao_fator', 8, 2)->nullable();
-            $table->decimal('valor_total', 8, 2)->nullable();
+            $table->decimal('peso', 11, 3)->nullable();
+            $table->decimal('fator', 10, 2)->nullable();
+            $table->decimal('cotacao_peso', 10, 2)->nullable();
+            $table->decimal('cotacao_fator', 10, 2)->nullable();
+            $table->decimal('valor_total', 10, 2)->nullable();
             
             $table->enum('metodo_pagamento', ['À vista', 'Parcelado', 'Aberto', 'Parcelado com entrada'])->nullable();
             $table->longText('observacao')->nullable();
@@ -37,9 +37,9 @@ class CreateVendasTable extends Migration
             $table->date('data_parcela');
             $table->string('nome_cheque')->nullable();
             $table->string('numero_cheque')->nullable();
-            $table->decimal('valor_parcela', 8, 2);
+            $table->decimal('valor_parcela', 10, 2);
             $table->enum('forma_pagamento', ['Dinheiro', 'Cheque', 'Nota Promissória', 'Cartão de Crédito', 'Cartão de Débito', 'Transferência Bancária', 'Depósito', 'Boleto', 'Aberto']);
-            $table->enum('status', ['Pago', 'Sustado', 'Adiado', 'Aguardando', 'Devolvido', 'Resgatado'])->default('Aguardando');
+            $table->enum('status', ['Pago', 'Sustado', 'Adiado', 'Aguardando', 'Devolvido', 'Resgatado', 'Depositado'])->default('Aguardando');
             $table->string('motivo')->nullable();
             $table->longText('observacao')->nullable();
             $table->foreignId('parceiro_id')->nullable()->constrained('parceiros');
