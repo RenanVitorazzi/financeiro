@@ -6,6 +6,7 @@ use App\Http\Requests\RequestFormPessoa;
 use App\Models\Fornecedor;
 use App\Models\Pessoa;
 use App\Models\ContaCorrente;
+use App\Models\Parcela;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +17,16 @@ class FornecedorController extends Controller
     {
         $fornecedores = Fornecedor::with(['pessoa'])
         ->withSum('contaCorrente', 'peso_agregado')
-        ->get();
-        
+        ->get()
+        ->sortBy('conta_corrente_sum_peso_agregado');
+
+        $labels = json_encode($fornecedores->pluck('pessoa.nome'));
+
+        $data = json_encode($fornecedores->pluck('conta_corrente_sum_peso_agregado'));
+
         $message = $request->session()->get('message');
         
-        return view('fornecedor.index', compact('fornecedores', 'message'));
+        return view('fornecedor.index', compact('fornecedores', 'message', 'labels', 'data'));
     }
 
     public function create()
@@ -50,10 +56,11 @@ class FornecedorController extends Controller
     {
         $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
 
-        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY id) AS saldo 
+        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY data) AS saldo 
         FROM conta_corrente 
         WHERE fornecedor_id = ? 
-        AND deleted_at IS NULL", [$id]);
+        AND deleted_at IS NULL
+        ORDER BY data", [$id]);
         
         return view('fornecedor.show',  compact('fornecedor', 'registrosContaCorrente'));    
     }
@@ -103,8 +110,40 @@ class FornecedorController extends Controller
     {
         $fornecedores = Fornecedor::with(['pessoa'])
         ->withSum('contaCorrente', 'peso_agregado')
-        ->get();
+        ->get()
+        ->sortBy('conta_corrente_sum_peso_agregado');
     
+        // dd($fornecedores->pluck('pessoa.nome'));
+        // $chartData = [
+        // "type" => 'bar',
+        //     "data" => [
+        //         "labels" => $fornecedores->pluck('pessoa.nome'),
+        //             "datasets" => [
+        //             [
+        //                 "data" => $fornecedores->pluck('conta_corrente_sum_peso_agregado')
+        //             ],
+        //         ],
+        //     "options" => [
+        //         "legend" => [
+        //             "display" => true,
+        //             "labels"=> [
+        //                 "font" => [
+        //                     "size" => 8
+        //                 ]
+        //             ]
+        //         ]
+                
+        //     ]
+        //     ]
+        // ]; 
+        // $chartData = json_encode($chartData);
+        
+        // $chartURL = "https://quickchart.io/chart?width=300&height=300&c=".urlencode($chartData);
+
+        // $chartData = file_get_contents($chartURL); 
+        // $chart = 'data:image/png;base64, '.base64_encode($chartData);
+        // dd($chart);
+
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('fornecedor.pdf.fornecedores', compact('fornecedores') );
         
@@ -115,7 +154,7 @@ class FornecedorController extends Controller
     {
         $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
 
-        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY id) AS saldo 
+        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY data) AS saldo 
         FROM conta_corrente 
         WHERE fornecedor_id = ? 
         AND deleted_at IS NULL", [$id]);
@@ -126,4 +165,31 @@ class FornecedorController extends Controller
         
         return $pdf->stream();
     }
+
+    public function pdf_diario()
+    {
+        $fornecedores = Fornecedor::with(['pessoa'])
+            ->withSum('contaCorrente', 'peso_agregado')
+            ->get()
+            ->sortBy('conta_corrente_sum_peso_agregado');
+
+        $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
+            ->where([
+                ['forma_pagamento', 'Cheque'],
+                ['status', '!=', 'Pago'],
+                ['status', '!=', 'Depositado'],
+                ['status', '!=', 'Adiado'],
+                ['parceiro_id', NULL],
+            ])
+            ->groupBy('month', 'year')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira') );
+        
+        return $pdf->stream();
+    }
+    
 }

@@ -177,7 +177,7 @@ Procurar cheque
             
             e.preventDefault()
             let dataForm = $(e.target).serialize() 
-            console.log(dataForm);
+
             $.ajax({
                 type: 'GET',
                 url: e.target.action,
@@ -190,22 +190,25 @@ Procurar cheque
                     Swal.showLoading()
                 },
                 success: (response) => {
-                    console.log(response);
                     let tableBody = ''
     
                     response.forEach(element => {
                         let dataTratada = transformaData(element.data_parcela)
                         let ondeEstaCheque = carteiraOuParceiro(element.parceiro_id, element.nome_parceiro)
-                        if (element.status === 'Adiado') {
+                        let numero_banco = tratarNulo(element.numero_banco)
+                        let numero_cheque = tratarNulo(element.numero_cheque)
+                        let representante = tratarNulo(element.nome_representante)
+
+                        if (element.status === 'ADIADO') {
                             tableBody += `
                                 <tr>
                                     <td>${element.nome_cheque}</td>
                                     <td><span class="text-muted">(${dataTratada})</span> ${transformaData(element.nova_data)}</td>
-                                    <td>${element.valor_parcela}</td>
-                                    <td>${element.nome_representante}</td>
+                                    <td>${element.valor_parcela_tratado}</td>
+                                    <td>${representante}</td>
                                     <td>${ondeEstaCheque}</td>
-                                    <td>${element.numero_banco}</td>
-                                    <td>${element.numero_cheque}</td>
+                                    <td>${numero_banco}</td>
+                                    <td>${numero_cheque}</td>
                                     <td>${element.status}</td>
                                     <td>
                                         <div class="btn btn-dark btn-adiar" 
@@ -222,11 +225,11 @@ Procurar cheque
                                 <tr>
                                     <td>${element.nome_cheque}</td>
                                     <td>${dataTratada}</td>
-                                    <td>${element.valor_parcela}</td>
-                                    <td>${element.nome_representante}</td>
+                                    <td>${element.valor_parcela_tratado}</td>
+                                    <td>${representante}</td>
                                     <td>${ondeEstaCheque}</td>
-                                    <td>${element.numero_banco}</td>
-                                    <td>${element.numero_cheque}</td>
+                                    <td>${numero_banco}</td>
+                                    <td>${numero_cheque}</td>
                                     <td>${element.status}</td>
                                     <td>
                                         <div class="btn btn-dark btn-adiar" 
@@ -289,10 +292,17 @@ Procurar cheque
 
     function carteiraOuParceiro (id, nome) {
         if (id === null) {
-            return 'Carteira'
+            return 'CARTEIRA'
         }
 
         return nome
+    }
+
+    function tratarNulo (valor) {
+        if (valor === null) {
+            return '';
+        }
+        return valor
     }
     
 </script>

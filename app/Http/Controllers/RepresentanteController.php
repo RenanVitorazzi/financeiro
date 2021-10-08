@@ -71,7 +71,6 @@ class RepresentanteController extends Controller {
 
     public function destroy (Request $request, $id)
     {
-
         Representante::destroy($id);
         
         $request
@@ -88,7 +87,7 @@ class RepresentanteController extends Controller {
     {
         $representantes = Representante::with('pessoa', 'conta_corrente')->get();
         $contaCorrenteGeral = ContaCorrenteRepresentante::get();
-        
+
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('representante.pdf.impresso', compact('representantes', 'contaCorrenteGeral') );
             

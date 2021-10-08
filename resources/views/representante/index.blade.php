@@ -12,49 +12,39 @@ Representantes
         <x-botao-novo href="{{ route('representantes.create') }}"></x-botao-novo>
     </div>
 </div>
-    @forelse ($representantes as $representante)
-        @if ($loop->first)
-        <div class='row'>  
-        @endif
-            <div class="col-4 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                        <div class='mt-2'>{{ $representante->pessoa->nome }}</div>
-                        <div class="d-flex">
-                            <x-botao-editar class="mr-2" href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
-                            {{-- @if ($representante->conta_corrente->isEmpty())
-                            <x-botao-excluir action="{{ route('representantes.destroy', $representante->id) }}"></x-botao-excluir>
-                            @endif --}}
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p>
-                            Peso: 
-                            <span class="{{ $representante->conta_corrente->sum('peso_agregado') < 0 ? 'text-danger' : 'text-success'}}">
-                                @peso($representante->conta_corrente->sum('peso_agregado'))
-                            </span>
-                        </p>
-                        <p>
-                            Fator: 
-                            <span class="{{ $representante->conta_corrente->sum('fator_agregado') < 0 ? 'text-danger' : 'text-success'}}">
-                                @fator($representante->conta_corrente->sum('fator_agregado'))
-                            </span>
-                        </p>
-                        <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
-                            Conta Corrente <i class="fas fa-balance-scale"></i>
-                        </a>
-                        <a class="btn btn-dark" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
-                            Vendas <i class="fas fa-shopping-cart"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        @if ($loop->last)
-        </div>  
-        @endif
+
+<x-table>
+    <x-table-header>
+        <tr>
+            <th>Nome</th>
+            <th>Peso</th>
+            <th>Fator</th>
+            <th><span class="fas fa-edit"></span></th>
+        </tr>
+    </x-table-header>
+    <tbody>
+        @forelse ($representantes as $representante)
+        <tr>
+            <td>{{ $representante->pessoa->nome }}</td>
+            <td>@peso($representante->conta_corrente->sum('peso_agregado'))g</td>
+            <td>@fator($representante->conta_corrente->sum('fator_agregado'))ft</td>
+            <td>
+                <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
+                    <i class="fas fa-balance-scale"></i>
+                </a>
+                {{-- <a class="btn btn-dark" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
+                    Vendas <i class="fas fa-shopping-cart"></i>
+                </a> --}}
+                <x-botao-editar class="mr-2" href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
+            </td>
+        </tr>
         @empty
-            <div class="alert alert-danger">Nenhum registro criado!</div>
+            <tr>
+                <td colspan=4>Nenhum registro criado!</td>
         @endforelse
+    </tbody>
+</x-table>
+
 @endsection
 @section('script')
 <script>

@@ -1,10 +1,10 @@
 @extends('layout')
 @section('title')
-Prorrogações
+Devolvidos
 @endsection
 @section('body')
 <div class='mb-2 d-flex justify-content-between'>
-    <h3> Prorrogações </h3>
+    <h3> Devolvidos </h3>
 </div>
        
 <x-table id="tabelaBalanco">
@@ -17,7 +17,9 @@ Prorrogações
             @endif
             <th>Data</th>
             <th>Valor</th>
-            <th>Detalhes</th>
+            <th>Número</th>
+            <th>Status</th>
+            <th>Observação</th>
             <th>Ações</th>
         </tr>
     </x-table-header>
@@ -35,20 +37,17 @@ Prorrogações
                 @endif
                 <td>@data($cheque->data_parcela)</td>
                 <td>@moeda($cheque->valor_parcela)</td>
-                <td>{{ $cheque->numero_cheque }} {{ $cheque->observacao}}</td>
+                <td>{{ $cheque->numero_cheque }}</td>
+                <td>{{ $cheque->status }}</td>
+                <td>{{ $cheque->observacao }}</td>
                 <td>
-                    @if ($cheque->status !== 'Resgatado')
-                    <div 
-                        class="btn btn-dark btn-adiar" 
+                    <button class="btn btn-success btn-pago" data-id="{{ $cheque->id }}">Pago</button> 
+                    <button class="btn btn-danger btn-devolvido" 
                         data-id="{{ $cheque->id }}" 
-                        data-dia="{{ $cheque->data_parcela }}" 
-                        data-valor="{{ $cheque->valor_parcela }}" 
-                        data-nome="{{ $cheque->nome_cheque }}"
-                    > 
-                        Adiar <i class="far fa-clock"></i> 
-                    </div>
-                    @endif
-                    
+                        data-nome="{{$cheque->nome_cheque}}"
+                        data-data="{{$cheque->data_parcela}}"
+                        data-valor="{{$cheque->valor_parcela}}"
+                    >Devolvido</button>     
                 </td>
             </tr>
         @empty
@@ -58,55 +57,54 @@ Prorrogações
         @endforelse
     </tbody>
 </x-table>
-{{ $cheques->links() }}
+
 @endsection
 @section('script')
 <script>
     const TAXA = 3
     const MODAL = $("#modal")
     const MODAL_BODY = $("#modal-body")
+    const MOTIVOS = JSON.parse(@json($motivos));
+ 
+    function criarOpcaoMotivos() {
+        let options = ``;
 
-    $(".btn-adiar").each( (index, element) => {
+        MOTIVOS.forEach( (element) => {
+            options += `<option value=${element.motivo_id}>${element.motivo_id} - ${element.descricao}</option>`
+        });
+
+        return options;
+    }
+
+    $(".btn-devolvido").each( (index, element) => {
         $(element).click( () => {
-            adiarCheque(element)
+            InformarDevolucao(element)
         })
     });
-
-    function adiarCheque(element) {
+    
+    function InformarDevolucao(element) {
 
         let data = $(element).data()
-        console.log(data);
-        let novaData = addDays(data.dia, 15)
-        let jurosNovos = calcularNovosJuros(element, 15)
+        let opcaoMotivo = criarOpcaoMotivos()
         
-        // let jurosAntigos = 0;
-        let jurosTotais = parseFloat(jurosNovos)/* + parseFloat(jurosAntigos)*/
         MODAL.modal("show")
         
         $("#modal-title").html("Prorrogação")
         
         MODAL_BODY.html(`
-            <form id="formAdiamento" action="{{ route('adiamentos.store') }}"> 
+            <form id="formDevolvido" action="{{ route('devolvidos.store') }}"> 
                 <meta name="csrf-token" content="{{ csrf_token() }}">
                 <p>Titular: <b>${data.nome}</b></p>
-                <p>Valor do cheque: <b>${data.valor}</b></p>
-                <p>Data: <b>${data.dia}</b></p>
-                
-                <p>Dias adiados: <b><span id="diasAdiados">15</span></b></p>
-                
+                <p>Valor do cheque: R$ <b>${data.valor}</b></p>
+                <p>Data: <b>${data.data}</b></p>
+
                 <div class="form-group">
-                    <label for="nova_data">Informe a nova data</label>
-                    <x-input type="date" value="${novaData}" name="nova_data"></x-input>
+                    <label for="nova_data">Informe o motivo</label>
+                    <x-select name="motivo">
+                        ${opcaoMotivo}
+                    </x-select>
                 </div>
-                <div class="form-group">
-                    <label for="taxa_juros">Informe a taxa de juros (%)</label>
-                    <x-input type="number" value="${TAXA.toFixed(2)}" name="taxa_juros"></x-input>
-                </div>
-                <div class="form-group">
-                    <label for="juros_totais">Valor total de juros</label>
-                    <x-input readonly type="number" value="${(jurosTotais).toFixed(2)}" name="juros_totais"></x-input>
-                </div>
-                
+               
                 <div class="form-group">
                     <label for="observacao">Observação</label>
                     <textarea class="form-control" name="observacao" id="observacao"></textarea>

@@ -62,7 +62,7 @@ class ContaCorrenteRepresentanteController extends Controller
             sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
             FROM conta_corrente_representante cc
             WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY id desc",
+            ORDER BY data desc, id desc",
             [$id]
         );
 
@@ -129,7 +129,7 @@ class ContaCorrenteRepresentanteController extends Controller
             sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
             FROM conta_corrente_representante cc
             WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY id desc",
+            ORDER BY data desc, id desc",
             [$id]
         );
 

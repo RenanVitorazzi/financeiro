@@ -12,6 +12,7 @@ use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\ContaCorrenteAnexoController;
 use App\Http\Controllers\ContaCorrenteRepresentanteAnexoController;
+use App\Http\Controllers\DevolvidosController;
 use App\Http\Controllers\TrocaChequeController;
 use App\Http\Controllers\HomeController;
 
@@ -49,12 +50,14 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('conta_corrente', ContaCorrenteController::class);
         Route::resource('troca_cheques', TrocaChequeController::class);
         Route::resource('adiamentos', AdiamentosController::class);
+        Route::resource('devolvidos', DevolvidosController::class);
         
         //? PDF
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
         Route::get('pdf_fornecedor/{id}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
+        Route::get('pdf_diario', [FornecedorController::class, 'pdf_diario'])->name('pdf_diario');
         
         //? Anexos 
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([

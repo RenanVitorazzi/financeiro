@@ -44,32 +44,30 @@
     <x-table-header>
         <tr>
                 <th>Nome</th>
-                <th>Número Cheque</th>
+                <th>Número</th>
                 <th>Data</th>
-                {{-- <th>Status</th> --}}
                 <th>Dias</th>
                 <th>Valor Bruto</th>
                 <th>Juros</th>
                 <th>Valor líquido</th>
-                {{-- <th>Ações</th> --}}
         </tr>
     </x-table-header>
     <tbody>
         @foreach ($troca->cheques as $cheque)
-            @if ($cheque->parcelas->first()->status === 'Adiado')
+            @if ($cheque->parcelas->status === 'Adiado')
             <tr>
-                <td><p>{{ $cheque->parcelas->first()->nome_cheque }}</p></td>
-                <td><p>{{ $cheque->parcelas->first()->numero_cheque }}</p></td>
+                <td><p>{{ $cheque->parcelas->nome_cheque }}</p></td>
+                <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
                 <td>
-                    <s>@data($cheque->parcelas->first()->data_parcela)</s>
+                    <s>@data($cheque->parcelas->data_parcela)</s>
                     <p>@data($cheque->adiamento->last()->data)</p>
                 </td>
-                {{-- <td><p>{{ $cheque->parcelas->first()->status }} ({{ $cheque->adiamento->count() }})</p></td> --}}
+                {{-- <td><p>{{ $cheque->parcelas->status }} ({{ $cheque->adiamento->count() }})</p></td> --}}
                 <td>
                     <s>{{ $cheque->dias }}</s>
                     <p>{{ $cheque->dias + $cheque->adiamento->last()->dias_totais }}</p>
                 </td>
-                <td><p>@moeda($cheque->parcelas->first()->valor_parcela)</p></td>
+                <td><p>@moeda($cheque->parcelas->valor_parcela)</p></td>
                 <td>
                     <s>@moeda($cheque->valor_juros)</s>
                     <p>@moeda($cheque->adiamento->last()->juros_totais)</p>
@@ -82,10 +80,10 @@
                     <div class="btn btn-dark btn-adiar" 
                         data-id="{{ $cheque->parcela_id }}" 
                         data-dia="{{ $cheque->adiamento->last()->data }}" 
-                        data-valor="{{ $cheque->parcelas->first()->valor_parcela }}" 
+                        data-valor="{{ $cheque->parcelas->valor_parcela }}" 
                         data-juros="{{ $cheque->adiamento->last()->juros_totais }}" 
                         data-troca_parcela_id="{{ $cheque->id }}"
-                        data-nome="{{ $cheque->parcelas->first()->nome_cheque }}"
+                        data-nome="{{ $cheque->parcelas->nome_cheque }}"
                     > Adiar <i class="far fa-clock"></i> </div>              
                     <form class="form-resgate" method="POST" action="{{ route('resgatar_cheque', $cheque->parcela_id) }}">
                         @csrf
@@ -96,23 +94,23 @@
             </tr>
             @else
             <tr>
-                <td>{{ $cheque->parcelas->first()->nome_cheque }}</td>
-                <td><p>{{ $cheque->parcelas->first()->numero_cheque }}</p></td>
-                <td>@data($cheque->parcelas->first()->data_parcela)</td>
-                {{-- <td>{{ $cheque->parcelas->first()->status }}</td> --}}
+                <td>{{ $cheque->parcelas->nome_cheque }}</td>
+                <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
+                <td>@data($cheque->parcelas->data_parcela)</td>
+                {{-- <td>{{ $cheque->parcelas->status }}</td> --}}
                 <td>{{ $cheque->dias }}</td>
-                <td>@moeda($cheque->parcelas->first()->valor_parcela)</td>
+                <td>@moeda($cheque->parcelas->valor_parcela)</td>
                 <td>@moeda($cheque->valor_juros)</td>
                 <td>@moeda($cheque->valor_liquido)</td>
                 {{-- <td>
-                    @if ($cheque->parcelas->first()->status !== 'Resgatado')
+                    @if ($cheque->parcelas->status !== 'Resgatado')
                     <div class="btn btn-dark btn-adiar" 
                             data-id="{{ $cheque->parcela_id }}" 
-                            data-dia="{{ $cheque->parcelas->first()->data_parcela }}" 
-                            data-valor="{{ $cheque->parcelas->first()->valor_parcela }}" 
+                            data-dia="{{ $cheque->parcelas->data_parcela }}" 
+                            data-valor="{{ $cheque->parcelas->valor_parcela }}" 
                             data-juros="{{ $cheque->valor_juros }}" 
                             data-troca_parcela_id="{{ $cheque->id }}"
-                            data-nome="{{ $cheque->parcelas->first()->nome_cheque }}"
+                            data-nome="{{ $cheque->parcelas->nome_cheque }}"
                     > Adiar <i class="far fa-clock"></i> </div>      
                     <form class="form-resgate" method="POST" action="{{ route('resgatar_cheque', $cheque->parcela_id) }}">
                         @csrf

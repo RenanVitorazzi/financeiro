@@ -33,27 +33,33 @@
             <tr>
                 <th>Nome</th>
                 <th>Balanço</th>
+                <th>%</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($fornecedores as $fornecedor)
-                <tr>
-                    <td>{{ $fornecedor->pessoa->nome }}</td>
-                    <td>@peso($fornecedor->conta_corrente_sum_peso_agregado)</td>
-                </tr>
+                @if ($fornecedor->conta_corrente_sum_peso_agregado != 0)
+                    <tr>
+                        <td>{{ $fornecedor->pessoa->nome }}</td>
+                        <td>@peso($fornecedor->conta_corrente_sum_peso_agregado)</td>
+                        <td> {{ number_format($fornecedor->conta_corrente_sum_peso_agregado / $fornecedores->sum('conta_corrente_sum_peso_agregado') * 100, 2) }} % </td>
+                    </tr>
+                @endif
             @empty
                 <tr>
-                    <td colspan=2>Nenhum registro</td>
+                    <td colspan=3>Nenhum registro</td>
                 </tr>
             @endforelse
             <tfoot>
                 <tr>
                     <td><b>Total</b></td>
                     <td><b>@peso($fornecedores->sum('conta_corrente_sum_peso_agregado'))</b></td>
+                    <td></td>
                 </tr>
             </tfoot>
         </tbody>
     </table>
+    {{-- <img src="{{$chart}}" alt=""> --}}
 </body>
 </html>
 

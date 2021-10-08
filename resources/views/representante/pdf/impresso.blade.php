@@ -38,24 +38,29 @@
                 <th>Nome</th>
                 <th>Saldo Peso</th>
                 <th>Saldo Fator</th>
+                <th>Saldo Geral</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($representantes as $representante)
-                <tr>
-                    <td>{{ $representante->pessoa->nome }}</td>
-                    <td>{{ number_format($representante->conta_corrente->sum('peso_agregado'), 3, ',', '.') }}</td>
-                    <td>{{ number_format($representante->conta_corrente->sum('fator_agregado'), 2, ',', '.') }}</td>
-                </tr>
+                @if ($representante->conta_corrente->sum('peso_agregado') != 0 || $representante->conta_corrente->sum('fator_agregado') != 0)
+                    <tr>
+                        <td>{{ $representante->pessoa->nome }}</td>
+                        <td>@peso($representante->conta_corrente->sum('peso_agregado')) </td>
+                        <td>@fator($representante->conta_corrente->sum('fator_agregado')) </td>
+                        <td>@peso(($representante->conta_corrente->sum('fator_agregado') / 32)  + $representante->conta_corrente->sum('peso_agregado') ) </td>
+                    </tr>
+                @endif
             @empty
                 <tr>
-                    <td colspan="3">Nenhum registro criado</td>
+                    <td colspan="4">Nenhum registro criado</td>
                 </tr>
             @endforelse
                 <tr>
                     <td><b>Total</b></td>
-                    <td><b>{{ number_format($contaCorrenteGeral->sum('peso_agregado'), 3, ',', '.') }}</b></td>
-                    <td><b>{{ number_format($contaCorrenteGeral->sum('fator_agregado'), 2, ',', '.') }}</b></td>
+                    <td><b>@peso($contaCorrenteGeral->sum('peso_agregado')) </b></td>
+                    <td><b>@fator($contaCorrenteGeral->sum('fator_agregado')) </b></td>
+                    <td><b>@peso(($contaCorrenteGeral->sum('fator_agregado') / 32) + $contaCorrenteGeral->sum('peso_agregado')) </b></td>
                 </tr>
         </tbody>
     </table>

@@ -141,6 +141,7 @@ class ChequeController extends Controller
 
     public function carteira_cheque_total () 
     {
+
         $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
             ->where([
                 ['forma_pagamento', 'Cheque'],
@@ -165,28 +166,37 @@ class ChequeController extends Controller
     {
         $cheques = DB::select(' SELECT 
                                     par.id,
-                                    par.nome_cheque,
+                                    UPPER(par.nome_cheque) as nome_cheque,
                                     par.data_parcela,
                                     par.numero_cheque,
+                                    Concat(?,Format(valor_parcela, 2, ?) ) AS valor_parcela_tratado,
                                     par.valor_parcela,
-                                    par.status,
-                                    (SELECT p.nome FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
-                                    (SELECT p.nome FROM pessoas p WHERE p.id = pa.pessoa_id) AS nome_parceiro,
+                                    UPPER(par.status) AS status,
+                                    (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
+                                    (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = pa.pessoa_id) AS nome_parceiro,
                                     par.numero_banco,
                                     par.parceiro_id,
                                     a.nova_data
                                 FROM
                                     parcelas par
-                                        LEFT JOIN
+                                LEFT JOIN
                                     representantes r ON r.id = par.representante_id
-                                        LEFT JOIN
+                                LEFT JOIN
                                     parceiros pa ON pa.id = par.parceiro_id
-                                        LEFT JOIN
+                                LEFT JOIN
                                     adiamentos a ON a.parcela_id = par.id
-                                        WHERE 
+                                WHERE 
                                     NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id) 
+                                    AND par.deleted_at IS NULL
                                     AND par.'.$request->tipo_select.' = ?
-                                    ORDER BY par.data_parcela', [$request->texto_pesquisa]);
+                                    ORDER BY par.data_parcela', 
+                                [
+                                    'R$ ',
+                                    'de_DE',
+                                    $request->texto_pesquisa,
+                                ]
+        );
+
         return json_encode($cheques);
     }
 }

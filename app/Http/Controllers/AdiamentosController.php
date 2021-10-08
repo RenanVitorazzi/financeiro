@@ -18,10 +18,10 @@ class AdiamentosController extends Controller
             ->where([
                 ['forma_pagamento', 'Cheque']
             ])
-            ->whereIn('status', array('Aguardando', 'Adiado'))
+            ->where('status', 'Adiado')
             ->orderBy('data_parcela')
             ->paginate(30);
-            
+
         return view('adiamento.index', compact('cheques'));
     }
 

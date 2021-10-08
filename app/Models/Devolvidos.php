@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Adiamento extends Model
+class Devolvidos extends Model
 {
-    protected $guarded = ['id'];
     use HasFactory;
 
-    public function parcelas() 
+    protected $guarded = ['id'];
+    public $timestamps = false;
+
+    public function cheques() 
     {
         return $this->belongsTo(Parcela::class);
-    }
+    } 
 
 }
