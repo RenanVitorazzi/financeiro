@@ -15,6 +15,7 @@ Procurar cheque
                 <option value="nome_cheque">Titular</option>
                 <option value="data_parcela">Data</option>
                 <option value="representante_id">Representante</option>
+                <option value="status">Status</option>
             </x-select>
         </div>
        
@@ -107,7 +108,8 @@ Procurar cheque
                 swal.showLoading()
             },
             success: (response) => {
-                console.log(response);
+                // console.log(response);
+                // return;
                 Swal.fire({
                     title: response.title,
                     icon: response.icon,
@@ -167,7 +169,18 @@ Procurar cheque
             $('#texto_pesquisa').get(0).type = 'date';
             return
         }
-
+        if (e.target.value==='status') {
+            $('#texto_pesquisa').replaceWith(`
+                <x-select id="texto_pesquisa" name="texto_pesquisa">
+                    <option value="Devolvido" selected>Devolvido</option>
+                    <option value="Pago">Pago</option>
+                    <option value="Adiado">Adiado</option>
+                    <option value="Depositado">Depositado</option>
+                    <option value="Aguardando">Aguardando</option>
+                </x-select>
+            `);
+            return
+        }
         $('#texto_pesquisa').get(0).type = 'text';
     })
 
@@ -198,8 +211,21 @@ Procurar cheque
                         let numero_banco = tratarNulo(element.numero_banco)
                         let numero_cheque = tratarNulo(element.numero_cheque)
                         let representante = tratarNulo(element.nome_representante)
-
-                        if (element.status === 'ADIADO') {
+                        if (element.status === 'PAGO') {
+                            tableBody += `
+                                <tr>
+                                    <td>${element.nome_cheque}</td>
+                                    <td>${dataTratada}</td>
+                                    <td>${element.valor_parcela_tratado}</td>
+                                    <td>${representante}</td>
+                                    <td>${ondeEstaCheque}</td>
+                                    <td>${numero_banco}</td>
+                                    <td>${numero_cheque}</td>
+                                    <td>${element.status}</td>
+                                    <td><x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar></td>
+                                </tr>
+                            `
+                        } else if (element.status === 'ADIADO') {
                             tableBody += `
                                 <tr>
                                     <td>${element.nome_cheque}</td>
@@ -211,12 +237,13 @@ Procurar cheque
                                     <td>${numero_cheque}</td>
                                     <td>${element.status}</td>
                                     <td>
+                                        <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
                                         <div class="btn btn-dark btn-adiar" 
                                             data-id="${element.id}" 
                                             data-dia="${element.data_parcela}" 
                                             data-valor="${element.valor_parcela}" 
                                             data-nome="${element.nome_cheque}"
-                                        > Adiar <i class="far fa-clock"></i> </div>    
+                                        > <i class="far fa-clock"></i> </div>    
                                     </td>
                                 </tr>
                             `
@@ -232,12 +259,13 @@ Procurar cheque
                                     <td>${numero_cheque}</td>
                                     <td>${element.status}</td>
                                     <td>
+                                        <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
                                         <div class="btn btn-dark btn-adiar" 
                                             data-id="${element.id}" 
                                             data-dia="${element.data_parcela}" 
                                             data-valor="${element.valor_parcela}" 
                                             data-nome="${element.nome_cheque}"
-                                        > Adiar <i class="far fa-clock"></i> </div>    
+                                        > <i class="far fa-clock"></i> </div>    
                                     </td>
                                 </tr>
                             `

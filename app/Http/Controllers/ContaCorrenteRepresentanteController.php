@@ -58,17 +58,17 @@ class ContaCorrenteRepresentanteController extends Controller
     public function show($id)
     {
         $contaCorrente = DB::select("SELECT cc.*,
-            sum(cc.peso_agregado) OVER (ORDER BY cc.id) as saldo_peso,
-            sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
+            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso,
+            sum(cc.fator_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_fator
             FROM conta_corrente_representante cc
             WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY data desc, id desc",
+            ORDER BY cc.data, cc.id ",
             [$id]
         );
 
         $representante = Representante::with('pessoa')->findOrFail($id);
         
-        return view('representante.show', compact('contaCorrente', 'representante'));
+        return view('conta_corrente_representante.show', compact('contaCorrente', 'representante'));
     }
 
     public function edit($id)
@@ -125,18 +125,36 @@ class ContaCorrenteRepresentanteController extends Controller
     public function impresso($id)
     {
         $contaCorrente = DB::select("SELECT cc.*,
-            sum(cc.peso_agregado) OVER (ORDER BY cc.id) as saldo_peso,
-            sum(cc.fator_agregado) OVER (ORDER BY cc.id) as saldo_fator
+            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso,
+            sum(cc.fator_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_fator
             FROM conta_corrente_representante cc
             WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY data desc, id desc",
+            ORDER BY data, cc.id",
+            [$id]
+        );
+
+        $representante = Representante::with('pessoa')->findOrFail($contaCorrente[0]->representante_id);
+    
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('conta_corrente_representante.pdf.impresso', compact('contaCorrente', 'representante') );
+            
+        return $pdf->stream();
+    }
+
+    public function impresso2($id)
+    {
+        $contaCorrente = DB::select("SELECT cc.*,
+            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso
+            FROM conta_corrente_representante cc
+            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
+            ORDER BY data asc, id asc",
             [$id]
         );
 
         $representante = Representante::with('pessoa')->findOrFail($contaCorrente[0]->representante_id);
         
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('conta_corrente_representante.pdf.impresso', compact('contaCorrente', 'representante') );
+        $pdf->loadView('conta_corrente_representante.pdf.impresso_terceiros', compact('contaCorrente', 'representante') );
             
         return $pdf->stream();
     }

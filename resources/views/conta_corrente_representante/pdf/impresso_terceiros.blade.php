@@ -29,26 +29,9 @@
 </style>
 <body>
     <h1>
-        Conta Corrente - {{ $representante->pessoa->nome }}
+        Conta Corrente - {{ $representante->pessoa->nome }} 
     </h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th colspan="2">Saldo</th>
-            </tr>
-            <tr>
-                <th>Peso</th>
-                <th>Fator</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@peso($contaCorrente[count($contaCorrente) - 1]->saldo_peso)</td>
-                <td>@fator($contaCorrente[count($contaCorrente) - 1]->saldo_fator)</td>
-            </tr>
-        </tbody>
-    </table>
     <br>
     <table>
         <thead>
@@ -62,19 +45,29 @@
         </thead>
         <tbody>
             @forelse ($contaCorrente as $registro)
-                <tr>
-                    <td>@data($registro->data)</td>
-                    <td>
-                        <div>Peso: @peso($registro->peso)</div>
-                        <div>Fator: @fator($registro->fator)</div>
-                    </td>
-                    <td>{{ $registro->balanco }}</td>
-                    <td>{{ $registro->observacao }}</td>
-                    <td>
-                        <div>Peso: @peso($registro->saldo_peso)</div>
-                        <div>Fator: @fator($registro->saldo_fator)</div>
-                    </td>
-                </tr>
+                @if ($loop->last)
+                    <tr>
+                        <td><b>@data($registro->data)</b></td>
+                        <td><b>Peso: @peso($registro->peso)</b></td>
+                        <td><b>{{ $registro->balanco == 'Reposição' ? 'Compra' : 'Fechamento' }}</b></td>
+                        <td><b>{{ $registro->observacao }}</b></td>
+                        <td><b>@peso($registro->saldo_peso)</b></td>
+                    </tr>
+                @else
+                    <tr>
+                        <td>@data($registro->data)</td>
+                        <td>
+                            Peso: @peso($registro->peso)
+                        </td>
+                        <td>
+                            {{ $registro->balanco == 'Reposição' ? 'Compra' : 'Fechamento' }}
+                        </td>
+                        <td>{{ $registro->observacao }}</td>
+                        <td>
+                            @peso($registro->saldo_peso)
+                        </td>
+                    </tr>
+                @endif
             @empty
                 <tr>
                     <td colspan="5">Nenhum registro criado</td>

@@ -29,7 +29,7 @@ class ChequeRequest extends FormRequest
             'nome_cheque' => 'nullable',
             'valor_parcela' => 'numeric|required|min:0',
             'status' => 'required',
-            'motivo_devolucao' => 'required_if:status,Devolvido|string|nullable|',
+            'motivo' => 'required_if:status,Devolvido|string|nullable|',
             'observacao' => 'nullable|string',
         ];
     }

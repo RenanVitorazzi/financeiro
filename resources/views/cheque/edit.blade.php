@@ -43,7 +43,7 @@ Editar cheque
                 </x-select>
             </div>
             <div id="motivo_form" class="col-6 {{ $cheque->status === 'Devolvido' ? '' : 'd-none'}}">
-                <x-form-group name="motivo_devolucao" value="{{ $cheque->motivo_devolucao }}">Motivo da devolução </x-form-group>
+                <x-form-group name="motivo" value="{{ $cheque->motivo }}">Motivo da devolução </x-form-group>
             </div>
         </div>
 

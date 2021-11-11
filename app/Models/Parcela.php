@@ -26,17 +26,29 @@ class Parcela extends Model
 
     public function parceiro()
     {
-        return $this->belongsTo(Parceiro::class);
+        return $this->belongsTo(Parceiro::class)->withDefault('Carteira');
     }
 
     public function adiamentos()
     {
-        return $this->hasMany(Adiamento::class);
+        return $this->hasOne(Adiamento::class);
     }
 
     public function troca()
     {
         return $this->belongsTo(TrocaParcela::class);
+    }
+
+    public function scopeCarteira($query)
+    {
+        return $query->where('forma_pagamento', 'Cheque')
+            ->where('status', 'Aguardando')
+            ->where('parceiro_id', NULL);
+    }
+
+    public function scopeAcharRepresentante($query, $id)
+    {
+        return $query->where('representante_id', $id);
     }
 
     protected static function booted()

@@ -36,11 +36,12 @@ class ChequeController extends Controller
                                     representantes r ON r.id = par.representante_id
                                 WHERE
                                     par.status != ?
-                                    AND par.status != ?
+                                        AND par.status != ?
+                                        AND par.status != ?
                                         AND par.deleted_at IS NULL
                                         AND r.deleted_at IS NULL
                                         AND parceiro_id IS NULL
-                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado', 'Pago', 'Depositado']);
+                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado', 'Pago', 'Depositado', 'Resgatado']);
         
         $arrayCores = [
             'Devolvido' => 'text-danger', 
@@ -198,5 +199,16 @@ class ChequeController extends Controller
         );
 
         return json_encode($cheques);
+    }
+
+    public function depositar_diario()
+    {
+        Parcela::where([
+            ['data_parcela','<=', DB::raw('CURDATE()')],
+            ['parceiro_id', NULL],
+            ['status', 'Aguardando']
+        ])->update(['status' => 'Depositado']);
+        
+        return redirect()->route('home');
     }
 }

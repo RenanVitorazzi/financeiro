@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestFormPessoa;
+use App\Models\Adiamento;
 use App\Models\Fornecedor;
 use App\Models\Pessoa;
 use App\Models\ContaCorrente;
 use App\Models\Parcela;
+use App\Models\Representante;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -56,11 +59,20 @@ class FornecedorController extends Controller
     {
         $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
 
-        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY data) AS saldo 
-        FROM conta_corrente 
-        WHERE fornecedor_id = ? 
-        AND deleted_at IS NULL
-        ORDER BY data", [$id]);
+        $registrosContaCorrente = DB::select("SELECT id, 
+                data, 
+                balanco, 
+                peso, 
+                observacao, 
+                sum(peso_agregado) OVER (ORDER BY data, id) AS saldo 
+            FROM 
+                conta_corrente 
+            WHERE 
+                fornecedor_id = ? 
+                AND deleted_at IS NULL
+            ORDER BY data, id", 
+            [$id]
+        );
         
         return view('fornecedor.show',  compact('fornecedor', 'registrosContaCorrente'));    
     }
@@ -112,37 +124,6 @@ class FornecedorController extends Controller
         ->withSum('contaCorrente', 'peso_agregado')
         ->get()
         ->sortBy('conta_corrente_sum_peso_agregado');
-    
-        // dd($fornecedores->pluck('pessoa.nome'));
-        // $chartData = [
-        // "type" => 'bar',
-        //     "data" => [
-        //         "labels" => $fornecedores->pluck('pessoa.nome'),
-        //             "datasets" => [
-        //             [
-        //                 "data" => $fornecedores->pluck('conta_corrente_sum_peso_agregado')
-        //             ],
-        //         ],
-        //     "options" => [
-        //         "legend" => [
-        //             "display" => true,
-        //             "labels"=> [
-        //                 "font" => [
-        //                     "size" => 8
-        //                 ]
-        //             ]
-        //         ]
-                
-        //     ]
-        //     ]
-        // ]; 
-        // $chartData = json_encode($chartData);
-        
-        // $chartURL = "https://quickchart.io/chart?width=300&height=300&c=".urlencode($chartData);
-
-        // $chartData = file_get_contents($chartURL); 
-        // $chart = 'data:image/png;base64, '.base64_encode($chartData);
-        // dd($chart);
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('fornecedor.pdf.fornecedores', compact('fornecedores') );
@@ -174,20 +155,41 @@ class FornecedorController extends Controller
             ->sortBy('conta_corrente_sum_peso_agregado');
 
         $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
-            ->where([
-                ['forma_pagamento', 'Cheque'],
-                ['status', '!=', 'Pago'],
-                ['status', '!=', 'Depositado'],
-                ['status', '!=', 'Adiado'],
-                ['parceiro_id', NULL],
-            ])
+            ->carteira()
             ->groupBy('month', 'year')
             ->orderBy('year')
             ->orderBy('month')
             ->get();
+        
+        $devolvidos = Parcela::where('status', 'Devolvido')->get();
 
+        $representantes = Representante::with('pessoa')
+            ->withSum('conta_corrente', 'peso_agregado')
+            ->withSum('conta_corrente', 'fator_agregado')
+            ->get();
+        
+        $adiamentos = Parcela::withSum('adiamentos', 'juros_totais')
+            ->whereHas('adiamentos')
+            ->get();
+        
+        // dd($adiamentos->where('representante_id', 2));
+
+        $pagamentoMed = DB::select('SELECT 
+            (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND deleted_at is null) 
+            -
+            ((SELECT IFNULL(sum(peso)/2, 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) between 30 and 59) AND deleted_at is null ) + 
+            (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) >= 60) AND deleted_at is null ) ) AS total,
+            (SELECT nome from pessoas WHERE f.pessoa_id = id) as fornecedor,
+            f.id as fornecedor_id
+            FROM fornecedores f',
+            [
+                'Crédito', 'Débito', 'Débito'
+            ]
+        );
+
+        // dd($adiamentos);
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira') );
+        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos') );
         
         return $pdf->stream();
     }

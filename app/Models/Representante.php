@@ -30,6 +30,18 @@ class Representante extends Model
         return $this->hasMany(Venda::class);
     }
 
+    public function parcelas()
+    {
+        return $this->hasMany(Parcela::class);
+    }
+
+    public function scopeAdiamentos($query)
+    {
+        return $query->with(['parcelas' => function ($query) {
+            $query->whereHas('adiamentos')->withSum('adiamentos', 'juros_totais');
+        }]);
+    }
+
     protected static function booted()
     {
         if (auth()->user()->is_representante && !auth()->user()->is_admin) {

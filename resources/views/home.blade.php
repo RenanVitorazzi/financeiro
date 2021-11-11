@@ -14,8 +14,14 @@
 <p></p>
 <p></p>
 <x-table>
-    <x-tableheader style='cursor:pointer'>
-        <th colspan=4>Cheques para depósito</th>
+    <x-tableheader>
+        <th colspan=4>
+            Cheques para depósito
+            <form style="display: inline-block; float:right;" action="{{ route('depositar_diario') }}" method="POST">
+                @csrf
+                <button class="btn btn-light">Depositar</button>
+            </form>
+        </th>
     </x-tableheader>
 
     <x-tableheader>

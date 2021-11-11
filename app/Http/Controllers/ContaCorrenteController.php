@@ -86,7 +86,7 @@ class ContaCorrenteController extends Controller
         return redirect("/fornecedores/{$request->fornecedor_id}");
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $contaCorrente = ContaCorrente::findOrFail($id);
         
@@ -97,11 +97,14 @@ class ContaCorrenteController extends Controller
 
         $contaCorrente->delete();
         
-        return json_encode([
-            'icon' => 'success',
-            'title' => 'Sucesso!',
-            'text' => 'Fornecedor excluído com sucesso!',
-        ]);
+        $request
+            ->session()
+            ->flash(
+                'message',
+                'Registro excluído com sucesso!'
+            );
+
+        return redirect()->route('fornecedores.show', $contaCorrente->fornecedor_id);
         
-    }
+    } 
 }

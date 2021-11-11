@@ -20,22 +20,47 @@ class TrocaChequeController extends Controller
 {
     public function index() 
     {
-        $trocas = Troca::latest()
-            ->paginate(15);
+        $trocas = Troca::orderBy('data_troca', 'Desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10);
 
         return view('troca_cheque.index', compact('trocas') );
     }
 
     public function create() 
     {
-        $cheques = Parcela::where('forma_pagamento', 'Cheque')
-            ->whereNull('parceiro_id')
-            ->orderBy('data_parcela')
-            ->get();
-
         $parceiros = Parceiro::with('pessoa')
             ->get();
 
+        $cheques = DB::select('SELECT 
+            par.id,
+            par.nome_cheque,
+            par.numero_cheque,
+            par.valor_parcela,
+            par.observacao,
+            par.status,
+            par.venda_id,
+            (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
+            IF(par.status = ?,
+                (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                par.data_parcela
+            ) as data_parcela,
+            p.nome
+        FROM
+            parcelas par
+                LEFT JOIN
+            representantes r ON r.id = par.representante_id
+            LEFT JOIN 
+            pessoas p ON p.id = r.pessoa_id 
+        WHERE
+            par.status != ?
+                AND par.status != ?
+                AND par.status != ?
+                AND par.deleted_at IS NULL
+                AND r.deleted_at IS NULL
+                AND parceiro_id IS NULL
+        ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado', 'Pago', 'Depositado', 'Resgatado']);
+        // dd($cheques);
         return view('troca_cheque.create', compact('cheques', 'parceiros') );
     }
     
@@ -60,7 +85,10 @@ class TrocaChequeController extends Controller
         
         foreach ($cheques as $cheque) {
             $adicionar_dia = 0;
-            $dataFim = new DateTime($cheque->data_parcela);
+            //* Se o cheque foi adiado, seleciona a nova data
+            $dataDoCheque =  $cheque->status == 'Adiado' ? $cheque->adiamentos->last()->nova_data : $cheque->data_parcela;
+
+            $dataFim = new DateTime($dataDoCheque);
             $diferencaDias = $dataInicio->diff($dataFim);
 
             if ($request->parceiro_id == 3) {
@@ -77,7 +105,8 @@ class TrocaChequeController extends Controller
                 }
             }
 
-            $dias = ($diferencaDias->days + $adicionar_dia);
+            $dias = ($dataInicio < $dataFim) ? $diferencaDias->days + $adicionar_dia : 0;
+
             $juros = ( ($cheque->valor_parcela * $taxa) / 30 ) * $dias;
             $valorLiquido = $cheque->valor_parcela - $juros;
 
@@ -122,8 +151,10 @@ class TrocaChequeController extends Controller
 
         //!CONFERIR SE A DATA DA TROCA OU A TAXA AINDA SÃO AS MESMAS
         if  (($troca->data_troca !== $request->data_troca) || $troca->taxa_juros != $request->taxa_juros) {
-            $cheques = TrocaParcela::with('parcelas')->where('troca_id', $troca->id)->orderBy('dias')->get();
-            // dd($cheques->parcelas);
+            $cheques = TrocaParcela::with('parcelas')
+                ->where('troca_id', $troca->id)
+                ->orderBy('dias')
+            ->get();
 
             $totalJuros = 0;
             $totalLiquido = 0;
@@ -131,8 +162,10 @@ class TrocaChequeController extends Controller
             $taxa = $request->taxa_juros / 100;
 
             foreach ($cheques as $cheque) {
+                //* Se o cheque foi adiado, seleciona a nova data
+                $dataDoCheque =  $cheque->parcelas->status == 'Adiado' ? $cheque->parcelas->adiamentos->last()->nova_data : $cheque->parcelas->data_parcela;
                 
-                $dataFim = new DateTime($cheque->parcelas->data_parcela);
+                $dataFim = new DateTime($dataDoCheque);
                 $diferencaDias = $dataInicio->diff($dataFim);
                 
                 $adicionar_dia = 0;
@@ -150,7 +183,8 @@ class TrocaChequeController extends Controller
                     }
                 }
                 
-                $dias = ($diferencaDias->days + $adicionar_dia);
+                $dias = ($dataInicio < $dataFim) ? $diferencaDias->days + $adicionar_dia : 0;
+
                 $juros = ( ($cheque->parcelas->valor_parcela * $taxa) / 30 ) * $dias;
                 $valorLiquido = $cheque->parcelas->valor_parcela - $juros;
     
@@ -187,14 +221,22 @@ class TrocaChequeController extends Controller
         $troca = Troca::with('parceiro')->findOrFail($id);
         
         $cheques = DB::select('SELECT 
-                *
+                IF(a.nova_data, MAX(a.nova_data), p.data_parcela) data, 
+                valor_parcela,
+                nome_cheque, 
+                numero_cheque,
+                t.*,
+                p.id
             FROM
-                parcelas
+                parcelas p
                     INNER JOIN
-                trocas_parcelas t ON t.parcela_id = parcelas.id
+                trocas_parcelas t ON t.parcela_id = p.id
+                    LEFT JOIN
+                adiamentos a ON a.parcela_id = p.id
             WHERE
                 troca_id = ?
-            ORDER BY data_parcela, valor_parcela', 
+            GROUP BY p.id
+            ORDER BY 1, 2', 
             [$id]
         );
 
@@ -210,7 +252,7 @@ class TrocaChequeController extends Controller
                 $query->orderBy('dias');
             }, 'parceiro'])
         ->findOrFail($id);
-            
+        
         return view('troca_cheque.show', compact('troca') );
     }
 

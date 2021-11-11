@@ -69,7 +69,7 @@
         @foreach ($cheques as $cheque)
             <tr>
                 <td>{{ substr($cheque->nome_cheque, 0, 25) }}</td>
-                <td>@data($cheque->data_parcela)</td>
+                <td>@data($cheque->data)</td>
                 <td>{{ $cheque->numero_cheque }}</td>
                 <td>{{ $cheque->dias }}</td>
                 <td>@moeda($cheque->valor_parcela)</td>

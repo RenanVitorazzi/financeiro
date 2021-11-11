@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestFormPessoa;
+use App\Models\Adiamento;
 use App\Models\ContaCorrenteRepresentante;
+use App\Models\Parcela;
 use App\Models\Pessoa;
 use App\Models\Representante;
 use Illuminate\Http\Request;
@@ -16,8 +18,9 @@ class RepresentanteController extends Controller {
     {
         $representantes = Representante::with('pessoa', 'conta_corrente', 'venda')->get();
         $message = $request->session()->get('message');
+        $devolvidos = Parcela::where('status', 'Devolvido')->get();
         
-        return view('representante.index', compact('representantes', 'message'));
+        return view('representante.index', compact('representantes', 'message', 'devolvidos'));
     }
     
     public function create()
@@ -49,6 +52,22 @@ class RepresentanteController extends Controller {
         $representante = Representante::findOrFail($id);
 
         return view('representante.edit', compact('representante'));
+    }
+
+    public function show($id)
+    {
+        $representante = Representante::with('pessoa')
+            ->withSum('conta_corrente', 'peso_agregado')
+            ->withSum('conta_corrente', 'fator_agregado')
+            ->adiamentos()
+            ->findOrFail($id);
+        
+        $devolvidos = Parcela::with('parceiro')
+            ->where('status', 'Devolvido')
+            ->where('representante_id', $id)
+            ->get();
+        
+        return view('representante.show', compact('representante', 'devolvidos'));
     }
 
     public function update (RequestFormPessoa $request, $id)
@@ -87,9 +106,10 @@ class RepresentanteController extends Controller {
     {
         $representantes = Representante::with('pessoa', 'conta_corrente')->get();
         $contaCorrenteGeral = ContaCorrenteRepresentante::get();
+        $devolvidos = Parcela::where('status', 'Devolvido')->get();
 
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('representante.pdf.impresso', compact('representantes', 'contaCorrenteGeral') );
+        $pdf->loadView('representante.pdf.impresso', compact('representantes', 'contaCorrenteGeral', 'devolvidos') );
             
         return $pdf->stream();
     }

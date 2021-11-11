@@ -14,10 +14,7 @@
 <div class='mb-2 d-flex justify-content-between'>
     <h3> {{ $troca->titulo }} </h3>
     <div>
-        {{-- @if (count($contaCorrente) > 0) --}}
         <x-botao-imprimir class="mr-2" href="{{ route('pdf_troca', $troca->id) }}"></x-botao-imprimir>
-        {{-- @endif --}}
-        {{-- <x-botao-novo href="{{ route('conta_corrente_representante.create', ['representante_id' => $representante->id]) }}"></x-botao-novo> --}}
     </div>
 </div>
 
@@ -43,13 +40,13 @@
 <x-table id="dataTable">
     <x-table-header>
         <tr>
-                <th>Nome</th>
-                <th>Número</th>
-                <th>Data</th>
-                <th>Dias</th>
-                <th>Valor Bruto</th>
-                <th>Juros</th>
-                <th>Valor líquido</th>
+            <th>Nome</th>
+            <th>Número</th>
+            <th>Data</th>
+            <th>Dias</th>
+            <th>Valor Bruto</th>
+            <th>Juros</th>
+            <th>Valor líquido</th>
         </tr>
     </x-table-header>
     <tbody>
@@ -60,65 +57,28 @@
                 <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
                 <td>
                     <s>@data($cheque->parcelas->data_parcela)</s>
-                    <p>@data($cheque->adiamento->last()->data)</p>
+                    <p>@data($cheque->parcelas->adiamentos->last()->nova_data)</p>
                 </td>
-                {{-- <td><p>{{ $cheque->parcelas->status }} ({{ $cheque->adiamento->count() }})</p></td> --}}
                 <td>
                     <s>{{ $cheque->dias }}</s>
-                    <p>{{ $cheque->dias + $cheque->adiamento->last()->dias_totais }}</p>
                 </td>
                 <td><p>@moeda($cheque->parcelas->valor_parcela)</p></td>
                 <td>
                     <s>@moeda($cheque->valor_juros)</s>
-                    <p>@moeda($cheque->adiamento->last()->juros_totais)</p>
                 </td>
                 <td>
-                    {{-- <s>@moeda($cheque->valor_liquido)</s> --}}
                     <p>@moeda($cheque->valor_liquido)</p>
                 </td>
-                {{-- <td>
-                    <div class="btn btn-dark btn-adiar" 
-                        data-id="{{ $cheque->parcela_id }}" 
-                        data-dia="{{ $cheque->adiamento->last()->data }}" 
-                        data-valor="{{ $cheque->parcelas->valor_parcela }}" 
-                        data-juros="{{ $cheque->adiamento->last()->juros_totais }}" 
-                        data-troca_parcela_id="{{ $cheque->id }}"
-                        data-nome="{{ $cheque->parcelas->nome_cheque }}"
-                    > Adiar <i class="far fa-clock"></i> </div>              
-                    <form class="form-resgate" method="POST" action="{{ route('resgatar_cheque', $cheque->parcela_id) }}">
-                        @csrf
-                        <input type="hidden" name="troca_id" value="{{ $cheque->id }}">
-                        <button type="submit" class="btn btn-primary btn-resgatar">Resgatar</button>
-                    </form>      
-                </td> --}}
             </tr>
             @else
             <tr>
                 <td>{{ $cheque->parcelas->nome_cheque }}</td>
                 <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
                 <td>@data($cheque->parcelas->data_parcela)</td>
-                {{-- <td>{{ $cheque->parcelas->status }}</td> --}}
                 <td>{{ $cheque->dias }}</td>
                 <td>@moeda($cheque->parcelas->valor_parcela)</td>
                 <td>@moeda($cheque->valor_juros)</td>
                 <td>@moeda($cheque->valor_liquido)</td>
-                {{-- <td>
-                    @if ($cheque->parcelas->status !== 'Resgatado')
-                    <div class="btn btn-dark btn-adiar" 
-                            data-id="{{ $cheque->parcela_id }}" 
-                            data-dia="{{ $cheque->parcelas->data_parcela }}" 
-                            data-valor="{{ $cheque->parcelas->valor_parcela }}" 
-                            data-juros="{{ $cheque->valor_juros }}" 
-                            data-troca_parcela_id="{{ $cheque->id }}"
-                            data-nome="{{ $cheque->parcelas->nome_cheque }}"
-                    > Adiar <i class="far fa-clock"></i> </div>      
-                    <form class="form-resgate" method="POST" action="{{ route('resgatar_cheque', $cheque->parcela_id) }}">
-                        @csrf
-                        <input type="hidden" name="troca_id" value="{{ $cheque->id }}">
-                        <button type="submit" class="btn btn-primary btn-resgatar">Resgatar</button>
-                    </form>
-                    @endif
-                </td> --}}
             </tr>
             @endif
         @endforeach

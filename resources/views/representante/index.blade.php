@@ -19,6 +19,7 @@ Representantes
             <th>Nome</th>
             <th>Peso</th>
             <th>Fator</th>
+            <th>Devolvidos</th>
             <th><span class="fas fa-edit"></span></th>
         </tr>
     </x-table-header>
@@ -28,14 +29,21 @@ Representantes
             <td>{{ $representante->pessoa->nome }}</td>
             <td>@peso($representante->conta_corrente->sum('peso_agregado'))g</td>
             <td>@fator($representante->conta_corrente->sum('fator_agregado'))ft</td>
+            <td>@moeda($devolvidos->where('representante_id', $representante->id)->sum('valor_parcela'))</td>
             <td>
                 <a class="btn btn-dark" title="Conta Corrente" href="{{ route('conta_corrente_representante.show', $representante->id) }}">
                     <i class="fas fa-balance-scale"></i>
                 </a>
+                <a class="btn btn-dark" title="Detalhes" href="{{ route('representantes.show', $representante->id) }}">
+                    <i class="fas fa-eye"></i>
+                </a>
                 {{-- <a class="btn btn-dark" title="Conta Corrente" href="{{ route('venda.show', $representante->id) }}">
                     Vendas <i class="fas fa-shopping-cart"></i>
                 </a> --}}
-                <x-botao-editar class="mr-2" href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
+                {{-- <a class="btn btn-dark" title="Imprimir devolvidos" target="_blank" href="{{ route('cheques_devolvidos', $representante->id) }}">
+                    <i class="fas fa-print"></i>
+                </a> --}}
+                <x-botao-editar href="{{ route('representantes.edit', $representante->id) }}"></x-botao-editar>
             </td>
         </tr>
         @empty

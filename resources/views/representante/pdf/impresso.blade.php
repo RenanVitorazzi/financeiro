@@ -38,6 +38,7 @@
                 <th>Nome</th>
                 <th>Saldo Peso</th>
                 <th>Saldo Fator</th>
+                <th>Total Devolvidos</th>
                 <th>Saldo Geral</th>
             </tr>
         </thead>
@@ -48,6 +49,7 @@
                         <td>{{ $representante->pessoa->nome }}</td>
                         <td>@peso($representante->conta_corrente->sum('peso_agregado')) </td>
                         <td>@fator($representante->conta_corrente->sum('fator_agregado')) </td>
+                        <td>@moeda($devolvidos->where('representante_id', $representante->id)->sum('valor_parcela'))</td>
                         <td>@peso(($representante->conta_corrente->sum('fator_agregado') / 32)  + $representante->conta_corrente->sum('peso_agregado') ) </td>
                     </tr>
                 @endif
@@ -60,6 +62,7 @@
                     <td><b>Total</b></td>
                     <td><b>@peso($contaCorrenteGeral->sum('peso_agregado')) </b></td>
                     <td><b>@fator($contaCorrenteGeral->sum('fator_agregado')) </b></td>
+                    <td><b>@moeda($devolvidos->sum('valor_parcela')) </b></td>
                     <td><b>@peso(($contaCorrenteGeral->sum('fator_agregado') / 32) + $contaCorrenteGeral->sum('peso_agregado')) </b></td>
                 </tr>
         </tbody>
