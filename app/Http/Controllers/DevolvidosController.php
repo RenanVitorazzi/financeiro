@@ -161,9 +161,15 @@ class DevolvidosController extends Controller
         return view('devolvidos.index', compact('cheques'));
     }
 
-    public function pagarChequeDevolvido($id)
+    public function pagar_cheque_devolvido($parcela_id)
     {
-        return $id;
+        $cheque = Parcela::findOrFail($parcela_id);
+        // dd($cheque);
+        $cheque->update([
+            'status' => 'Pago'
+        ]);
+
+        return redirect()->back();
     }
     public function cheques_devolvidos ($representante_id) {
         
@@ -205,7 +211,7 @@ class DevolvidosController extends Controller
         return $pdf->stream();
     }
 
-    public function fechamento_representante ($representante_id, $data_inicio) {
+    public function fechamento_representante ($representante_id) {
         
         $representante = Representante::with('pessoa')->findorFail($representante_id);
 
@@ -252,8 +258,8 @@ class DevolvidosController extends Controller
                 adiamentos a ON a.parcela_id = p.id AND a.pago IS NULL
             WHERE p.representante_id = ?
                 AND p.deleted_at IS NULL
-                AND a.created_at >= ?', 
-            [$representante_id, $data_inicio]
+                AND a.pago IS NULL', 
+            [$representante_id]
         );
             
         $adiamentos_total = DB::select('SELECT 
@@ -264,8 +270,8 @@ class DevolvidosController extends Controller
                 adiamentos a ON a.parcela_id = p.id AND a.pago IS NULL
             WHERE p.representante_id = ?
                 AND p.deleted_at IS NULL
-                AND a.created_at >= ? ', 
-            [$representante_id, $data_inicio]
+                AND a.pago IS NULL', 
+            [$representante_id]
         );
 
         $totalValorCheques = DB::select('SELECT 
@@ -284,7 +290,7 @@ class DevolvidosController extends Controller
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView(
             'devolvidos.pdf.fechamento', 
-            compact('cheques_devolvidos', 'juros_totais', 'representante', 'hoje', 'adiamentos', 'adiamentos_total', 'data_inicio', 'totalValorCheques')
+            compact('cheques_devolvidos', 'juros_totais', 'representante', 'hoje', 'adiamentos', 'adiamentos_total', 'totalValorCheques')
         );
         
         return $pdf->stream();

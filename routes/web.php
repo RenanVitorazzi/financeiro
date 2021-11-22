@@ -42,7 +42,6 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('resgatar_cheque/{id}', [TrocaChequeController::class, 'resgatar_cheque'])->name('resgatar_cheque');
         Route::post('depositar_diario', [ChequeController::class, 'depositar_diario'])->name('depositar_diario');
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
-        Route::post('devolvidos/pagarChequeDevolvido/{id}', 'cheque.pagarChequeDevolvido')->name('pagarChequeDevolvido');
 
         //? Cadastros auxiliares
         Route::resource('fornecedores', FornecedorController::class);
@@ -63,7 +62,8 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_diario', [FornecedorController::class, 'pdf_diario'])->name('pdf_diario');
         Route::get('adiamento_impresso/{representante_id}/{data_inicio}', [AdiamentosController::class, 'adiamento_impresso'])->name('adiamento_impresso');
         Route::get('cheques_devolvidos/{representante_id}', [DevolvidosController::class, 'cheques_devolvidos'])->name('cheques_devolvidos');
-        Route::get('fechamento_representante/{representante_id}/{data_inicio}', [DevolvidosController::class, 'fechamento_representante'])->name('fechamento_representante');
+        Route::get('fechamento_representante/{representante_id}', [DevolvidosController::class, 'fechamento_representante'])->name('fechamento_representante');
+        Route::post('devolvidos/pagar_cheque_devolvido/{parcela_id}', [DevolvidosController::class, 'pagar_cheque_devolvido'])->name('pagarChequeDevolvido');
         
         //? Anexos 
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([

@@ -17,11 +17,11 @@
         text-align: center;
     }
     th {
-        background-color:black;
-        color:white;
+        /* background-color:black; */
+        /* color:white; */
     }
     tr:nth-child(even) {
-        background-color: #a9acb0;
+        background-color: #ebedf0;
     }
     h1 {
         text-align: center;

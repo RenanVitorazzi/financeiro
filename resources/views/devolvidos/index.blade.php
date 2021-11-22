@@ -27,7 +27,7 @@ Devolvidos
         @forelse ($cheques as $parcela)
             <tr>
                 {{-- <td>{{ $parcela->venda_id ? $parcela->cliente : 'Não informado' }}</td> --}}
-                <td>{{ $parcela->nome_parcela }}</td>
+                <td>{{ $parcela->nome_cheque }}</td>
                 @if (!auth()->user()->is_representante)
                     @if ($parcela->representante_id)
                     <td>{{ $parcela->representante->pessoa->nome }}</td>
@@ -41,7 +41,7 @@ Devolvidos
                 <td>{{ $parcela->motivo }}</td>
                 <td>{{ $parcela->observacao }}</td>
                 <td>
-                    <form action="{{ route('pagarChequeDevolvido', $parcela->id) }}" method="POST">
+                    <form class="pagarCheque" action="{{ route('pagarChequeDevolvido', $parcela->id) }}" method="POST">
                         @csrf
                         <button class="btn btn-success btn-pago">Pago</button> 
                     </form>
@@ -62,20 +62,11 @@ Devolvidos
     const MODAL_BODY = $("#modal-body")
     const MODAL_HEADER = $("#modal-header")
  
- $("#devolvidos").dataTable();
+    // $("#devolvidos").dataTable();
 
-    $(".btn-pago").each( (index, element) => {
-        $(element).click( () => {
-            element.preventDefault()
-
-            informarPagamento(element)
-        })
-    });
-
-    function informarPagamento (e) {
-
-        let parcela_id = $(e).data("id")
-
+    $(".pagarCheque").submit( (e) => {
+        e.preventDefault()
+        
         Swal.fire({
             icon: 'question',
             text: 'Tem certeza que deseja dar baixa no pagamento?',
@@ -83,7 +74,7 @@ Devolvidos
             confirmButtonText: 'Sim',
             showCancelButton: true,
             cancelButtonText: 'Não',
-            cancelButtonColor: '#d33',
+            cancelButtonColor: '#d33', 
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire(
@@ -91,8 +82,10 @@ Devolvidos
                     'Baixa realizada.',
                     'success'
                 )
+                $(e.target)[0].submit()
             }
         })
-    }
+    });
+
 </script>
 @endsection

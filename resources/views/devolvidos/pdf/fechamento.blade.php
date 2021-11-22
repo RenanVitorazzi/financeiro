@@ -70,7 +70,7 @@
     <table>
         <thead>
             <tr>
-                <th colspan = 6>Prorrogações - @data($data_inicio) até @data($hoje)</th>
+                <th colspan = 6>Prorrogações </th>
             </tr>
             <tr>
                 <th>Cliente</th>

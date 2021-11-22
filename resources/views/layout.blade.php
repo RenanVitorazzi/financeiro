@@ -119,7 +119,10 @@
                   <a href="{{ route('procura_cheque') }}">Procurar cheque</a>
                 </li>
                 <li>
-                  <a href="{{ route('adiamentos.index') }}">Adiar cheque</a>
+                  <a href="{{ route('adiamentos.index') }}">Prorrogações</a>
+                </li>
+                <li>
+                    <a href="{{ route('devolvidos.index') }}">Devolvidos</a>
                 </li>
               </ul>
             </div>

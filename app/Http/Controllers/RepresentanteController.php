@@ -66,7 +66,7 @@ class RepresentanteController extends Controller {
             ->where('status', 'Devolvido')
             ->where('representante_id', $id)
             ->get();
-        
+        // dd($devolvidos->first()->parceiro->pessoa->nome);
         return view('representante.show', compact('representante', 'devolvidos'));
     }
 

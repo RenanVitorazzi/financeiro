@@ -186,10 +186,11 @@ class FornecedorController extends Controller
                 'Crédito', 'Débito', 'Débito'
             ]
         );
+        $hoje = date('d/m/Y');
 
         // dd($adiamentos);
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos') );
+        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos', 'hoje') );
         
         return $pdf->stream();
     }

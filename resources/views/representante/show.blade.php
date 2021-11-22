@@ -15,6 +15,7 @@
 
 <div class='mb-2 d-flex justify-content-between'>
     <h3>{{ $representante->pessoa->nome }}</h3>
+    <x-botao-imprimir href="{{ route('fechamento_representante', $representante->id) }}"></x-botao-imprimir>
 </div>
 
 <div class="row">
@@ -30,12 +31,14 @@
     <div class="col-4">
         <div class="card">
             <div class="card-header">Devolvidos</div>
-            <div class="card-body">@moeda($devolvidos->sum('valor_parcela'))</div>
+            <div class="card-body">
+                <p>@moeda($devolvidos->sum('valor_parcela'))</p>
+            </div>
         </div>
     </div>
     <div class="col-4">
         <div class="card">
-            <div class="card-header">Prorrogações <button class="btn btn-dark btnAdiamento"><span class="fas fa-eye"></span></button></div>
+            <div class="card-header">Prorrogações</div>
             <div class="card-body">
                 <p>@moeda($representante->parcelas->sum('adiamentos_sum_juros_totais'))</p>
             </div>
@@ -53,19 +56,25 @@
                     <th>Valor</th>
                     <th>Data</th>
                     <th>Nova data</th>
+                    <th>Juros</th>
                     <th>Parceiro</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($representante->parcelas as $cheque)
+                @forelse ($representante->parcelas as $cheque)
                 <tr>
-                        <td>{{ $cheque->nome_cheque }}</td>
-                        <td>@moeda($cheque->valor_parcela)</td>
-                        <td>@data($cheque->data_parcela)</td>
-                        <td>@data('2021-05-10')</td>
-                        <td>{{ $cheque->parceiro->pessoa->nome }}</td>
+                    <td>{{ $cheque->nome_cheque }}</td>
+                    <td>@moeda($cheque->valor_parcela)</td>
+                    <td>@data($cheque->data_parcela)</td>
+                    <td>@data($cheque->adiamentos->nova_data)</td>
+                    <td>@moeda($cheque->adiamentos->juros_totais)</td>
+                    <td>{{ $cheque->parceiro->pessoa->nome }}</td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan=6>Nenhum cheque devolvido</td>
+                </tr>
+                @endforelse
             </tbody>
         </x-table>
     </div>
@@ -90,7 +99,7 @@
                     <td>{{ $cheque->nome_cheque }}</td>
                     <td>@moeda($cheque->valor_parcela)</td>
                     <td>@data($cheque->data_parcela)</td>
-                    <td>{{ $cheque->parceiro->pessoa->nome }}</td>
+                    <td>{{ $cheque->parceiro ? $cheque->parceiro->pessoa->nome : 'Carteira'}}</td>
                 </tr>
                 @empty
                     <tr>

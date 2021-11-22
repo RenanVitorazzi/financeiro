@@ -24,6 +24,7 @@
     
 </style>
 <body>
+    <h3>Data: {{ $hoje }}</h3>
     <table>
         <thead>
             <tr>
