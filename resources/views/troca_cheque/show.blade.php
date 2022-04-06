@@ -21,6 +21,7 @@
 <x-table>
       <x-table-header>
             <tr>
+                <th>Data da Troca</th>
                 <th>Total Bruto</th>
                 <th>Total Juros</th>
                 <th>Total Líquido</th>
@@ -29,6 +30,7 @@
       </x-table-header>
       <tbody>
             <tr>
+                <td><b>@data($troca->data_troca)</b></td>
                 <td><b>@moeda($troca->valor_bruto)</b></td>
                 <td><b>@moeda($troca->valor_juros)</b></td>
                 <td><b>@moeda($troca->valor_liquido)</b></td>
@@ -57,14 +59,14 @@
                 <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
                 <td>
                     <s>@data($cheque->parcelas->data_parcela)</s>
-                    <p>@data($cheque->parcelas->adiamentos->last()->nova_data)</p>
+                    <p>@data($cheque->parcelas->adiamentos->nova_data)</p>
                 </td>
                 <td>
                     <s>{{ $cheque->dias }}</s>
                 </td>
                 <td><p>@moeda($cheque->parcelas->valor_parcela)</p></td>
                 <td>
-                    <s>@moeda($cheque->valor_juros)</s>
+                    <p>@moeda($cheque->valor_juros)</p>
                 </td>
                 <td>
                     <p>@moeda($cheque->valor_liquido)</p>

@@ -39,18 +39,18 @@
     <div class="sidebar-content">
       <div class="sidebar-brand">
         <a href="{{ route('home') }}">
-            {{-- dl metais --}}
-            <img src="{{ asset('dl_logo.png') }}"></img>
+            dl metais
+            {{-- <img src="{{ asset('dl_logo.png') }}"></img> --}}
         </a>
         <div id="close-sidebar">
           <i class="fas fa-times"></i>
         </div>
       </div>
       <div class="sidebar-header">
-        <div class="user-pic">
+        {{-- <div class="user-pic">
           <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg"
             alt="User picture">
-        </div>
+        </div> --}}
         <div class="user-info">
           <span class="user-name"><b>{{ auth()->user()->name }}</b></span>
           <span class="user-role">{{ auth()->user()->is_admin ? 'Administrador' : 'Representante' }}</span>
@@ -84,29 +84,69 @@
           </li>
           <li @if(route('parceiros.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('parceiros.index') }}">
-              <i class="fas fa-handshake"></i>
+              {{-- <i class="fas fa-handshake"></i> --}}
+              <i class="fas fa-hands-helping"></i>
               <span>Parceiros</span>
             </a>
           </li>
           <li @if(route('representantes.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('representantes.index') }}">
-              <i class="fas fa-users"></i>
+              <i class="fas fa-user-tie"></i>
               <span>Representantes</span>
             </a>
           </li>
           @endif
           <li @if(route('clientes.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('clientes.index') }}">
-              <i class="fas fa-hand-holding-usd"></i>
+              <i class="fas fa-users"></i>
               <span>Clientes</span>
             </a>
           </li>
           @if(auth()->user()->is_admin)
-          <li class="sidebar-dropdown">
-            <a href="#">
-              <i class="fas fa-dollar-sign"></i>
-              <span>Financeiro</span>
-            </a>
+          <li class="header-menu">
+            <span>Cheques</span>
+          </li>
+          <div class="sidebar-menu">
+            <ul>
+                <li @if(route('cheques.index') == Request::url()) class="ativo" @endif>
+                    <a href="{{ route('cheques.index') }}">
+                      <i class="fas fa-wallet"></i>
+                      <span>Carteira de cheques</span>
+                    </a>
+                </li>
+                <li @if(route('troca_cheques.index') == Request::url()) class="ativo" @endif>
+                    <a href="{{ route('troca_cheques.index') }}">
+                      <i class="fas fa-hand-holding-usd"></i>
+                      <span>Troca de cheques</span>
+                    </a>
+                </li>
+                <li @if(route('procura_cheque') == Request::url()) class="ativo" @endif>
+                    <a href="{{ route('procura_cheque') }}">
+                      <i class="fas fa-search"></i>
+                      <span>Procurar cheque</span>
+                    </a>
+                </li>
+                
+                {{-- <li @if(route('adiamentos.index') == Request::url()) class="ativo" @endif>
+                    <a href="{{ route('adiamentos.index') }}">
+                      <i class="fas fa-clock"></i>
+                      <span>Prorrogações</span>
+                    </a>
+                </li> --}}
+                <li @if(route('devolvidos.index') == Request::url()) class="ativo" @endif>
+                    <a href="{{ route('devolvidos.index') }}">
+                      <i class="fas fa-undo-alt"></i>
+                      <span>Devolvidos</span>
+                    </a>
+                </li>
+            
+            </ul>
+        </div>
+          {{-- <li class="sidebar-dropdown">
+                <a href="#">
+                <i class="fas fa-dollar-sign"></i>
+                <span>Financeiro</span>
+                </a>
             <div class="sidebar-submenu">
               <ul>
                 <li>
@@ -126,7 +166,7 @@
                 </li>
               </ul>
             </div>
-          </li>
+          </li> --}}
           @endif
           @if(auth()->user()->is_representante)
             <li @if(route('venda.show', auth()->user()->is_representante) == Request::url()) class="ativo" @endif>

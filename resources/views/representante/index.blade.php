@@ -13,7 +13,7 @@ Representantes
     </div>
 </div>
 
-<x-table>
+<x-table class="table-striped">
     <x-table-header>
         <tr>
             <th>Nome</th>

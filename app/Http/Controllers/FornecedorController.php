@@ -7,6 +7,7 @@ use App\Models\Adiamento;
 use App\Models\Fornecedor;
 use App\Models\Pessoa;
 use App\Models\ContaCorrente;
+use App\Models\Parceiro;
 use App\Models\Parcela;
 use App\Models\Representante;
 use Illuminate\Database\Eloquent\Builder;
@@ -172,8 +173,24 @@ class FornecedorController extends Controller
             ->whereHas('adiamentos')
             ->get();
         
-        // dd($adiamentos->where('representante_id', 2));
-
+        
+        $parceiros = DB::select('SELECT 
+                SUM(juros_totais) AS totalJuros, pe.nome AS nomeParceiro
+            FROM
+                troca_adiamentos t
+                    INNER JOIN
+                parcelas p ON p.id = t.parcela_id
+                    INNER JOIN
+                parceiros pa ON pa.id = p.parceiro_id
+                    INNER JOIN
+                pessoas pe ON pe.id = pa.pessoa_id
+            WHERE
+                t.pago IS NULL
+                AND t.deleted_at IS NULL
+                AND pa.deleted_at IS NULL
+            GROUP BY pa.id
+        ');
+        
         $pagamentoMed = DB::select('SELECT 
             (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND deleted_at is null) 
             -
@@ -190,7 +207,7 @@ class FornecedorController extends Controller
 
         // dd($adiamentos);
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos', 'hoje') );
+        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos', 'hoje', 'parceiros') );
         
         return $pdf->stream();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\baixarDebitosRepresentantesRequest;
 use App\Http\Requests\RequestFormPessoa;
 use App\Models\Adiamento;
 use App\Models\ContaCorrenteRepresentante;
@@ -65,8 +66,9 @@ class RepresentanteController extends Controller {
         $devolvidos = Parcela::with('parceiro')
             ->where('status', 'Devolvido')
             ->where('representante_id', $id)
+            ->orderBy('data_parcela')
             ->get();
-        // dd($devolvidos->first()->parceiro->pessoa->nome);
+
         return view('representante.show', compact('representante', 'devolvidos'));
     }
 
@@ -112,6 +114,21 @@ class RepresentanteController extends Controller {
         $pdf->loadView('representante.pdf.impresso', compact('representantes', 'contaCorrenteGeral', 'devolvidos') );
             
         return $pdf->stream();
+    }
+
+    public function baixarDebitosRepresentantes(baixarDebitosRepresentantesRequest $request, $representante_id)
+    {
+        //TODO criar botão desfazer
+        if ($request->devolvidos) {
+            Parcela::whereIn('id', $request->devolvidos)->update(['status' => 'Pago']);
+        }
+        
+        if ($request->adiamentos) {
+            Adiamento::whereIn('id', $request->adiamentos)->update(['pago' => 1]);
+        }
+        
+        return redirect()->route('representantes.show', $representante_id);
+
     }
 } 
 

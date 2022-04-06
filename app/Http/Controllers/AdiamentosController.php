@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdiamentoFormRequest;
 use App\Models\Adiamento;
+use App\Models\Feriados;
 use App\Models\Parceiro;
 use App\Models\Parcela;
 use App\Models\Representante;
 use App\Models\TrocaAdiamento as ModelsTrocaAdiamento;
 use App\Models\TrocaParcela;
+use DateTime;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use TrocaAdiamento;
@@ -30,14 +32,19 @@ class AdiamentosController extends Controller
 
     public function store(AdiamentoFormRequest $request)
     {
+        $nova_data = new DateTime($request->nova_data);
+        $feriados = Feriados::all();
+
+        while (in_array($nova_data->format('w'), [0, 6]) || !$feriados->where('data_feriado', $nova_data->format('Y-m-d'))->isEmpty()) {
+            $nova_data->modify('+1 weekday');
+        }
+
         $porcentagem = $request->taxa_juros / 100;
         $cheque = Parcela::findOrFail($request->parcela_id);
 
-        $nova_data = date_create($request->nova_data);
-        $parcela_data = date_create($request->parcela_data);
-        $interval = date_diff($nova_data, $parcela_data);
+        $parcela_data = new DateTime($request->parcela_data);
        
-        $dias = $interval->format('%a');
+        $dias = $parcela_data->diff($nova_data)->days;
 
         $jurosTotais = ( ( ($cheque->valor_parcela * $porcentagem) / 30 ) * $dias);
         
@@ -50,7 +57,7 @@ class AdiamentosController extends Controller
             Adiamento::where('parcela_id', $cheque->id)->delete();
         }
 
-        //!GERA UMA 'VIA' PARA A PESSOA QUE ESTÁ COM O CHEQUE, DESSE JEITO SABEMOS O QUANTO TEREMOS QUE PAGÁ-LO
+        //!GERA UMA 'VIA' PARA A PESSOA QUE ESTÁ COM O CHEQUE, DESSE JEITO SABEMOS O QUANTO PAGAREMOS
         if ($cheque->parceiro_id) {
             $parceiro = Parceiro::findOrFail($cheque->parceiro_id);
             $troca = TrocaParcela::where('parcela_id', $cheque->id)->firstOrFail();
@@ -63,7 +70,7 @@ class AdiamentosController extends Controller
             }
 
             ModelsTrocaAdiamento::create([
-                'data' => $request->nova_data,
+                'data' => $nova_data->format('Y-m-d'),
                 'dias_totais' => $dias,
                 'juros_totais' => $jurosTotaisParceiro,
                 'adicional_juros' => $jurosTotaisParceiro,
@@ -74,7 +81,7 @@ class AdiamentosController extends Controller
         }
         
         $adiamento = Adiamento::create([
-            'nova_data' => $request->nova_data,
+            'nova_data' => $nova_data->format('Y-m-d'),
             'taxa_juros' => $request->taxa_juros,
             'juros_totais' => $jurosTotais,
             'dias_totais' => $dias,
@@ -85,44 +92,28 @@ class AdiamentosController extends Controller
         return json_encode([
             'title' => 'Sucesso',
             'icon' => 'success',
-            'text' => 'Salvo com sucesso',
-            'adiamento' => $adiamento
+            'text' => 'Cheque prorrogado para dia '.$nova_data->format('d/m/Y'),
+            'adiamento' => $adiamento,
         ]);        
     }
 
-    public function adiamento_impresso ($representante_id, $data_inicio) {
+    public function adiamento_impresso ($representante_id) {
 
         $representante = Representante::with('pessoa')->findOrFail($representante_id);
 
-        $adiamentos = DB::select('SELECT 
-            p.nome_cheque, 
-            p.numero_cheque, 
-            a.created_at, 
-            p.data_parcela, 
-            a.nova_data, 
-            p.valor_parcela, 
-            a.juros_totais, 
-            a.dias_totais 
-        FROM parcelas p 
-        INNER JOIN adiamentos a ON a.parcela_id = p.id
-        WHERE p.representante_id = ?
-        AND p.deleted_at IS NULL
-        AND a.created_at BETWEEN ? AND CURDATE()', 
-        [$representante_id, $data_inicio]);
+        $adiamentos = Parcela::whereHas('adiamentos')
+            ->where('representante_id', $representante_id)
+            ->with('adiamentos')
+            ->get();
+
+        $total = 0;
+
+        foreach ($adiamentos as $adiamentos->adiamentos => $cheque) {
+            $total += $cheque->adiamentos->juros_totais;
+        }
         
-        $adiamentos_total = DB::select('SELECT 
-            SUM(a.juros_totais) AS total_juros
-        FROM parcelas p 
-        INNER JOIN adiamentos a ON a.parcela_id = p.id
-        WHERE p.representante_id = ?
-        AND p.deleted_at IS NULL
-        AND a.created_at BETWEEN ? AND CURDATE()', 
-        [$representante_id, $data_inicio]);
-
-        $hoje = date('y-m-d');
-
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('adiamento.pdf.adiamentos_representante', compact('adiamentos', 'adiamentos_total', 'representante', 'hoje', 'data_inicio') );
+        $pdf->loadView('adiamento.pdf.adiamentos_representante', compact('adiamentos', 'representante', 'total') );
         
         return $pdf->stream();
     }

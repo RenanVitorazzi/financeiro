@@ -24,17 +24,17 @@
     
 </style>
 <body>
-    <h3>Data: {{ $hoje }}</h3>
+    {{-- <h3>Data: {{  }}</h3> --}}
     <table>
         <thead>
             <tr>
-                <th colspan = 4>Carteira</th>
+                <th colspan = 2>Carteira {{$hoje}}</th>
             </tr>
             <tr>
                 <th>Mês</th>
                 <th>Valor</th>
-                <th>Valor (Adiados)</th>
-                <th>Valor (Total)</th>
+                {{-- <th>Valor (Adiados)</th> --}}
+                {{-- <th>Valor (Total)</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
 
                 <tr>
                     <td>{{ $carteira_mensal->month }}/{{ $carteira_mensal->year }}</td>
-                    <td>@moeda($carteira_mensal->valor)</td>
+                    {{-- <td>@moeda($carteira_mensal->valor)</td> --}}
                     @php
                         $adiadoMes = DB::select('SELECT 
                                 SUM(p1.valor_parcela) as total_adiado,
@@ -59,10 +59,10 @@
                         // dd($totalAdiado);
                     @endphp
                     @if (count($adiadoMes) > 0)
-                        <td>@moeda($adiadoMes[0]->total_adiado)</td>
+                        {{-- <td>@moeda($adiadoMes[0]->total_adiado)</td> --}}
                         <td>@moeda($carteira_mensal->valor + $adiadoMes[0]->total_adiado)</td>
                     @else
-                        <td>@moeda(0)</td>
+                        {{-- <td>@moeda(0)</td> --}}
                         <td>@moeda($carteira_mensal->valor)</td>
                     @endif
                 </tr>
@@ -75,7 +75,7 @@
         <tfoot>
             <tr>
                 <td><b>Total</b></td>
-                <td><b>@moeda($carteira->sum('valor'))</b></td>
+                {{-- <td><b>@moeda($carteira->sum('valor'))</b></td> --}}
                 @php
                     $totalAdiado = DB::select('SELECT 
                             SUM(p1.valor_parcela) as total_adiado,
@@ -94,7 +94,7 @@
                         $valorTotalAdiado += $value->total_adiado;
                     }
                 @endphp
-                <td><b>@moeda($valorTotalAdiado)</b></td>
+                {{-- <td><b>@moeda($valorTotalAdiado)</b></td> --}}
                 <td><b>@moeda($carteira->sum('valor') + $valorTotalAdiado)</b></td>
             </tr>
         </tfoot>
@@ -103,13 +103,13 @@
     <table class="a">
         <thead>
             <tr>
-                <th colspan=4>Fornecedores</th>
+                <th colspan=3>Fornecedores</th>
             </tr>
             <tr>
                 <th>Nome</th>
                 <th>Balanço</th>
                 <th>%</th>
-                <th>30/60</th>
+                {{-- <th>30/60</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -119,25 +119,25 @@
                         <td>{{ $fornecedor->pessoa->nome }}</td>
                         <td>@peso($fornecedor->conta_corrente_sum_peso_agregado)</td>
                         <td> {{ number_format($fornecedor->conta_corrente_sum_peso_agregado / $fornecedores->sum('conta_corrente_sum_peso_agregado') * 100, 2) }} % </td>
-                        <td>  
+                        {{-- <td>  
                             @foreach ($pagamentoMed as $pagamento_fornecedor)
                                 @if ($pagamento_fornecedor->fornecedor_id === $fornecedor->id)
                                     {{ $pagamento_fornecedor->total }}
                                 @endif
                             @endforeach
-                        </td>
+                        </td> --}}
                     </tr>
                 @endif
             @empty
                 <tr>
-                    <td colspan=4>Nenhum registro</td>
+                    <td colspan=3>Nenhum registro</td>
                 </tr>
             @endforelse
             <tfoot>
                 <tr>
                     <td><b>Total</b></td>
                     <td><b>@peso($fornecedores->sum('conta_corrente_sum_peso_agregado'))</b></td>
-                    <td></td>
+                    {{-- <td></td> --}}
                     <td></td>
                 </tr>
             </tfoot>
@@ -155,7 +155,7 @@
                 <th>Fator</th>
                 <th>Total</th>
                 <th>Devolvidos</th>
-                <th>Juros adiados</th>
+                <th>Prorrogações</th>
             </tr>
         </thead>
         <tbody>
@@ -187,6 +187,30 @@
                     <td><b> </b></td>
                 </tr>
             </tfoot>
+        </tbody>
+    </table>
+<br>
+    <table>
+        <thead>
+            <tr>
+                <th colspan=2>Juros adiamentos</th>
+            </tr>
+            <tr>
+                <th>Parceiro</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($parceiros as $parceiro)
+                <tr>
+                    <td>{{ $parceiro->nomeParceiro }}</td>
+                    <td>@moeda($parceiro->totalJuros)</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan=2>Nenhum registro</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
     

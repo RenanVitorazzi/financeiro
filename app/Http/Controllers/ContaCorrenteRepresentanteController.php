@@ -22,7 +22,7 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function store(ContaCorrenteRepresentanteRequest $request)
     {
-        if ($request->balanco == 'Venda') {
+        if ($request->balanco == 'Venda' || $request->balanco == 'Devolução') {
             $peso_agregado = $request->peso;
             $fator_agregado = $request->fator;
         } else {

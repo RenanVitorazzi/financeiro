@@ -91,7 +91,11 @@
                     <td>@data($adiamento->data_parcela)</td>
                     <td>@data($adiamento->nova_data)</td>
                     <td>{{ $adiamento->dias_totais }}</td>
-                    <td>@moeda($adiamento->juros_totais)</td>
+                    @if ($adiamento->status == 'Devolvido')
+                        <td><s>@moeda($adiamento->juros_totais)</s></td>
+                    @else
+                        <td>@moeda($adiamento->juros_totais)</td>
+                    @endif
                 </tr>
             @empty
                 <tr>

@@ -40,7 +40,6 @@ Procurar cheque
     function adiarCheque(element) {
 
         let data = $(element).data()
-        console.log(data);
         let novaData = addDays(data.dia, 15)
         let jurosTotais = calcularNovosJuros(element, 15)
         MODAL.modal("show")
@@ -94,7 +93,6 @@ Procurar cheque
 
     $(".modal-footer > .btn-primary").click( () => {
         let dataForm = $("#formAdiamento").serialize()
-        console.log(dataForm);
 
         $.ajax({
             type: 'POST',
@@ -108,8 +106,7 @@ Procurar cheque
                 swal.showLoading()
             },
             success: (response) => {
-                // console.log(response);
-                // return;
+                
                 Swal.fire({
                     title: response.title,
                     icon: response.icon,

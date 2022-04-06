@@ -40,6 +40,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::group(['middleware' => ['is_admin']], function() {
 
         Route::post('resgatar_cheque/{id}', [TrocaChequeController::class, 'resgatar_cheque'])->name('resgatar_cheque');
+        Route::post('baixarDebitosRepresentantes/{representante_id}', [RepresentanteController::class, 'baixarDebitosRepresentantes'])->name('baixarDebitosRepresentantes');
         Route::post('depositar_diario', [ChequeController::class, 'depositar_diario'])->name('depositar_diario');
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
 
@@ -53,17 +54,17 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('troca_cheques', TrocaChequeController::class);
         Route::resource('adiamentos', AdiamentosController::class);
         Route::resource('devolvidos', DevolvidosController::class);
-        
+        Route::post('devolvidos/pagar_cheque_devolvido/{parcela_id}', [DevolvidosController::class, 'pagar_cheque_devolvido'])->name('pagarChequeDevolvido');
+
         //? PDF
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
         Route::get('pdf_fornecedor/{id}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
         Route::get('pdf_diario', [FornecedorController::class, 'pdf_diario'])->name('pdf_diario');
-        Route::get('adiamento_impresso/{representante_id}/{data_inicio}', [AdiamentosController::class, 'adiamento_impresso'])->name('adiamento_impresso');
+        Route::get('adiamento_impresso/{representante_id}', [AdiamentosController::class, 'adiamento_impresso'])->name('adiamento_impresso');
         Route::get('cheques_devolvidos/{representante_id}', [DevolvidosController::class, 'cheques_devolvidos'])->name('cheques_devolvidos');
         Route::get('fechamento_representante/{representante_id}', [DevolvidosController::class, 'fechamento_representante'])->name('fechamento_representante');
-        Route::post('devolvidos/pagar_cheque_devolvido/{parcela_id}', [DevolvidosController::class, 'pagar_cheque_devolvido'])->name('pagarChequeDevolvido');
         
         //? Anexos 
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([

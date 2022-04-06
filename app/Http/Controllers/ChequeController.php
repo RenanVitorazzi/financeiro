@@ -35,13 +35,11 @@ class ChequeController extends Controller
                                         LEFT JOIN
                                     representantes r ON r.id = par.representante_id
                                 WHERE
-                                    par.status != ?
-                                        AND par.status != ?
-                                        AND par.status != ?
+                                    par.status in (?,?)
                                         AND par.deleted_at IS NULL
                                         AND r.deleted_at IS NULL
                                         AND parceiro_id IS NULL
-                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado', 'Pago', 'Depositado', 'Resgatado']);
+                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado','Aguardando']);
         
         $arrayCores = [
             'Devolvido' => 'text-danger', 
@@ -146,9 +144,7 @@ class ChequeController extends Controller
         $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
             ->where([
                 ['forma_pagamento', 'Cheque'],
-                ['status', '!=', 'Pago'],
-                ['status', '!=', 'Depositado'],
-                ['status', '!=', 'Adiado'],
+                ['status', '=', 'Aguardando'],
                 ['parceiro_id', NULL],
             ])
             //['data_parcela', '>=', DB::raw('curdate()')],

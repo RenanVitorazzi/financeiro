@@ -36,6 +36,7 @@ Nova troca de cheques
                     <th>Número</th>
                     <th>Data</th>
                     <th>Valor</th>
+                    <th>Observação</th>
                 </tr>
             </x-table-header>
             <tbody>
@@ -49,6 +50,7 @@ Nova troca de cheques
                         <td>{{ $cheque->numero_cheque }}</td>
                         <td>@data($cheque->data_parcela)</td>
                         <td>@moeda($cheque->valor_parcela)</td>
+                        <td>{{ $cheque->observacao }}</td>
                     </tr>
                 @empty
                 <tr>

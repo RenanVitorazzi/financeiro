@@ -32,10 +32,10 @@ Editar conta
             <x-form-group name="peso" type="number" step="0.001" min="0" value="{{ $contaCorrente->peso }}">Peso (g)</x-form-group>
         </div>
         
-        <div class="col-4" id="group-cotacao" style="display:none">
+        <div class="col-4" id="group-cotacao" {{ $contaCorrente->balanco == 'Débito' ? 'style="display:none"' : ''}}>
             <x-form-group name="cotacao" type="number" step="0.01" min="0" value="{{ $contaCorrente->cotacao }}">Cotação do dia (R$)</x-form-group>
         </div>
-        <div class="col-4" id="group-valor" style="display:none">
+        <div class="col-4" id="group-valor" {{ $contaCorrente->balanco == 'Débito' ? 'style="display:none"' : ''}}>
             <x-form-group name="valor" type="number" step="0.01" min="0" value="{{ $contaCorrente->valor }}">Valor (R$)</x-form-group>
         </div>
         

@@ -251,7 +251,8 @@ class DevolvidosController extends Controller
                 a.nova_data, 
                 p.valor_parcela, 
                 a.juros_totais, 
-                a.dias_totais 
+                a.dias_totais ,
+                p.status
             FROM 
                 parcelas p 
             INNER JOIN 
@@ -270,8 +271,9 @@ class DevolvidosController extends Controller
                 adiamentos a ON a.parcela_id = p.id AND a.pago IS NULL
             WHERE p.representante_id = ?
                 AND p.deleted_at IS NULL
+                AND p.status != ?
                 AND a.pago IS NULL', 
-            [$representante_id]
+            [$representante_id, 'Devolvido']
         );
 
         $totalValorCheques = DB::select('SELECT 

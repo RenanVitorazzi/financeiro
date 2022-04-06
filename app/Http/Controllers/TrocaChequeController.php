@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdiamentoFormRequest;
 use App\Http\Requests\EditTrocaChequeRequest;
 use App\Http\Requests\TrocaChequesRequest;
+use App\Models\Feriados;
 use App\Models\Parcela;
 use App\Models\Troca;
 use App\Models\TrocaAdiamento;
@@ -18,6 +19,11 @@ use Illuminate\Support\Facades\App;
 
 class TrocaChequeController extends Controller
 {
+    public function __construct()
+    {
+        $this->feriados = Feriados::all();
+    }
+    
     public function index() 
     {
         $trocas = Troca::orderBy('data_troca', 'Desc')
@@ -53,13 +59,11 @@ class TrocaChequeController extends Controller
             LEFT JOIN 
             pessoas p ON p.id = r.pessoa_id 
         WHERE
-            par.status != ?
-                AND par.status != ?
-                AND par.status != ?
+            (par.status LIKE ? or par.status LIKE ?)
                 AND par.deleted_at IS NULL
                 AND r.deleted_at IS NULL
                 AND parceiro_id IS NULL
-        ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado', 'Pago', 'Depositado', 'Resgatado']);
+        ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado', 'Aguardando']);
         // dd($cheques);
         return view('troca_cheque.create', compact('cheques', 'parceiros') );
     }
@@ -84,30 +88,21 @@ class TrocaChequeController extends Controller
         $totalLiquido = 0;
         
         foreach ($cheques as $cheque) {
-            $adicionar_dia = 0;
             //* Se o cheque foi adiado, seleciona a nova data
-            $dataDoCheque =  $cheque->status == 'Adiado' ? $cheque->adiamentos->last()->nova_data : $cheque->data_parcela;
+            $dataDoCheque =  $cheque->status == 'Adiado' ? $cheque->adiamentos->nova_data : $cheque->data_parcela;
 
             $dataFim = new DateTime($dataDoCheque);
-            $diferencaDias = $dataInicio->diff($dataFim);
 
             if ($request->parceiro_id == 3) {
-                switch ($dataFim->format('w')) {
-                    case 0:
-                        $adicionar_dia = 1;
-                        break;
-                    case 6:
-                        $adicionar_dia = 2;
-                        break;
-                    default:
-                        $adicionar_dia = 0;
-                        break;
+                //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado 
+                while (in_array($dataFim->format('w'), [0, 6]) || !$this->feriados->where('data_feriado', $dataFim->format('Y-m-d'))->isEmpty()) {
+                    $dataFim->modify('+1 weekday');
                 }
             }
 
-            $dias = ($dataInicio < $dataFim) ? $diferencaDias->days + $adicionar_dia : 0;
-
-            $juros = ( ($cheque->valor_parcela * $taxa) / 30 ) * $dias;
+            $diferencaDias = $dataInicio->diff($dataFim)->days;
+           
+            $juros = ( ($cheque->valor_parcela * $taxa) / 30 ) * $diferencaDias;
             $valorLiquido = $cheque->valor_parcela - $juros;
 
             $totalJuros += $juros;
@@ -116,7 +111,7 @@ class TrocaChequeController extends Controller
             TrocaParcela::create([
                 'parcela_id' => $cheque->id,
                 'troca_id' => $troca->id,
-                'dias' => $dias,
+                'dias' => $diferencaDias,
                 'valor_liquido' => $valorLiquido,
                 'valor_juros' => $juros
             ]);
@@ -163,36 +158,27 @@ class TrocaChequeController extends Controller
 
             foreach ($cheques as $cheque) {
                 //* Se o cheque foi adiado, seleciona a nova data
-                $dataDoCheque =  $cheque->parcelas->status == 'Adiado' ? $cheque->parcelas->adiamentos->last()->nova_data : $cheque->parcelas->data_parcela;
+                $dataDoCheque =  $cheque->parcelas->status == 'Adiado' ? $cheque->parcelas->adiamentos->nova_data : $cheque->parcelas->data_parcela;
                 
                 $dataFim = new DateTime($dataDoCheque);
-                $diferencaDias = $dataInicio->diff($dataFim);
                 
-                $adicionar_dia = 0;
                 if ($request->parceiro_id == 3) {
-                    switch ($dataFim->format('w')) {
-                        case 0:
-                            $adicionar_dia = 1;
-                            break;
-                        case 6:
-                            $adicionar_dia = 2;
-                            break;
-                        default:
-                            $adicionar_dia = 0;
-                            break;
+                    //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado 
+                    while (in_array($dataFim->format('w'), [0, 6]) || !$this->feriados->where('data_feriado', $dataFim->format('Y-m-d'))->isEmpty()) {
+                        $dataFim->modify('+1 weekday');
                     }
                 }
-                
-                $dias = ($dataInicio < $dataFim) ? $diferencaDias->days + $adicionar_dia : 0;
 
-                $juros = ( ($cheque->parcelas->valor_parcela * $taxa) / 30 ) * $dias;
+                $diferencaDias = $dataInicio->diff($dataFim)->days;
+
+                $juros = ( ($cheque->parcelas->valor_parcela * $taxa) / 30)  * $diferencaDias;
                 $valorLiquido = $cheque->parcelas->valor_parcela - $juros;
     
                 $totalJuros += $juros;
                 $totalLiquido += $valorLiquido;
     
                 $cheque->update([
-                    'dias' => $dias,
+                    'dias' => $diferencaDias,
                     'valor_liquido' => $valorLiquido,
                     'valor_juros' => $juros
                 ]);
