@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Adiamento;
+use App\Models\DespesaFixa;
+use App\Models\Local;
 use App\Models\Parcela;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +18,7 @@ class HomeController extends Controller
     }
 
     public function index()
-    {   
+    {  
         $depositos = Parcela::where([
             ['data_parcela','<=', DB::raw('CURDATE()')],
             ['parceiro_id', NULL],
@@ -25,6 +28,18 @@ class HomeController extends Controller
             ->orderBy('data_parcela')
             ->orderBy('valor_parcela')
             ->orderBy('nome_cheque')
+            ->get();
+        
+        $qtdDiasParaSexta = 5 - Carbon::now()->dayOfWeek;
+
+        $ordensPagamentoParaSemana = Parcela::with('representante')
+            ->where([
+                ['forma_pagamento', 'Depósito'],
+                ['status', 'Aguardando'],
+                ['data_parcela', '<=', DB::raw('DATE_ADD(curdate(), INTERVAL '.$qtdDiasParaSexta.' day)')],
+            ])
+            ->orderBy('data_parcela')
+            ->orderBy('valor_parcela')
             ->get();
 
         $adiamentos = DB::select('SELECT 
@@ -44,6 +59,6 @@ class HomeController extends Controller
             ORDER BY pa.id'
         );
             
-        return view('home', compact('depositos', 'adiamentos'));
+        return view('home', compact('depositos', 'adiamentos', 'ordensPagamentoParaSemana'));
     }
 }

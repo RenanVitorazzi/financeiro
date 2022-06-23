@@ -21,7 +21,7 @@ class CarteiraSeeder extends Seeder
      */
     public function run()
     {
-        $json = Storage::disk('public')->get('json/hfdus.json');
+        $json = Storage::disk('public')->get('json/.json');
         $json = json_decode($json, true);
         
         foreach ($json['Carteira'] as $cheque => $info) {

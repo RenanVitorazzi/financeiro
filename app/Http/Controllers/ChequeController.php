@@ -39,7 +39,8 @@ class ChequeController extends Controller
                                         AND par.deleted_at IS NULL
                                         AND r.deleted_at IS NULL
                                         AND parceiro_id IS NULL
-                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado','Aguardando']);
+                                        AND forma_pagamento LIKE ?
+                                ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado','Aguardando', 'Cheque']);
         
         $arrayCores = [
             'Devolvido' => 'text-danger', 
@@ -185,11 +186,13 @@ class ChequeController extends Controller
                                 WHERE 
                                     NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id) 
                                     AND par.deleted_at IS NULL
+                                    AND par.forma_pagamento like ?
                                     AND par.'.$request->tipo_select.' = ?
                                     ORDER BY par.data_parcela', 
                                 [
                                     'R$ ',
                                     'de_DE',
+                                    'Cheque',
                                     $request->texto_pesquisa,
                                 ]
         );

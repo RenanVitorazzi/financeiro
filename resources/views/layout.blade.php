@@ -30,6 +30,22 @@
         </div>
     </div>
 </div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" id="modal2">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title2"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body2"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="page-wrapper chiller-theme toggled">
   <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
     <i class="fas fa-bars"></i>
@@ -102,6 +118,18 @@
               <span>Clientes</span>
             </a>
           </li>
+          <li @if(route('despesas.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('despesas.index') }}">
+              <i class="fas fa-money-bill"></i>
+              <span>Despesas</span>
+            </a>
+          </li>
+          <li @if(route('ops.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('ops.index') }}">
+              <i class="fas fa-comment-dollar"></i>
+              <span>Ordens de pagamento</span>
+            </a>
+          </li>
           @if(auth()->user()->is_admin)
           <li class="header-menu">
             <span>Cheques</span>
@@ -133,12 +161,12 @@
                       <span>Prorrogações</span>
                     </a>
                 </li> --}}
-                <li @if(route('devolvidos.index') == Request::url()) class="ativo" @endif>
+                {{-- <li @if(route('devolvidos.index') == Request::url()) class="ativo" @endif>
                     <a href="{{ route('devolvidos.index') }}">
                       <i class="fas fa-undo-alt"></i>
                       <span>Devolvidos</span>
                     </a>
-                </li>
+                </li> --}}
             
             </ul>
         </div>

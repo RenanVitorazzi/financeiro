@@ -12,9 +12,11 @@ use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\ContaCorrenteAnexoController;
 use App\Http\Controllers\ContaCorrenteRepresentanteAnexoController;
+use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\DevolvidosController;
 use App\Http\Controllers\TrocaChequeController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OpController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,7 +57,9 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('adiamentos', AdiamentosController::class);
         Route::resource('devolvidos', DevolvidosController::class);
         Route::post('devolvidos/pagar_cheque_devolvido/{parcela_id}', [DevolvidosController::class, 'pagar_cheque_devolvido'])->name('pagarChequeDevolvido');
-
+        Route::resource('despesas', DespesaController::class);
+        Route::resource('ops', OpController::class);
+        
         //? PDF
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
