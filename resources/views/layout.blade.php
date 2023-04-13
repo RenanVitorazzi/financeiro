@@ -30,17 +30,17 @@
         </div>
     </div>
 </div>
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" id="modal2">
+<div class="modal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="modal2">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" id="modal-header2">
                 <h5 class="modal-title" id="modal-title2"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body" id="modal-body2"></div>
-            <div class="modal-footer">
+            <div class="modal-footer" id="modal-footer2">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
             </div>
         </div>
@@ -55,23 +55,25 @@
     <div class="sidebar-content">
       <div class="sidebar-brand">
         <a href="{{ route('home') }}">
-            dl metais
+            Home
             {{-- <img src="{{ asset('dl_logo.png') }}"></img> --}}
         </a>
         <div id="close-sidebar">
           <i class="fas fa-times"></i>
         </div>
       </div>
+      {{--
       <div class="sidebar-header">
-        {{-- <div class="user-pic">
+        <div class="user-pic">
           <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg"
             alt="User picture">
-        </div> --}}
+        </div> 
         <div class="user-info">
           <span class="user-name"><b>{{ auth()->user()->name }}</b></span>
           <span class="user-role">{{ auth()->user()->is_admin ? 'Administrador' : 'Representante' }}</span>
         </div>
       </div> 
+      --}}
       <!-- sidebar-header  -->
       {{-- <div class="sidebar-search">
         <div>
@@ -118,21 +120,25 @@
               <span>Clientes</span>
             </a>
           </li>
-          <li @if(route('despesas.index') == Request::url()) class="ativo" @endif>
-            <a href="{{ route('despesas.index') }}">
-              <i class="fas fa-money-bill"></i>
-              <span>Despesas</span>
-            </a>
-          </li>
+          
+          {{--
           <li @if(route('ops.index') == Request::url()) class="ativo" @endif>
             <a href="{{ route('ops.index') }}">
               <i class="fas fa-comment-dollar"></i>
               <span>Ordens de pagamento</span>
             </a>
           </li>
+          --}}
+          
+          <li @if(route('estoque.index') == Request::url()) class="ativo" @endif>
+            <a href="{{ route('estoque.index') }}">
+            <i class="fas fa-exchange-alt"></i>
+              <span>Estoque</span>
+            </a>
+          </li>
           @if(auth()->user()->is_admin)
           <li class="header-menu">
-            <span>Cheques</span>
+            <span>Financeiro</span>
           </li>
           <div class="sidebar-menu">
             <ul>
@@ -154,7 +160,24 @@
                       <span>Procurar cheque</span>
                     </a>
                 </li>
-                
+                <li @if(route('recebimentos.index') == Request::url()) class="ativo" @endif>
+                  <a href="{{ route('recebimentos.index') }}">
+                  <i class="fas fa-exchange-alt"></i>
+                    <span>Recebimentos</span>
+                  </a>
+                </li>
+                <li @if(route('despesas.index') == Request::url()) class="ativo" @endif>
+                  <a href="{{ route('despesas.index') }}">
+                    <i class="fas fa-money-bill"></i>
+                    <span>Despesas</span>
+                  </a>
+                </li>
+                <li @if(route('entrega_parcela.index') == Request::url()) class="ativo" @endif>
+                  <a href="{{ route('entrega_parcela.index') }}">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Entregar/Pegar cheques</span>
+                  </a>
+                </li>
                 {{-- <li @if(route('adiamentos.index') == Request::url()) class="ativo" @endif>
                     <a href="{{ route('adiamentos.index') }}">
                       <i class="fas fa-clock"></i>

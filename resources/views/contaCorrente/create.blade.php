@@ -62,9 +62,11 @@ Adicionar nova conta
             if (!cotacao || !valor) {
                 return false
             }
-
+            
             let peso = valor/cotacao;
-            $("#peso").val(peso.toFixed(3))
+            let pesoTratado = peso.toFixed(3).slice(0,-1);
+
+            $("#peso").val(pesoTratado)
         })
 
         $("#balanco").change( (e) => {

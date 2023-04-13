@@ -1,0 +1,564 @@
+{
+    "Carteira": [
+        {
+            "nome_cheque": "MARLENE CRUZ DE SOUSA",
+            "numero_banco": "1",
+            "numero_cheque": "850581",
+            "valor_parcela": "2790.00",
+            "data_parcela": "2023-05-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA APARECIDA DIAS SOUZA",
+            "numero_banco": "237",
+            "numero_cheque": "2585",
+            "valor_parcela": "3117.00",
+            "data_parcela": "2023-05-27",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA PEREIRA DE SOUZA OLIVEIRA",
+            "numero_banco": "237",
+            "numero_cheque": "2386",
+            "valor_parcela": "7334.00",
+            "data_parcela": "2023-05-28",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIENE DOS SANTOS NEIVA",
+            "numero_banco": "756",
+            "numero_cheque": "272",
+            "valor_parcela": "4109.75",
+            "data_parcela": "2023-05-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "EVA FRANCISCO DIAS ALMEIDA",
+            "numero_banco": "1",
+            "numero_cheque": "851680",
+            "valor_parcela": "2620.00",
+            "data_parcela": "2023-06-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIZABETE DE SOUSA LOPES",
+            "numero_banco": "237",
+            "numero_cheque": "271",
+            "valor_parcela": "1795.00",
+            "data_parcela": "2023-05-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ISABELLA SOUZA FIGUEIREDO DE FREITAS",
+            "numero_banco": "1",
+            "numero_cheque": "850053",
+            "valor_parcela": "1112.00",
+            "data_parcela": "2023-06-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROGERIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "82",
+            "valor_parcela": "20000.00",
+            "data_parcela": "2023-06-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA DA CONCEICAO",
+            "numero_banco": "237",
+            "numero_cheque": "2971",
+            "valor_parcela": "4300.00",
+            "data_parcela": "2023-06-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA RITA RODRIGUES DOS SANTOS",
+            "numero_banco": "1",
+            "numero_cheque": "850202",
+            "valor_parcela": "899.00",
+            "data_parcela": "2023-06-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ONOFRE SOARES DE OLIVEIRA FILH",
+            "numero_banco": "341",
+            "numero_cheque": "UA-000013",
+            "valor_parcela": "3577.00",
+            "data_parcela": "2023-06-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARLENE CRUZ DE SOUSA",
+            "numero_banco": "1",
+            "numero_cheque": "850582",
+            "valor_parcela": "2790.00",
+            "data_parcela": "2023-06-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA APARECIDA DIAS SOUZA",
+            "numero_banco": "237",
+            "numero_cheque": "2586",
+            "valor_parcela": "3117.00",
+            "data_parcela": "2023-06-27",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA PEREIRA DE SOUZA OLIVEIRA",
+            "numero_banco": "237",
+            "numero_cheque": "2387",
+            "valor_parcela": "7334.00",
+            "data_parcela": "2023-06-28",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIENE DOS SANTOS NEIVA",
+            "numero_banco": "756",
+            "numero_cheque": "273",
+            "valor_parcela": "4109.75",
+            "data_parcela": "2023-06-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "EVA FRANCISCO DIAS ALMEIDA",
+            "numero_banco": "1",
+            "numero_cheque": "851681",
+            "valor_parcela": "2620.00",
+            "data_parcela": "2023-07-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIZABETE DE SOUSA LOPES",
+            "numero_banco": "237",
+            "numero_cheque": "272",
+            "valor_parcela": "1795.00",
+            "data_parcela": "2023-07-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA DA CONCEICAO",
+            "numero_banco": "237",
+            "numero_cheque": "2972",
+            "valor_parcela": "4300.00",
+            "data_parcela": "2023-07-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA RITA RODRIGUES DOS SANTOS",
+            "numero_banco": "1",
+            "numero_cheque": "850203",
+            "valor_parcela": "899.00",
+            "data_parcela": "2023-07-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ONOFRE SOARES DE OLIVEIRA FILH",
+            "numero_banco": "341",
+            "numero_cheque": "UA-000014",
+            "valor_parcela": "3577.00",
+            "data_parcela": "2023-07-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARLENE CRUZ DE SOUSA",
+            "numero_banco": "1",
+            "numero_cheque": "850583",
+            "valor_parcela": "2790.00",
+            "data_parcela": "2023-07-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROGERIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "83",
+            "valor_parcela": "20000.00",
+            "data_parcela": "2023-07-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA APARECIDA DIAS SOUZA",
+            "numero_banco": "237",
+            "numero_cheque": "2587",
+            "valor_parcela": "3117.00",
+            "data_parcela": "2023-07-27",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA PEREIRA DE SOUZA OLIVEIRA",
+            "numero_banco": "237",
+            "numero_cheque": "2388",
+            "valor_parcela": "7334.00",
+            "data_parcela": "2023-07-28",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIENE DOS SANTOS NEIVA",
+            "numero_banco": "756",
+            "numero_cheque": "275",
+            "valor_parcela": "4109.75",
+            "data_parcela": "2023-07-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "EVA FRANCISCO DIAS ALMEIDA",
+            "numero_banco": "1",
+            "numero_cheque": "851682",
+            "valor_parcela": "2620.00",
+            "data_parcela": "2023-08-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIZABETE DE SOUSA LOPES",
+            "numero_banco": "237",
+            "numero_cheque": "273",
+            "valor_parcela": "1650.00",
+            "data_parcela": "2023-08-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ONOFRE SOARES DE OLIVEIRA FILH",
+            "numero_banco": "341",
+            "numero_cheque": "UA-000015",
+            "valor_parcela": "3577.00",
+            "data_parcela": "2023-08-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARLENE CRUZ DE SOUSA",
+            "numero_banco": "1",
+            "numero_cheque": "850584",
+            "valor_parcela": "2790.00",
+            "data_parcela": "2023-08-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROGERIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "84",
+            "valor_parcela": "20000.00",
+            "data_parcela": "2023-08-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA APARECIDA DIAS SOUZA",
+            "numero_banco": "237",
+            "numero_cheque": "2588",
+            "valor_parcela": "3117.00",
+            "data_parcela": "2023-08-27",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA PEREIRA DE SOUZA OLIVEIRA",
+            "numero_banco": "237",
+            "numero_cheque": "2389",
+            "valor_parcela": "7334.00",
+            "data_parcela": "2023-08-28",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "WAGNER CARVALHO AMORIM",
+            "numero_banco": "1",
+            "numero_cheque": "850103",
+            "valor_parcela": "2960.00",
+            "data_parcela": "2023-08-29",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIENE DOS SANTOS NEIVA",
+            "numero_banco": "756",
+            "numero_cheque": "276",
+            "valor_parcela": "4109.75",
+            "data_parcela": "2023-08-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ANGIELLY LOPES RUAS",
+            "numero_banco": "1",
+            "numero_cheque": "850998",
+            "valor_parcela": "11336.00",
+            "data_parcela": "2023-09-06",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "JOANA MARTINS ARAUJO SANTOS",
+            "numero_banco": "1",
+            "numero_cheque": "852085",
+            "valor_parcela": "7465.07",
+            "data_parcela": "2023-09-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "EVA FRANCISCO DIAS ALMEIDA",
+            "numero_banco": "1",
+            "numero_cheque": "851683",
+            "valor_parcela": "2620.00",
+            "data_parcela": "2023-09-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "GERALDO LACERDA GONCALVES",
+            "numero_banco": "70",
+            "numero_cheque": "700536",
+            "valor_parcela": "3665.00",
+            "data_parcela": "2023-09-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIZABETE DE SOUSA LOPES",
+            "numero_banco": "237",
+            "numero_cheque": "274",
+            "valor_parcela": "1650.00",
+            "data_parcela": "2023-09-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ONOFRE SOARES DE OLIVEIRA FILH",
+            "numero_banco": "341",
+            "numero_cheque": "UA-000016",
+            "valor_parcela": "3577.00",
+            "data_parcela": "2023-09-25",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROGERIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "85",
+            "valor_parcela": "20000.00",
+            "data_parcela": "2023-09-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARLENE CRUZ DE SOUSA",
+            "numero_banco": "1",
+            "numero_cheque": "850585",
+            "valor_parcela": "2790.00",
+            "data_parcela": "2023-09-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "WAGNER CARVALHO AMORIM",
+            "numero_banco": "1",
+            "numero_cheque": "850104",
+            "valor_parcela": "2960.00",
+            "data_parcela": "2023-09-29",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "MARIA PEREIRA DE SOUZA OLIVEIRA",
+            "numero_banco": "237",
+            "numero_cheque": "2390",
+            "valor_parcela": "7334.00",
+            "data_parcela": "2023-09-28",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ELIENE DOS SANTOS NEIVA",
+            "numero_banco": "756",
+            "numero_cheque": "274",
+            "valor_parcela": "4109.75",
+            "data_parcela": "2023-09-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ANGIELLY LOPES RUAS",
+            "numero_banco": "1",
+            "numero_cheque": "850999",
+            "valor_parcela": "11336.00",
+            "data_parcela": "2023-10-06",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "JOANA MARTINS ARAUJO SANTOS",
+            "numero_banco": "1",
+            "numero_cheque": "852086",
+            "valor_parcela": "7465.07",
+            "data_parcela": "2023-10-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROSELI DA SILVA VAZ GONCALVES",
+            "numero_banco": "237",
+            "numero_cheque": "1543",
+            "valor_parcela": "5000.00",
+            "data_parcela": "2023-10-10",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROSELI DA SILVA VAZ GONCALVES",
+            "numero_banco": "237",
+            "numero_cheque": "1544",
+            "valor_parcela": "5000.00",
+            "data_parcela": "2023-10-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROGERIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "86",
+            "valor_parcela": "23000.00",
+            "data_parcela": "2023-10-30",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "WAGNER CARVALHO AMORIM",
+            "numero_banco": "1",
+            "numero_cheque": "850099",
+            "valor_parcela": "2960.00",
+            "data_parcela": "2023-10-29",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ALCINEIA SIMPLICIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "677",
+            "valor_parcela": "4600.00",
+            "data_parcela": "2023-10-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROMILDA RODRIGUES DE OLIVEIRA",
+            "numero_banco": "1",
+            "numero_cheque": "855095",
+            "valor_parcela": "2100.00",
+            "data_parcela": "2023-10-10",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ANA CRISTINA ALVES DA SILVA",
+            "numero_banco": "237",
+            "numero_cheque": "455",
+            "valor_parcela": "1820.00",
+            "data_parcela": "2023-10-05",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ALCINEIA SIMPLICIO DA SILVA",
+            "numero_banco": "237",
+            "numero_cheque": "1437",
+            "valor_parcela": "1600.00",
+            "data_parcela": "2023-10-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROSELI DA SILVA VAZ GONCALVES",
+            "numero_banco": "237",
+            "numero_cheque": "1545",
+            "valor_parcela": "2750.00",
+            "data_parcela": "2023-11-10",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ALCINEIA SIMPLICIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "678",
+            "valor_parcela": "4600.00",
+            "data_parcela": "2023-11-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROMILDA RODRIGUES DE OLIVEIRA",
+            "numero_banco": "1",
+            "numero_cheque": "855096",
+            "valor_parcela": "2100.00",
+            "data_parcela": "2023-11-10",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ALCINEIA SIMPLICIO DA SILVA",
+            "numero_banco": "237",
+            "numero_cheque": "1438",
+            "valor_parcela": "2347.00",
+            "data_parcela": "2023-11-15",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ALCINEIA SIMPLICIO DA SILVA",
+            "numero_banco": "33",
+            "numero_cheque": "679",
+            "valor_parcela": "6600.00",
+            "data_parcela": "2023-12-20",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "ROMILDA RODRIGUES DE OLIVEIRA",
+            "numero_banco": "1",
+            "numero_cheque": "855097",
+            "valor_parcela": "2100.00",
+            "data_parcela": "2023-12-10",
+            "id_representante": "12"
+        },
+        {
+            "nome_cheque": "GESIEL GOMES DA SILVA ",
+            "numero_banco": "756",
+            "numero_cheque": "5",
+            "valor_parcela": "2300.00",
+            "data_parcela": "2023-05-12",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851489",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2023-10-30",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851490",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2023-11-30",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851491",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2023-12-30",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851492",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2024-01-30",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851493",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2024-02-28",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "ALESSANDRA WALESKA RIBEIRO DE AGUIAR",
+            "numero_banco": "1",
+            "numero_cheque": "851494",
+            "valor_parcela": "2825.00",
+            "data_parcela": "2024-03-30",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "LUZINEIDE DA SILVA FONSECA",
+            "numero_banco": "1",
+            "numero_cheque": "851031",
+            "valor_parcela": "1866.00",
+            "data_parcela": "2023-08-05",
+            "id_representante": "11"
+        },
+        {
+            "nome_cheque": "LUZINEIDE DA SILVA FONSECA",
+            "numero_banco": "1",
+            "numero_cheque": "851032",
+            "valor_parcela": "1866.00",
+            "data_parcela": "2023-09-05",
+            "id_representante": "11"
+        }
+    ]
+}

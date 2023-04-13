@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Blade::directive('peso', function ($expression) {
-            return "<?php echo number_format($expression, 3, ',', '.'); ?>";
+            return "<?php echo number_format($expression, 2, ',', '.'); ?>";
         });
 
         Blade::directive('fator', function ($expression) {

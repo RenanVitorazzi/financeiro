@@ -3,6 +3,8 @@
 Adicionar vendas
 @endsection
 @section('body')
+<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
@@ -13,7 +15,7 @@ Adicionar vendas
         <li class="breadcrumb-item active" aria-current="page">Novo</li>
     </ol>
 </nav>
-<form method="POST" action="{{ route('venda.store')}}">
+<form method="POST" action="{{ route('venda.store') }}" id="formEnviarVenda">
     @csrf
     <div class="row">
         <div class="col-6">
@@ -26,7 +28,7 @@ Adicionar vendas
                     <option></option>
                     @foreach ($clientes as $cliente)
                     <option value="{{ $cliente->id }}" {{ old("cliente_id") == $cliente->id ? 'selected': '' }} >
-                        {{ $cliente->pessoa->nome }}
+                        {{ $cliente->nome }}
                     </option>
                     @endforeach
                 </x-select>
@@ -39,13 +41,12 @@ Adicionar vendas
         <input type="hidden" name="balanco" value="Venda">
         <input type="hidden" name="representante_id" id="representante_id" value="{{ $representante_id }}">
         
-        <x-table class="table-striped table-bordered table-dark">
-            <thead>
+        <x-table class="table-striped table-bordered">
+            <thead class="thead-dark">
                 <tr>
                     <th>Descrição</th>
                     <th>Quantidade</th>
                     <th>Valor</th>
-                    {{-- <th>Total</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -61,9 +62,7 @@ Adicionar vendas
                 </tr>
                 <tr>
                     <td colspan='2'>Total</td>
-                    {{-- <td></td> --}}
                     <td><x-input name="valor_total" type="number" step="0.01" value="{{ old('valor_total') }}" ></x-input></td>
-                    {{-- <td><x-input type="number" name="cotacao_fator" required></x-input></td> --}}
                 </tr>
             </tbody>
         </x-table>
@@ -77,218 +76,182 @@ Adicionar vendas
                 @endforeach
             </x-select> 
         </div>
-        <div class="col-4 form-group d-none" id="groupDiaVencimento">
+        <div class="col-4 form-group" id="groupDiaVencimento">
             <label for="dia_vencimento">Dia de vencimento</label>
-            <x-input name="dia_vencimento" type="number"></x-input>
+            <x-input name="dia_vencimento" type="number" value="{{old('dia_vencimento')}}"></x-input>
         </div>
-        <div class="col-4 form-group d-none" id="groupParcelas">
+        <div class="col-4 form-group" id="groupParcelas">
             <label for="parcelas">Quantidade de parcelas</label>
-            <x-input name="parcelas" type="number"></x-input>
+            <x-input name="parcelas" type="number" value="{{old('parcelas')}}"></x-input>
         </div>
     </div> 
     
-    {{-- <div id="campoQtdParcelas" class="row">
-        @if (old('metodo_pagamento') == 'Parcelado')
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="prazo" type="number" value="{{ old('prazo') }}">Prazo</x-form-group>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-            <x-form-group name="parcelas" type="number" value="{{ old('parcelas') }}">Parcelas</x-form-group>
-        </div>
-        @elseif (old('metodo_pagamento') == 'À vista')
-        <div class="col-md-4 col-sm-6 col-lg-3">
-            <div class="card mb-4 card-hover">
-                <div class="card-body">
-                    <h5 class="card-title mb-4"> 
-                        <div class="d-flex justify-content-between">
-                            Pagamento
-                        </div>
-                    </h5>
-                    <div class='form-group'>
-                        <label for="forma_pagamento[0]">Informe a forma de pagamento</label>
-                        <x-select name="forma_pagamento[0]">
-                            @foreach ($forma_pagamento as $pagamento)
-                            <option value="{{ $pagamento }}" {{ old("forma_pagamento.0") == $pagamento ? 'selected': '' }} >
-                                {{ $pagamento }}
-                            </option>
-                            @endforeach
-                        </x-select>
-                    </div>
-                   
-                    <div class="form-group {{ old('forma_pagamento.0') == 'Cheque' ? '' : 'd-none' }}" id="groupNome_0">
-                        <label for="nome_cheque[0]">Nome</label>
-                        @if ($errors->has('nome_cheque.0'))
-                            <x-input name="nome_cheque[0]" value="{{ old('nome_cheque.0') }}" class="is-invalid"></x-input>
-                            <div class="invalid-feedback d-inline">{{ $errors->first('nome_cheque.0') }}</div>
-                        @else
-                            <x-input name="nome_cheque[0]" value="{{ old('nome_cheque.0') }}"></x-input>
-                        @endif
-                    </div>
-
-                    <div class="form-group {{ old('forma_pagamento.0') == 'Cheque' ? '' : 'd-none' }}" id="groupNumero_0">
-                        <label for="numero_cheque[0]">Número do Cheque</label>
-                        <x-input name="numero_cheque[0]" value="{{ old('numero_cheque.0') }}"></x-input>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="data_parcela[0]">Data</label>
-                        @if ($errors->has('data_parcela.0'))
-                            <x-input name="data_parcela[0]" type="date" value="{{ old('data_parcela.0') }}" class="is-invalid"></x-input>
-                            <div class="invalid-feedback d-inline">{{ $errors->first('data_parcela.0') }}</div>
-                        @else
-                            <x-input name="data_parcela[0]" type="date" value="{{ old('data_parcela.0') }}"></x-input>
-                        @endif
-                    </div>
-                    <div class="form-group">
-                        <label for="valor_parcela[]">Valor</label>
-                        @if ($errors->has('valor_parcela.0'))
-                            <x-input name="valor_parcela[]" type="number" step="0.01" value="{{ old('valor_parcela.0') }}" class="is-invalid"></x-input>
-                            <div class="invalid-feedback d-inline">{{ $errors->first('valor_parcela.0') }}</div>
-                        @else
-                            <x-input name="valor_parcela[]" type="number" step="0.01" value="{{ old('valor_parcela.0') }}"></x-input>
-                        @endif
-                    </div>
-
-                    <div class="form-group">
-                        <label for="observacao[]">Observação</label>
-                        <x-text-area name="observacao[]" id="observacao[]"></x-text-area>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-    </div> --}}
     <div id="infoCheques" class="row">
-        @if (old('metodo_pagamento') == 'Parcelado')
-            @foreach (old('parcelas') as $item)
-            <div class="col-md-4 col-sm-6 col-lg-3">
-                <div class="card mb-4 card-hover">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4"> 
-                            <div class="d-flex justify-content-between">
-                                <div>${index + 1}ª Parcela</div>
-                                ${btnCopiarDados}
+        @if (old('parcelas') && old('parcelas') > 0)
+            @for ($i = 0; $i < old('parcelas'); $i++)
+                <div class="col-4">
+                    <div class="card mb-4 card-hover">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4"> 
+                                <div class="d-flex justify-content-between">
+                                    <div>{{ $i + 1 }}ª Parcela</div>
+                                    @if($i == 0) 
+                                        <div class="btn btn-dark copiarDadosPagamento">Copiar</div>
+                                    @endif
+                                </div>
+                            </h5>
+                            <div class='form-group'>
+                                <label for="forma_pagamento[{{$i}}]">Informe a forma de pagamento</label>
+                                <x-select class="form-control {{ $errors->has('forma_pagamento.'.$i) ? 'is-invalid' : ''}}" name="forma_pagamento[{{$i}}]" id="forma_pagamento[{{$i}}]" data-index="{{$i}}" >
+                                    <option value=""></option>
+                                    @foreach ($forma_pagamento as $forma)
+                                        <option value="{{ $forma }}" {{ $forma == old('forma_pagamento.'.$i) ? 'selected' : '' }}>
+                                            {{ $forma }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                                @error('forma_pagamento.'.$i)
+                                    <div class="invalid-feedback d-inline">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
-                        </h5>
-                        <div class='form-group'>
-                            <label for="forma_pagamento[${index}]">Informe a forma de pagamento</label>
-                            <select class="form-control" name="forma_pagamento[${index}]" id="forma_pagamento[${index}]" data-index="${index}">
-                                ${option}
-                            </select>
-                        </div>
-                        <div class="form-group d-none" id="groupNome_${index}">
-                            <label for="nome_cheque[${index}]">Nome</label>
-                            <div class="d-flex">
-                                <input type="text" name="nome_cheque[${index}]" id="nome_cheque[${index}]" class="form-control primeiroInputNome">
+                            <div class="form-group {{old('forma_pagamento.'.$i) == 'Cheque' ? '' : 'd-none'}}" id="groupNome_{{$i}}">
+                                <label for="nome_cheque[{{$i}}]">Nome</label>
+                                <div class="d-flex">
+                                    <x-input type="text" name="nome_cheque[{{$i}}]" 
+                                        id="nome_cheque[{{$i}}]" 
+                                        class="form-control primeiroInputNome {{ $errors->has('nome_cheque.'.$i) ? 'is-invalid' : ''}}"
+                                        value="{{old('nome_cheque.'.$i)}}"
+                                    ></x-input>
+                                    @error('nome_cheque.'.$i)
+                                        <div class="invalid-feedback d-inline">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group {{old('forma_pagamento.'.$i) == 'Cheque' ? '' : 'd-none'}}" id="groupNumero_{{$i}}">
+                                <label for="numero_banco[{{$i}}]">Número do Banco</label>
+                                <div class="d-flex">
+                                    <x-input type="text" 
+                                        name="numero_banco[{{$i}}]" 
+                                        id="numero_banco[{{$i}}]" 
+                                        class="form-control {{ $errors->has('numero_banco.'.$i) ? 'is-invalid' : ''}}" 
+                                        value="{{ old('numero_banco.'.$i) }}"
+                                    ></x-input>
+                                    @error('numero_banco.'.$i)
+                                        <div class="invalid-feedback d-inline">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group {{old('forma_pagamento.'.$i) == 'Cheque' ? '' : 'd-none'}}" id="groupNumero_{{$i}}">
+                                <label for="numero_cheque[{{$i}}]">Número do Cheque</label>
+                                <div class="d-flex">
+                                    <x-input type="text" 
+                                        name="numero_cheque[{{$i}}]" 
+                                        id="numero_cheque[{{$i}}]" 
+                                        class="form-control {{ $errors->has('numero_cheque.'.$i) ? 'is-invalid' : ''}}"
+                                        value="{{old('numero_cheque.'.$i)}}"
+                                    ></x-input>
+                                    @error('numero_cheque.'.$i)
+                                        <div class="invalid-feedback d-inline">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data_parcela[{{$i}}]">Data da Parcela</label>
+                                <x-input type="date" 
+                                    name="data_parcela[{{$i}}]" 
+                                    id="data_parcela[{{$i}}]" 
+                                    class="form-control {{ $errors->has('data_parcela.'.$i) ? 'is-invalid' : ''}}" 
+                                    value="{{old('data_parcela.'.$i)}}"
+                                ></x-input>
+                                @error('data_parcela.'.$i)
+                                    <div class="invalid-feedback d-inline">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="valor_parcela[{{$i}}]">Valor</label>
+                                <x-input type="number" 
+                                    name="valor_parcela[{{$i}}]" 
+                                    id="valor_parcela[{{$i}}]" 
+                                    class="form-control primeiroInputValor {{ $errors->has('valor_parcela.'.$i) ? 'is-invalid' : ''}}" 
+                                    value="{{old('valor_parcela.'.$i)}}"
+                                ></x-input>
+                                @error('valor_parcela.'.$i)
+                                    <div class="invalid-feedback d-inline">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                           
+                            <div class="form-group">
+                                <label for="status[{{$i}}]">Status</label>
+                                <x-select name="status[{{$i}}]" id="status[{{$i}}]" class="{{ $errors->has('status.'.$i) ? 'is-invalid' : ''}}">
+                                    <option value=""></option>
+                                    @if(old('forma_pagamento.'.$i) == 'Cheque')
+                                        <option value="Aguardando" {{ old('status.'.$i) == 'Aguardando' ? 'selected' : ''}}>Aguardando Depósito</option>
+                                        <option value="Aguardando Envio" {{ old('status.'.$i) == 'Aguardando Envio' ? 'selected' : ''}}>Aguardando Envio</option>
+                                    @elseif(old('forma_pagamento.'.$i) == 'Pix' || old('forma_pagamento.'.$i) == 'Dinheiro')
+                                        <option value="Pago">Pago</option>
+                                    @elseif(old('forma_pagamento.'.$i) == 'Transferência Bancária')  
+                                        <option value="Pago" {{ old('status.'.$i) == 'Pago' ? 'selected' : ''}}>Pago</option>
+                                        <option value="Aguardando Pagamento" {{ old('status.'.$i) == 'Aguardando Pagamento' ? 'selected' : ''}}>Aguardando Pagamento</option>
+                                    @endif
+                                </x-select>
+
+                                @error('status.'.$i)
+                                    <div class="invalid-feedback d-inline">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                                 
                             </div>
-                        </div>
-                        <div class="form-group d-none" id="groupNumero_${index}">
-                            <label for="numero_cheque[${index}]">Número do Cheque</label>
-                            <div class="d-flex">
-                                <input type="text" name="numero_cheque[${index}]" id="numero_cheque[${index}]" class="form-control">
+                            <div class="form-group">
+                                <label for="observacao[{{$i}}]">Observação</label>
+                                <x-textarea name="observacao[{{$i}}]" id="observacao[{{$i}}]" class="form-control">{{old('observacao.'.$i)}}</x-textarea>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="data_parcela[${index}]">Data da Parcela</label>
-                            <input type="date" name="data_parcela[${index}]" id="data_parcela[${index}]" class="form-control" value="${proximaData}">
-                        </div>
-                        <div class="form-group">
-                            <label for="valor_parcela[${index}]">Valor</label>
-                            <input type="number" name="valor_parcela[${index}]" id="valor_parcela[${index}]" class="form-control primeiroInputValor" value="${campoValorTratado}">
-                        </div>
-                        <div class="form-group">
-                            <label for="observacao[${index}]">Observação</label>
-                            <textarea name="observacao[${index}]" id="observacao[${index}]" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
-            </div>
-            @endforeach
+            @endfor
         @endif
     </div>
-
+    @if($errors->any())
+        <div class="alert alert-danger">
+        @foreach ($errors->all() as $error)
+            <div>{{ $error }}</div>
+        @endforeach
+        </div>
+    @endif
     <input type="submit" class='btn btn-success'>
 </form>
 @endsection
 @section('script')
+<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.1/jquery-migrate.min.js"></script>
 <script>
-    // const CAMPO_PARCELAS = $("#campoQtdParcelas")
-    const FORMA_PAGAMENTO = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Depósito']
+    const FORMA_PAGAMENTO = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Pix']
     let option = `<option></option>`
 
     FORMA_PAGAMENTO.forEach(element => {
         option += `<option value="${element}">${element}</option>`;
     })
 
-    function tipoPagamento(forma_pagamento) {
-        let htmlPagamento = "";
-        
-        if (forma_pagamento == 'À vista') {
-            $("#groupDiaVencimento").addClass('d-none')
-            $("#groupParcelas").addClass('d-none')
-
-            let valor = $("#valor_total").val()
-
-            htmlPagamento = `
-                <div class="col-md-4 col-sm-6 col-lg-3">
-                    <div class="card mb-4 card-hover">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4"> 
-                                <div class="d-flex justify-content-between">
-                                    <div>Pagamento</div>
-                                </div>
-                            </h5>
-                            <div class='form-group'>
-                                <label for="forma_pagamento[0]">Informe a forma de pagamento</label>
-                                <select class="form-control" name="forma_pagamento[0]" id="forma_pagamento[0]" data-index="0">
-                                    ${option}
-                                </select>
-                            </div>
-                            <div class="form-group d-none" id="groupNome_0">
-                                <label for="nome_cheque[0]">Nome</label>
-                                <div class="d-flex">
-                                    <input type="text" name="nome_cheque[0]" id="nome_cheque[0]" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group d-none" id="groupNumero_0">
-                                <label for="numero_cheque[0]">Número do Cheque</label>
-                                <div class="d-flex">
-                                    <input type="text" name="numero_cheque[0]" id="numero_cheque[0]" class="form-control">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="data_parcela[0]">Data da Parcela</label>
-                                <input type="date" name="data_parcela[0]" id="data_parcela[0]" class="form-control" value="{{date('Y-m-d')}}">
-                            </div>
-                            <div class="form-group">
-                                <label for="valor_parcela[0]">Valor</label>
-                                <input type="number" name="valor_parcela[0]" id="valor_parcela[0]" class="form-control" value="${valor}">
-                            </div>
-                            <div class="form-group">
-                                <label for="observacao[0]">Observação</label>
-                                <textarea name="observacao[0]" id="observacao[0]" class="form-control"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `
-            
-            $("#infoCheques").html(htmlPagamento)
-            listenerFormaPagamentoParcela()
-        } else if (forma_pagamento == 'Parcelado') {
-            $("#groupDiaVencimento").removeClass('d-none')
-            $("#groupParcelas").removeClass('d-none')
-        }
-    }
-
     $("#metodo_pagamento").change( (e) => {
         let metodo = $(e.target).val()
 
         $("#infoCheques").html("")
-        tipoPagamento(metodo)
+        //tipoPagamento(metodo)
 
         htmlParcelas()
     })
@@ -348,7 +311,7 @@ Adicionar vendas
                 : ''
 
                 html += `
-                    <div class="col-md-4 col-sm-6 col-lg-3">
+                    <div class="col-4">
                         <div class="card mb-4 card-hover">
                             <div class="card-body">
                                 <h5 class="card-title mb-4"> 
@@ -366,16 +329,23 @@ Adicionar vendas
                                 <div class="form-group d-none" id="groupNome_${index}">
                                     <label for="nome_cheque[${index}]">Nome</label>
                                     <div class="d-flex">
-                                        <input type="text" name="nome_cheque[${index}]" id="nome_cheque[${index}]" class="form-control primeiroInputNome">
+                                        <input type="text" name="nome_cheque[${index}]" id="nome_cheque[${index}]" class="form-control primeiroInputNome titularCheque">
                                         
                                     </div>
                                 </div>
                                 <div class="form-group d-none" id="groupNumero_${index}">
+                                    <label for="numero_banco[${index}]">Número do Banco</label>
+                                    <div class="d-flex">
+                                        <input type="text" name="numero_banco[${index}]" id="numero_banco[${index}]" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group d-none" id="groupBanco_${index}">
                                     <label for="numero_cheque[${index}]">Número do Cheque</label>
                                     <div class="d-flex">
                                         <input type="text" name="numero_cheque[${index}]" id="numero_cheque[${index}]" class="form-control">
                                     </div>
                                 </div>
+                                
 
                                 <div class="form-group">
                                     <label for="data_parcela[${index}]">Data da Parcela</label>
@@ -386,6 +356,15 @@ Adicionar vendas
                                     <input type="number" step="0.01" name="valor_parcela[${index}]" id="valor_parcela[${index}]" class="form-control primeiroInputValor" value="${campoValorTratado}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="status[${index}]">Status</label>
+                                    <select name="status[${index}]" id="status[${index}]" class="form-control">
+                                        <option value="Aguardando" selected>Aguardando Depósito</option>  
+                                        <option value="Pago">Pago</option>
+                                        <option value="Aguardando Envio">Aguardando Envio</option>
+                                        <option value="Aguardando Pagamento">Aguardando Pagamento</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="observacao[${index}]">Observação</label>
                                     <textarea name="observacao[${index}]" id="observacao[${index}]" class="form-control"></textarea>
                                 </div>
@@ -393,7 +372,6 @@ Adicionar vendas
                         </div>
                     </div>
                 `
-
             }
             
             $("#infoCheques").html(html);
@@ -418,18 +396,6 @@ Adicionar vendas
         calcularTotalVenda(cotacao_fator, cotacao_peso, fator, peso)
     })
 
-    // function addDays(date, days) {
-    //     let arrDate = date.split("-")
-    //     let daysFiltered = parseInt(days)
-
-    //     var result = new Date(arrDate[0], arrDate[1]-1, arrDate[2])
-    //     result.setDate(result.getDate() + daysFiltered);
-    
-    //     return result.getFullYear() + '-' 
-    //     + (adicionaZero(result.getMonth()+1).toString()) + "-"
-    //     + adicionaZero(result.getDate().toString());
-    // }
-
     function adicionaZero(numero){
         if (numero <= 9) 
             return "0" + numero;
@@ -448,16 +414,16 @@ Adicionar vendas
     }
 
     $(".procurarCliente").click( () => {
-        $(".modal").modal('show')
+        $("#modal2").modal('show')
 
-        $(".modal-header").text(`Procurar cliente`)
-        $(".modal-footer > .btn-primary").remove()
+        $("#modal-header2").text(`Procurar cliente`)
+        $("#modal-footer2 > .btn-primary").remove()
 
-        $(".modal-body").html(`
+        $("#modal-body2").html(`
             <form id="formProcurarCliente" method="GET" action="{{ route('procurarCliente') }}">
-                <input type="hidden" name="representante_id" value="{{ $representante_id }}">
+                <input type='hidden' value="{{ $representante_id }}" name="representante_id">
                 <div class="d-flex justify-content-between">
-                    <input class="form-control" id="dado" name="dado" placeholder="Informe o cpf ou nome do Cliente">
+                    <input class="form-control" id="dado" name="dado" placeholder="Informe o CPF ou nome do Cliente">
                     <button type="submit" class="btn btn-dark ml-2">
                         <span class="fas fa-search"></span>
                     </button>
@@ -550,6 +516,10 @@ Adicionar vendas
                 $("select[name^='forma_pagamento']:not(:eq(0))")
             )
 
+            copiarInput(
+                $("input[name^='numero_banco']:eq(0)").val(), 
+                $("input[name^='numero_banco']:not(:eq(0))")
+            )
         })
     }
 
@@ -573,15 +543,143 @@ Adicionar vendas
                 if (valorSelect == 'Cheque') {
                     $("#groupNumero_" + indexSelect).removeClass('d-none')
                     $("#groupNome_" + indexSelect).removeClass('d-none')
-                    return
+                    $("#groupBanco_" + indexSelect).removeClass('d-none')
+                    
+                    listenerNomes()
+                    tratarCampoStatus(indexSelect, valorSelect)
+                } else if (valorSelect == 'Dinheiro' || valorSelect == 'Pix') {
+                    $("#groupNumero_" + indexSelect).addClass('d-none')
+                    $("#groupNome_" + indexSelect).addClass('d-none')
+                    $("#groupBanco_" + indexSelect).addClass('d-none')
+                    
+                    tratarCampoStatus(indexSelect, valorSelect)
+                } else if (valorSelect == 'Transferência Bancária') {
+                    $("#groupNumero_" + indexSelect).addClass('d-none')
+                    $("#groupNome_" + indexSelect).addClass('d-none')
+                    $("#groupBanco_" + indexSelect).addClass('d-none')
+
+                    tratarCampoStatus(indexSelect, valorSelect)
                 }
 
-                $("#groupNumero_" + indexSelect).addClass('d-none')
-                $("#groupNome_" + indexSelect).addClass('d-none')
-                
             });
             
         })
     }
+
+    function tratarCampoStatus(index, valorSelect) {
+        let opcoesDisponiveis = []
+        let element = $("select[name^='status']:eq(" + index + ")")
+
+        if (valorSelect == 'Cheque') {
+            opcoesDisponiveis = {
+                '': '',
+                'Aguardando Depósito': 'Aguardando',
+                'Aguardando Envio': 'Aguardando Envio' 
+            }
+        } else if (valorSelect == 'Pix' || valorSelect == 'Dinheiro') {
+            opcoesDisponiveis = {
+                'Pago': 'Pago'
+            }
+        } else if (valorSelect == 'Transferência Bancária') {
+            opcoesDisponiveis = {
+                '': '',
+                'Pago': 'Pago', 
+                'Aguardando Pagamento': 'Aguardando Pagamento'
+            }
+        }
+        
+        element.empty()
+
+        $.each(opcoesDisponiveis, function(key,value) {
+            element.append($("<option></option>")
+            .attr("value", value).text(key));
+        });
+    }
+
+    function listenerNomes () {
+        $(".titularCheque").focus( (e) => {
+            $(e.target).autocomplete({
+                minLength: 0,
+                source: titularDoUltimoCheque,
+                autoFocus: true,
+            });
+        })
+    }
+    
+    let titularDoUltimoCheque = [];
+
+    $("#cliente_id").change( (e) => {
+        
+        let clienteId = $(e.target).val()
+
+        if (clienteId) {
+            $.ajax({
+                type: 'GET',
+                url: '/titularDoUltimoCheque',
+                data: {
+                    'cliente_id': clienteId
+                },
+                dataType: 'json',
+                beforeSend: () => {
+                    swal.showLoading()
+                },
+                success: (response) => {
+                    titularDoUltimoCheque = []
+                    swal.close()
+
+                    for (let i in response) {
+                        titularDoUltimoCheque.push(response[i].nome_cheque)
+                    }
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error(jqXHR)
+                    console.error(textStatus)
+                    console.error(errorThrown)
+                }
+            });
+        } 
+    })
+
+    listenerFormaPagamentoParcela ()
+
+    let moeda = Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'BRL',
+    });
+
+    $("#formEnviarVenda").submit( (element) => {
+        element.preventDefault();
+        
+        let valorTotalPago = 0;
+        $("input[name^='valor_parcela']").each( (index, element) => {
+            valorTotalPago += parseFloat($(element).val())
+            // console.log({index, element})
+        })
+
+        let valorTotalPedido = parseFloat($("#valor_total").val())
+        let form = element.target;
+
+        if (valorTotalPago < valorTotalPedido) {
+           
+            Swal.fire({
+                title: 'Atenção!',
+                html: 
+                    "O valor pago é <b>menor</b> que o valor do pedido!" + 
+                    "<br> Valor total pago: " + moeda.format(valorTotalPago) + 
+                    "<br> Valor total do pedido: " + moeda.format(valorTotalPedido) ,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                    return
+                }
+            })
+        }
+        
+    })
 </script>
 @endsection

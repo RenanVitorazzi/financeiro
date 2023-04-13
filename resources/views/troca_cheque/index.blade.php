@@ -4,7 +4,7 @@ Trocas de cheques
 @endsection
 @section('body')
 <div class="mb-2 d-flex justify-content-between">
-    <h3>Trocas de cheques</h3>
+    <h3>Trocas</h3>
     <x-botao-novo href="{{ route('troca_cheques.create') }}"></x-botao-novo>
 </div>
 <x-table id="tabelaCheques">
@@ -22,7 +22,7 @@ Trocas de cheques
     <tbody>
         @forelse ($trocas as $troca)
         <tr>
-            <td> {{ $troca->parceiro()->exists() ? $troca->parceiro->pessoa->nome : 'Não informado' }} </td>
+            <td> {{ $troca->parceiro()->exists() ? $troca->parceiro->pessoa->nome : $troca->titulo }} </td>
             <td> @data($troca->data_troca) </td>
             <td> @moeda($troca->valor_bruto) </td>
             <td> @moeda($troca->valor_juros) </td>

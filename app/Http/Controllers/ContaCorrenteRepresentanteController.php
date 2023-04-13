@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContaCorrenteRepresentante;
 use App\Models\Representante;
+use App\Models\Estoque;
 use App\Http\Requests\ContaCorrenteRepresentanteRequest;
 use App\Models\ContaCorrenteRepresentanteAnexos as ModelsContaCorrenteRepresentanteAnexos;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function store(ContaCorrenteRepresentanteRequest $request)
     {
+        $representante = Representante::findOrFail($request->representante_id);
         if ($request->balanco == 'Venda' || $request->balanco == 'Devolução') {
             $peso_agregado = $request->peso;
             $fator_agregado = $request->fator;
@@ -30,8 +32,11 @@ class ContaCorrenteRepresentanteController extends Controller
             $fator_agregado = -$request->fator;
         }
 
+        $lancado_estoque = ($request->balanco !== 'Venda' && !$representante->atacado) ? 1 : NULL;
+    
         $request->request->add(['peso_agregado' => $peso_agregado]);
         $request->request->add(['fator_agregado' => $fator_agregado]);
+        $request->request->add(['lancado_estoque' => $lancado_estoque]);
 
         $contaCorrente = ContaCorrenteRepresentante::create($request->all());
         
@@ -44,7 +49,26 @@ class ContaCorrenteRepresentanteController extends Controller
                 ]);
             }
         }
+
         
+        if ($request->balanco !== 'Venda' && !$representante->atacado) {
+                
+            $balanco = $request->balanco == 'Devolução' ? 'Crédito' : 'Débito';
+
+            Estoque::create([
+                'data' => $request->data,
+                'balanco' => $balanco,
+                'peso' => $request->peso,
+                'fator' => $request->fator,
+                'representante_id' => $request->representante_id,
+                'peso_agregado' => $request->peso_agregado,
+                'fator_agregado' => $request->fator_agregado,
+                'user_id' => auth()->user()->id,
+                'cc_representante_id' => $contaCorrente->id,
+            ]);
+            
+        }
+
         $request
             ->session()
             ->flash(
@@ -67,8 +91,11 @@ class ContaCorrenteRepresentanteController extends Controller
         );
 
         $representante = Representante::with('pessoa')->findOrFail($id);
-        
-        return view('conta_corrente_representante.show', compact('contaCorrente', 'representante'));
+        $impresso = 'impresso_ccr';
+        if ($representante->atacado) {
+            $impresso = 'impresso_ccr2';
+        }
+        return view('conta_corrente_representante.show', compact('contaCorrente', 'representante', 'impresso'));
     }
 
     public function edit($id)
@@ -93,6 +120,32 @@ class ContaCorrenteRepresentanteController extends Controller
         $request->request->add(['fator_agregado' => $fator_agregado]);
 
         $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
+        $representante = Representante::findOrFail($request->representante_id);
+
+        if (!$representante->atacado) {
+            $balanco = $request->balanco == 'Devolução' ? 'Crédito' : 'Débito';
+
+            if ($request->balanco == 'Venda') {
+                Estoque::where('cc_representante_id', $contaCorrente->id)->delete();
+            } else {
+                $estoque = Estoque::updateOrCreate (
+                ['cc_representante_id' => $contaCorrente->id],    
+                [
+                    'data' => $request->data,
+                    'balanco' => $balanco,
+                    'peso' => $request->peso,
+                    'fator' => $request->fator,
+                    'representante_id' => $request->representante_id,
+                    'peso_agregado' => $request->peso_agregado,
+                    'fator_agregado' => $request->fator_agregado,
+                    'user_id' => auth()->user()->id,
+                    'cc_representante_id' => $contaCorrente->id,
+                    'deleted_at' => NULL
+                ]);
+            }
+                      
+        } 
+
         $contaCorrente
             ->fill($request->all())
             ->save();
@@ -110,6 +163,11 @@ class ContaCorrenteRepresentanteController extends Controller
     public function destroy(Request $request, $id)
     {
         $contaCorrente = ContaCorrenteRepresentante::findOrFail($id);
+        
+        $representante = Representante::findOrFail($contaCorrente->representante_id);
+        
+        Estoque::where('cc_representante_id', $contaCorrente->id)->delete();
+
         $contaCorrente->delete();
 
         $request

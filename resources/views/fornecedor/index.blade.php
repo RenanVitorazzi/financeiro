@@ -18,7 +18,7 @@ Fornecedores
     </div>
 </div>
 <div class='row'>
-    <div class="col-6">
+    <div class="col-12">
         <ul class="d-flex list-group list-group">
             @forelse ($fornecedores as $fornecedor)
             
@@ -41,9 +41,9 @@ Fornecedores
             @endforelse
         </ul>
     </div>
-    <div class="col-6">
+    {{-- <div class="col-6">
         <canvas id="myChart"></canvas>
-    </div>
+    </div> --}}
    
 </div>
 
@@ -52,47 +52,47 @@ Fornecedores
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const LABELS = @json($labels);
-    const DATA_GRAFICO = @json($data);
+    // const LABELS = @json($labels);
+    // const DATA_GRAFICO = @json($data);
 
     @if(Session::has('message'))
         toastr["success"]("{{ Session::get('message') }}")
     @endif
     
-    var poolColors = function (a) {
-        var pool = [];
-        for(i=0;i<a;i++){
-            pool.push(dynamicColors());
-        }
-        return pool;
-    }
+    // var poolColors = function (a) {
+    //     var pool = [];
+    //     for(i=0;i<a;i++){
+    //         pool.push(dynamicColors());
+    //     }
+    //     return pool;
+    // }
 
-    var dynamicColors = function() {
-        var r = Math.floor(Math.random() * 255);
-        var g = Math.floor(Math.random() * 255);
-        var b = Math.floor(Math.random() * 255);
-        return "rgb(" + r + "," + g + "," + b + ")";
-    }
+    // var dynamicColors = function() {
+    //     var r = Math.floor(Math.random() * 255);
+    //     var g = Math.floor(Math.random() * 255);
+    //     var b = Math.floor(Math.random() * 255);
+    //     return "rgb(" + r + "," + g + "," + b + ")";
+    // }
 
-    const data = {
-        labels: JSON.parse(LABELS),
-        datasets: [{
-            data: JSON.parse(DATA_GRAFICO),
-            backgroundColor: 
-                poolColors(20)
+    // const data = {
+    //     labels: JSON.parse(LABELS),
+    //     datasets: [{
+    //         data: JSON.parse(DATA_GRAFICO),
+    //         backgroundColor: 
+    //             poolColors(20)
             
-            ,
-        }]
-    };
+    //         ,
+    //     }]
+    // };
 
-    const config = {
-        type: 'pie',
-        data: data
-    };
+    // const config = {
+    //     type: 'pie',
+    //     data: data
+    // };
     
-    var myChart = new Chart(
-        document.getElementById('myChart'),
-        config
-    );
+    // var myChart = new Chart(
+    //     document.getElementById('myChart'),
+    //     config
+    // );
 </script>
 @endsection

@@ -20,67 +20,72 @@
         background-color:black;
         color:white;
     }
-    tr:nth-child(even) {
-        background-color: #a9acb0;
+    .saldo {
+        background-color:#d1d1d3;
     }
     h1 {
         text-align: center;
     }
 </style>
 <body>
-    <h1>
-        Conta Corrente - {{ $representante->pessoa->nome }}
-    </h1>
-
+    <h1>Conta Corrente - {{ $representante->pessoa->nome }}</h1>
     <table>
         <thead>
             <tr>
-                <th colspan="2">Saldo</th>
+                <th rowspan=2>Data</th>
+                <th rowspan=2>Observação</th>
+                <th colspan=3>Peso</th>
+                <th colspan=3>Fator</th>
             </tr>
             <tr>
-                <th>Peso</th>
-                <th>Fator</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@peso($contaCorrente[count($contaCorrente) - 1]->saldo_peso)</td>
-                <td>@fator($contaCorrente[count($contaCorrente) - 1]->saldo_fator)</td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <table>
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Relação</th>
-                <th>Balanço</th>
-                <th>Observação</th>
+                <th>Crédito</th>
+                <th>Débito</th>
+                <th>Saldo</th>
+                <th>Crédito</th>
+                <th>Débito</th>
                 <th>Saldo</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($contaCorrente as $registro)
                 <tr>
-                    <td>@data($registro->data)</td>
-                    <td>
-                        <div>Peso: @peso($registro->peso)</div>
-                        <div>Fator: @fator($registro->fator)</div>
-                    </td>
-                    <td>{{ $registro->balanco }}</td>
-                    <td>{{ $registro->observacao }}</td>
-                    <td>
-                        <div>Peso: @peso($registro->saldo_peso)</div>
-                        <div>Fator: @fator($registro->saldo_fator)</div>
-                    </td>
+                    @if ($registro->balanco == 'Venda')
+                        <td>@data($registro->data)</td>
+                        <td>{{ $registro->balanco }}{{ $registro->observacao }} </td>
+                        <td></td>
+                        <td>@peso($registro->peso) </td>
+                        <td class="saldo">@peso($registro->saldo_peso)</td>
+                        <td></td>
+                        <td>@fator($registro->fator) </td>
+                        <td class="saldo">@fator($registro->saldo_fator)</td>
+                    @else
+                        <td>@data($registro->data)</td>
+                        <td>
+                            {{ $registro->balanco }}
+                            {{ $registro->observacao ? '('.$registro->observacao.')' : '' }} 
+                        </td>
+                        <td>@peso($registro->peso)</td>
+                        <td></td>
+                        <td class="saldo">@peso($registro->saldo_peso)</td>
+                        <td>@fator($registro->fator)</td>
+                        <td></td>
+                        <td class="saldo">@fator($registro->saldo_fator)</td>
+                    @endif
+                    
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">Nenhum registro criado</td>
+                    <td colspan="8">Nenhum registro criado</td>
                 </tr>
             @endforelse
         </tbody>
+        <tfoot>
+            <tr>
+                <td class="saldo" colspan=2>Total</td>
+                <td class="saldo" colspan=3 class="peso">@peso($contaCorrente[count($contaCorrente) - 1]->saldo_peso)</td>
+                <td class="saldo" colspan=3>@fator($contaCorrente[count($contaCorrente) - 1]->saldo_fator)</td>
+            </tr>
+        </tfoot>
     </table>
 </body>
 </html>

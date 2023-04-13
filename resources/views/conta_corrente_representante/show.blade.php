@@ -16,8 +16,8 @@ Conta Corrente {{ $representante->pessoa->nome }}
 <div class='mb-2 d-flex justify-content-between'>
     <h3>Conta Corrente - {{ $representante->pessoa->nome }}</h3>
     <div>
-        @if (count($contaCorrente) > 0)
-        <x-botao-imprimir class="mr-2" href="{{ route('impresso_ccr', ['id' => $representante->id]) }}"></x-botao-imprimir>
+        @if (count($contaCorrente) > 0) 
+            <x-botao-imprimir class="mr-2" href="{{ route($impresso, ['id' => $representante->id]) }}"></x-botao-imprimir>
         @endif
         <x-botao-novo href="{{ route('conta_corrente_representante.create', ['representante_id' => $representante->id]) }}"></x-botao-novo>
     </div>

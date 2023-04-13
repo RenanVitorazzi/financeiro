@@ -61,9 +61,10 @@ class TrocaChequeController extends Controller
         WHERE
             (par.status LIKE ? or par.status LIKE ?)
                 AND par.deleted_at IS NULL
+                AND par.forma_pagamento like ?
                 AND r.deleted_at IS NULL
                 AND parceiro_id IS NULL
-        ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado', 'Aguardando']);
+        ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado', 'Aguardando', 'Cheque']);
         // dd($cheques);
         return view('troca_cheque.create', compact('cheques', 'parceiros') );
     }
@@ -93,7 +94,7 @@ class TrocaChequeController extends Controller
 
             $dataFim = new DateTime($dataDoCheque);
 
-            if ($request->parceiro_id == 3) {
+            if ($request->parceiro_id == 3 || $request->parceiro_id == 4) {
                 //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado 
                 while (in_array($dataFim->format('w'), [0, 6]) || !$this->feriados->where('data_feriado', $dataFim->format('Y-m-d'))->isEmpty()) {
                     $dataFim->modify('+1 weekday');
@@ -162,7 +163,7 @@ class TrocaChequeController extends Controller
                 
                 $dataFim = new DateTime($dataDoCheque);
                 
-                if ($request->parceiro_id == 3) {
+                if ($request->parceiro_id == 3 || $request->parceiro_id == 4) {
                     //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado 
                     while (in_array($dataFim->format('w'), [0, 6]) || !$this->feriados->where('data_feriado', $dataFim->format('Y-m-d'))->isEmpty()) {
                         $dataFim->modify('+1 weekday');

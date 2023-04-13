@@ -16,11 +16,15 @@ Adicionar cheque
     @csrf
 
     <div class="row">
-        <div class="col-6 form-group">
+        <div class="col-4 form-group">
             <label for="quantidade_cheques">Quantidade de cheques</label>
             <x-input name="quantidade_cheques" type="number" value="{{ old('quantidade_cheques') }}"></x-input>
         </div>
-        <div class="col-6 form-group">
+        <div class="col-4 form-group">
+            <label for="data_troca">Data da troca</label>
+            <x-input name="data_troca" type="date" value="{{ old('data_troca') }}"></x-input>
+        </div>
+        <div class="col-4 form-group">
             <label for="representante_id">Representante</label>
             <x-select name="representante_id">
                 <option></option>
@@ -29,14 +33,14 @@ Adicionar cheque
                 @endforeach
             </x-select>
         </div>
-        <div class="col-6 form-group">
+        <div class="col-4 form-group">
             <label for="nova_troca">Criar troca?</label>
             <x-select type="checkbox" name="nova_troca" type="number">
                 <option value="Não" {{ old('nova_troca') == 'Não' ? 'selected' : '' }}>Não</option>
                 <option value="Sim" {{ old('nova_troca') == 'Sim' ? 'selected' : '' }}>Sim</option>
             </x-select>
         </div>
-        <div class="col-6 form-group" id="taxa_group" style="{{ old('nova_troca') == 'Sim' ? 'display:block' : 'display:none' }}">
+        <div class="col-4 form-group" id="taxa_group" style="{{ old('nova_troca') == 'Sim' ? 'display:block' : 'display:none' }}">
             <label for="taxa_juros">Taxa de juros (%)</label>
             <x-input name="taxa_juros" type="number" step="0.01" value="{{ old('taxa_juros') }}"></x-input>
         </div>
@@ -47,6 +51,7 @@ Adicionar cheque
             <x-table-header>
                 <tr>
                     <th>Titular</th>
+                    <th>Banco</th>
                     <th>Número</th>
                     <th>Valor</th>
                     <th>Data</th>
@@ -58,6 +63,14 @@ Adicionar cheque
                         <td>
                             <x-input value="{{ old('nome_cheque.'. $i) }}"  name="nome_cheque[{{ $i }}]" class="input_cheque {{ $errors->has('nome_cheque.'.$i) ? 'is-invalid' : '' }}" ></x-input>
                             @error('nome_cheque.'.$i)
+                                <div class="invalid-feedback d-inline">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </td>
+                        <td>
+                            <x-input value="{{ old('numero_banco.'. $i) }}" name="numero_banco[{{ $i }}]" class="{{ $errors->has('numero_banco.'.$i) ? 'is-invalid' : '' }}"></x-input>
+                            @error('numero_banco.'.$i)
                                 <div class="invalid-feedback d-inline">
                                     {{ $message }}
                                 </div>
@@ -120,6 +133,9 @@ Adicionar cheque
                     <input class="form-control input_cheque" name="nome_cheque[${index}]" id="teste_${index}" autocomplete="off">
                 </td>
                 <td>
+                    <input class="form-control" type="number" name="numero_banco[${index}]">
+                </td>
+                <td>
                     <input class="form-control" name="numero_cheque[${index}]">
                 </td>
                 <td>
@@ -128,6 +144,7 @@ Adicionar cheque
                 <td>
                     <input class="form-control" type="date" name="data_parcela[${index}]" >
                 </td>
+                
             </tr>`
         }
                 
@@ -136,6 +153,7 @@ Adicionar cheque
                 <x-table-header>
                     <tr>
                         <th>Titular</th>
+                        <th>Banco</th> 
                         <th>Número</th>
                         <th>Valor</th>
                         <th>Data</th>

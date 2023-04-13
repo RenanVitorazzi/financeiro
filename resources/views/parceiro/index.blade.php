@@ -17,6 +17,7 @@ Parceiros
                 <span class="text-muted">{{ $parceiro->porcentagem_padrao }}%</span>
             </div>
             <div class='d-flex'>
+                <a class="btn btn-dark mr-2" href="{{ route('pdf_cc_parceiro', $parceiro->id) }}">Conta Corrente</a>
                 <x-botao-editar class="mr-2" href="{{ route('parceiros.edit', $parceiro->id) }}"></x-botao-editar>
                 <x-botao-excluir action="{{ route('parceiros.destroy', $parceiro->id) }}"></x-botao-excluir>
             </div>

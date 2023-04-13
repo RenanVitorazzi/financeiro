@@ -9,6 +9,7 @@ use App\Models\Local;
 use Despesa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 
 class DespesaController extends Controller
 {
@@ -26,6 +27,7 @@ class DespesaController extends Controller
             ->pluck('fixas_id');
             
         $fixasNaoPagas = DespesaFixa::with('local')
+            ->orderBy('dia_vencimento')
             ->whereNotIn('id', $idFixasPagas)
             ->get();
 
@@ -34,7 +36,9 @@ class DespesaController extends Controller
             ->orderBy('local_id')
             ->get();
 
-        return view('despesa.index', compact('despesas', 'fixasNaoPagas'));
+        $mes = date('m');
+
+        return view('despesa.index', compact('despesas', 'fixasNaoPagas', 'mes'));
     }
 
     /**
@@ -139,5 +143,19 @@ class DespesaController extends Controller
             );
 
         return redirect()->route('despesas.index');
+    }
+
+    public function pdf_despesa_mensal ($mes) 
+    {
+        $despesas = ModelsDespesa::with('local')
+            ->where(DB::raw('MONTH(data_vencimento)'), DB::raw($mes))
+            ->where(DB::raw('YEAR(data_vencimento)'), DB::raw('YEAR(CURDATE())'))
+            ->orderBy('local_id')
+            ->get();
+            
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('despesa.pdf.pdf_despesa_mensal', compact('despesas', 'mes') );
+        
+        return $pdf->stream();
     }
 }

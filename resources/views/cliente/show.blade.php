@@ -26,8 +26,10 @@
         </x-table-header> --}}
         <x-table-header>
             <th>Data</th>
-            <th>Balanço</th>
-            <th>Valor</th>
+            <th>Pagamento</th>
+            <th>Compra</th>
+            <th>Cotação</th>
+            <th>Valor da Venda</th>
             <th>Pagamento</th>
             <th>Ações</th>
         </x-table-header>
@@ -35,27 +37,27 @@
             @forelse ($vendas as $venda)
             <tr>
                 <td>{{ date('d/m/Y', strtotime($venda->data_venda)) }}</td>
-                <td class="{{ $venda->balanco !== 'Venda' ? 'text-danger' : 'text-success' }}">
-                    <b>{{ $venda->balanco }}</b>
-                    <i class="fas {{ $venda->balanco !== 'Venda' ? 'fa-angle-down' : 'fa-angle-up' }}"></i>
+                <td>{{$venda->metodo_pagamento}}</td>   
+                <td>
+                    Peso: @peso($venda->peso)
+                    <br>
+                    Fator: @fator($venda->fator)
+                </td>
+                <td>
+                    Peso: @moeda($venda->cotacao_peso)
+                    <br>
+                    Fator: @moeda($venda->cotacao_fator)
                 </td>   
-                @if ($venda->metodo_pagamento)
-                    <td>{{ number_format($venda->valor_total, 2) }}</td>
-                    <td>
-                        <div><b>{{$venda->metodo_pagamento}}</b></div>
-                        @foreach ($venda->parcela as $parcela)
+                <td>@moeda($venda->valor_total)</td>
+                <td>
+                    @foreach ($venda->parcela as $parcela)
                         <div>
-                            {{ date('d/m/Y', strtotime($parcela->data_parcela)) }} - {{ number_format($parcela->valor_parcela, 2) }} 
+                            {{$parcela->forma_pagamento}} -
+                            @data($parcela->data_parcela) - 
+                            @moeda($parcela->valor_parcela) 
                         </div>
-                        @endforeach
-                    </td>
-                @else
-                    <td>- - - - -</td>
-                    <td>
-                        Peso: {{ number_format($venda->peso, 2) ?? '0.00' }}<br>
-                        Fator: {{ number_format($venda->fator, 2) ?? '0.00'}}
-                    </td>
-                @endif
+                    @endforeach
+                </td>
                 <td>
                     <x-botao-editar href='{{ route("venda.edit", $venda->id) }}'></x-botao-editar>
                     <x-botao-excluir action='{{ route("venda.destroy", $venda->id) }}'></x-botao-excluir>

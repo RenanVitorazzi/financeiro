@@ -83,7 +83,7 @@ class ContaCorrenteController extends Controller
                 'Conta corrente atualizada com sucesso!'
             );
 
-        return redirect("/fornecedores/{$request->fornecedor_id}");
+        return redirect("/fornecedores/{$request->fornecedor_id}"); 
     }
 
     public function destroy(Request $request, $id)
@@ -96,7 +96,8 @@ class ContaCorrenteController extends Controller
         }
 
         $contaCorrente->delete();
-        
+        Estoque::where('cc_fornecedor_id', $contaCorrente->id)->delete();
+
         $request
             ->session()
             ->flash(

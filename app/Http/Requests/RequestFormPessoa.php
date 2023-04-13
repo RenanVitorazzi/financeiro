@@ -26,21 +26,21 @@ class RequestFormPessoa extends FormRequest
         return [
             'nome' => 'required|max:255|min:3|string',
             'tipoCadastro' => 'required',
-            'cpf' => 'cpf',
-            'cnpj' => 'cnpj',
-            'cep' => 'formato_cep',
+            'cpf' => 'cpf|nullable',
+            'cnpj' => 'cnpj|nullable',
+            'cep' => 'formato_cep|nullable',
             'estado' => 'string|nullable',
             'municipio' => 'string|nullable',
             'bairro' => 'string|nullable',
             'logradouro' => 'nullable',
             'numero' => 'nullable',
             'complemento' => 'max:255|nullable',
-            'telefone' => 'telefone_com_ddd',
-            'celular' => 'celular_com_ddd',
-            'telefone2' => 'telefone_com_ddd',
-            'celular2' => 'celular_com_ddd',
+            'telefone' => 'telefone_com_ddd|nullable',
+            'celular' => 'celular_com_ddd|nullable',
+            'telefone2' => 'telefone_com_ddd|nullable',
+            'celular2' => 'celular_com_ddd|nullable',
             'email' => 'email:rfc,dns|nullable|',
-            'representante_id' => 'nullable'
+            'representante_id' => 'nullable|integer'
         ];
     }
 

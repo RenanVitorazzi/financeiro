@@ -15,7 +15,7 @@ class OpSeeder extends Seeder
      */
     public function run()
     {
-        $json = Storage::disk('public')->get('json/op_2022_06_22.json');
+        $json = Storage::disk('public')->get('json/.json');
         $json = json_decode($json, true);
         
         foreach ($json['OPS'] as $cheque => $info) {

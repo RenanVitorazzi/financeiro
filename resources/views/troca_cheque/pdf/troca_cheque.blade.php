@@ -11,6 +11,7 @@
     table {
         width:100%;
         border-collapse: collapse;
+        font-size: 12px;
     }
     td, th {
         border: 1px solid black;
@@ -26,39 +27,21 @@
         background-color: #a9acb0;
     }
 
-    h1 {
-        text-align: center;
-    }
-
-    .cheques td {
-        font-size: 10px;
+    h3 {
+        text-align:center;
     }
 </style>
 <body>
-    <h1>{{ $troca->titulo }}</h1>
+<h3>
+    {{ $troca->parceiro->pessoa->nome ?? $troca->titulo }} - @data($troca->data_troca)<br> 
+    Taxa: {{ $troca->taxa_juros }}%
+</h3>
+
 <x-table>
-    <x-table-header>
-        <tr>
-            <th>Total Bruto</th>
-            <th>Total Juros</th>
-            <th>Total Líquido</th>
-        </tr>
-    </x-table-header>
-    <tbody>
-        <tr>
-            <td>@moeda($troca->valor_bruto)</td>
-            <td>@moeda($troca->valor_juros)</td>
-            <td>@moeda($troca->valor_liquido)</td>
-        </tr>
-    </tbody>
-</x-table>
-<p></p>
-<x-table class="cheques">
     <x-table-header>
         <tr>
             <th>Nome</th>
             <th>Data</th>
-            <th>Nº ch</th>
             <th>Dias</th>
             <th>Valor Bruto</th>
             <th>Juros</th>
@@ -70,7 +53,6 @@
             <tr>
                 <td>{{ substr($cheque->nome_cheque, 0, 25) }}</td>
                 <td>@data($cheque->data)</td>
-                <td>{{ $cheque->numero_cheque }}</td>
                 <td>{{ $cheque->dias }}</td>
                 <td>@moeda($cheque->valor_parcela)</td>
                 <td>@moeda($cheque->valor_juros)</td>
@@ -78,6 +60,14 @@
             </tr>
         @endforeach
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan=3><b>Total</b></td>
+            <td><b>@moeda($troca->valor_bruto)</b></td>
+            <td><b>@moeda($troca->valor_juros)</b></td>
+            <td><b>@moeda($troca->valor_liquido)</b></td>
+        </tr>
+    </tfoot>
 </x-table>
 </body>
 </html>

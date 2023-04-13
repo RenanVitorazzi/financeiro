@@ -6,13 +6,13 @@
         {{ session('status') }}
     </div>
 @endif
-<title>Home DL</title>
-<h1>Bem-vindo(a), <strong>{{ auth()->user()->name }}</strong>!</h1>
-<p></p>
-<p></p>
-<hr>
-<p></p>
-<p></p>
+<title>Home</title>
+@if($fixasNaoPagas->count() > 0)
+    <div class="alert alert-warning">
+        Você tem {{ $fixasNaoPagas->count() }} despesa para pagar nos próximos 7 dias
+    </div>
+@endif
+<div class="table-responsive">
 <x-table>
     <x-tableheader>
         <th colspan=5>
@@ -37,8 +37,8 @@
         <tr>
             <td>{{ $loop->index + 1 }}</td>
             <td>{{ $cheque->nome_cheque }}</td>
-            <td>@moeda($cheque->valor_parcela)</td>
             <td>@data($cheque->data_parcela)</td>
+            <td>@moeda($cheque->valor_parcela)</td>
             <td>{{ $cheque->representante->pessoa->nome ?? '-' }}</td>
         </tr>
     @empty
@@ -54,7 +54,7 @@
     </tfoot>
     @endif
 </x-table>
-
+</div>
 <x-table id="adiamentos">
     <x-tableheader id="copiarAdiamentos" style="cursor:pointer">
         <th colspan=8>Prorrogações</th>
@@ -87,48 +87,6 @@
             <td colspan=8>Nenhum cheque adiado!</td>
         </tr>
     @endforelse
-    </tbody>
-</x-table>
-
-
-<x-table>
-    <x-tableheader>
-        <th colspan=7>Ordens de pagamento para a semana</th>
-    </x-tableheader>
-
-    <x-tableheader>
-        <th>#</th>
-        <th>Nome</th>
-        <th>Data Vencimento</th>
-        <th>Valor</th>
-        <th>Representante</th>
-        <th>Observação</th>
-        <th></th>
-    </x-tableheader>
-    <tbody>
-    @forelse ($ordensPagamentoParaSemana as $op)
-        <tr>
-            <td>{{ $loop->index + 1}}</td>
-            <td>{{ $op->nome_cheque }}</td>
-            <td>@data($op->data_parcela)</td>
-            <td>@moeda($op->valor_parcela)</td>
-            <td>{{ $op->representante->pessoa->nome }}</td>
-            <td>{{ $op->observacao }}</td>
-            <td>
-                <x-botao-editar href="{{ route('cheques.edit', $op->id) }}"></x-botao-editar>
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan=7>Nenhuma op atrasada!</td>
-        </tr>
-    @endforelse
-        @if ($ordensPagamentoParaSemana)
-        <tfoot class="thead-dark">
-            <th>Total</th>
-            <th colspan=6>@moeda($ordensPagamentoParaSemana->sum('valor_parcela'))</th>
-        </tfoot>
-        @endif
     </tbody>
 </x-table>
 

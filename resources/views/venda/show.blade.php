@@ -19,7 +19,7 @@ Vendas - {{$representante->pessoa->nome}}
 <div class='mb-2 d-flex justify-content-between'>
     <h3>Vendas - {{ $representante->pessoa->nome}}</h3> 
     <div> 
-        {{-- <x-botao-imprimir class="mr-2" href=""></x-botao-imprimir> --}}
+        <x-botao-imprimir class="mr-2" href="{{ route('pdf_conferencia_relatorio_vendas', ['representante_id' => $representante->id]) }}"></x-botao-imprimir>
         <x-botao-novo href="{{ route('venda.create', ['id' => $representante->id]) }}"></x-botao-novo>
     </div>
 </div>
@@ -30,6 +30,8 @@ Vendas - {{$representante->pessoa->nome}}
         </th>
         <th>Data</th>
         <th>Cliente</th>
+        <th>Peso</th>
+        <th>Fator</th>
         <th>Valor</th>
         <th>Pagamento</th>
         <th>Ações</th>
@@ -40,6 +42,8 @@ Vendas - {{$representante->pessoa->nome}}
             <td><input type="checkbox" name="id_venda[]" value="{{ $venda->id }}"></td>
             <td>@data($venda->data_venda)</td>
             <td>{{ $venda->cliente->pessoa->nome }}</td>
+            <td>@peso($venda->peso)</td>
+            <td>@fator($venda->fator)</td>
             <td>@moeda($venda->valor_total)</td>
             <td>
                 <b>{{$venda->metodo_pagamento}}</b>
@@ -57,7 +61,9 @@ Vendas - {{$representante->pessoa->nome}}
         </tr>
 
         @empty
-        <tr><td colspan="7" class="table-danger">Nenhum registro criado</td></tr>
+        <tr>
+            <td colspan="8" class="table-danger">Nenhum registro criado</td>
+        </tr>
         @endforelse
     </tbody>
 </x-table>
@@ -111,6 +117,8 @@ Vendas - {{$representante->pessoa->nome}}
             arrayId.push( $( element ).val() );
         })
 
+        console.log(arrayId)
+        
         $.ajax({
             method: "POST",
             url: "{{ route('enviar_conta_corrente') }}",
@@ -120,7 +128,7 @@ Vendas - {{$representante->pessoa->nome}}
             },
             dataType: 'json'
         }).done( (response) => {
-            
+            console.log(response)    
             Swal.fire({
                 title: 'Sucesso!',          
                 icon: 'success'

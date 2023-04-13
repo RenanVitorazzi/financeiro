@@ -8,7 +8,7 @@ Procurar cheque
     @csrf
 
     <div class="row">
-        <div class="col-3 form-group">
+        <div class="col-lg-3 col-sm-6 form-group">
             <x-select name="tipo_select" type="number" value="{{ old('tipo_select') }}">
                 <option value="valor_parcela">Valor</option>
                 <option value="numero_cheque">Número</option>
@@ -19,10 +19,10 @@ Procurar cheque
             </x-select>
         </div>
        
-        <div class="col-7 form-group">
+        <div class="col-lg-7 col-sm-6 form-group">
             <x-input name="texto_pesquisa"></x-input>
         </div>
-        <div class="col-2 form-group">
+        <div class="col-lg-2 col-sm-6 form-group">
             <input type="submit" class='btn btn-dark'>
         </div>
     </div>
@@ -83,7 +83,7 @@ Procurar cheque
             let diferencaDias = calcularDiferencaDias(data.dia, dataNova)
 
             let jurosNovos = calcularNovosJuros(element, diferencaDias)
-
+            console.log({element, diferencaDias});
             $("#diasAdiados").html(diferencaDias)
             $("#juros_totais").val(jurosNovos)
         })
@@ -139,7 +139,8 @@ Procurar cheque
     }
 
     function calcularNovosJuros (element, dias) {
-        let taxa = $("#taxa").val();
+        let taxa = $("#taxa_juros").val();
+        console.log(taxa);  
         let valor_cheque = $(element).data("valor")
         let porcentagem = taxa / 100 || TAXA / 100 ;
         
@@ -201,14 +202,35 @@ Procurar cheque
                 },
                 success: (response) => {
                     let tableBody = ''
-    
-                    response.forEach(element => {
+                    let arrayNomeBlackList = response.blackList[0].nome_cheque ? response.blackList[0].nome_cheque.split(',') : []
+                    let arrayClienteIdBlackList = response.blackList[0].cliente_id ? response.blackList[0].cliente_id.split(',') : []
+                   
+                    response.Cheques.forEach(element => {
                         let dataTratada = transformaData(element.data_parcela)
                         let ondeEstaCheque = carteiraOuParceiro(element.parceiro_id, element.nome_parceiro)
                         let numero_banco = tratarNulo(element.numero_banco)
                         let numero_cheque = tratarNulo(element.numero_cheque)
                         let representante = tratarNulo(element.nome_representante)
-                        if (element.status === 'PAGO') {
+                        
+                        let ClienteBlackList = arrayNomeBlackList.includes(element.nome_cheque) || arrayClienteIdBlackList.includes(element.cliente_id)
+                        
+                        let botaoAdiar = ClienteBlackList ? 
+                            `<div class="btn btn-danger btn-adiar" 
+                                title="Adiou e o mesmo cheque foi devolvido"
+                                data-id="${element.id}" 
+                                data-dia="${element.data_parcela}" 
+                                data-valor="${element.valor_parcela}" 
+                                data-nome="${element.nome_cheque}"
+                            > <i class="fas fa-exclamation-triangle"></i> </div>` 
+                            : 
+                            `<div class="btn btn-dark btn-adiar" 
+                                data-id="${element.id}" 
+                                data-dia="${element.data_parcela}" 
+                                data-valor="${element.valor_parcela}" 
+                                data-nome="${element.nome_cheque}"
+                            > <i class="far fa-clock"></i> </div>`
+
+                        if (element.status === 'PAGO' || element.status === 'DEPOSITADO') {
                             tableBody += `
                                 <tr>
                                     <td>${element.nome_cheque}</td>
@@ -222,7 +244,7 @@ Procurar cheque
                                     <td><x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar></td>
                                 </tr>
                             `
-                        } else if (element.status === 'ADIADO') {
+                        } else if (element.adiamento_id) {
                             tableBody += `
                                 <tr>
                                     <td>${element.nome_cheque}</td>
@@ -235,12 +257,7 @@ Procurar cheque
                                     <td>${element.status}</td>
                                     <td>
                                         <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
-                                        <div class="btn btn-dark btn-adiar" 
-                                            data-id="${element.id}" 
-                                            data-dia="${element.data_parcela}" 
-                                            data-valor="${element.valor_parcela}" 
-                                            data-nome="${element.nome_cheque}"
-                                        > <i class="far fa-clock"></i> </div>    
+                                        ${botaoAdiar}
                                     </td>
                                 </tr>
                             `
@@ -257,23 +274,19 @@ Procurar cheque
                                     <td>${element.status}</td>
                                     <td>
                                         <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
-                                        <div class="btn btn-dark btn-adiar" 
-                                            data-id="${element.id}" 
-                                            data-dia="${element.data_parcela}" 
-                                            data-valor="${element.valor_parcela}" 
-                                            data-nome="${element.nome_cheque}"
-                                        > <i class="far fa-clock"></i> </div>    
+                                        ${botaoAdiar}
                                     </td>
                                 </tr>
                             `
                         }
+
                     })
     
                     $("#table_div").html(`
                         <x-table>
                             <x-table-header>
                                 <tr>
-                                    <th colspan=10>Número total de resultado: ${response.length}</th>  
+                                    <th colspan=10>Número total de resultado: ${response.Cheques.length}</th>  
                                 </tr>
                                 <tr>
                                     <th>Titular</th>

@@ -155,12 +155,45 @@ class FornecedorController extends Controller
             ->get()
             ->sortBy('conta_corrente_sum_peso_agregado');
 
-        $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
-            ->carteira()
-            ->groupBy('month', 'year')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
+        $carteira = DB::select('SELECT 
+                sum(valor_parcela) as total_mes,
+                MONTH(IF(par.status = ?,
+                    (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                    par.data_parcela
+                )) as month,
+                YEAR(IF(par.status = ?,
+                    (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                    par.data_parcela
+                )) as year
+            FROM
+                parcelas par
+            WHERE
+                par.status in (?,?)
+                    AND par.deleted_at IS NULL
+                    AND parceiro_id IS NULL
+                    AND forma_pagamento LIKE ?
+                    GROUP BY YEAR( IF(par.status = ?,
+                    (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                    par.data_parcela
+                ) ), MONTH( IF(par.status = ?,
+                    (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                    par.data_parcela
+                ) )
+            ORDER BY 3,2',
+            ['Adiado', 'Adiado', 'Adiado', 'Aguardando', 'Cheque', 'Adiado', 'Adiado']
+        );
+        
+        $totalCarteira =  DB::select('SELECT 
+                sum(valor_parcela) as totalCarteira
+            FROM
+                parcelas par
+            WHERE
+                par.status in (?,?)
+                    AND par.deleted_at IS NULL
+                    AND parceiro_id IS NULL
+                    AND forma_pagamento LIKE ?',
+            ['Adiado', 'Aguardando', 'Cheque']
+        );
         
         $devolvidos = Parcela::where('status', 'Devolvido')->get();
 
@@ -191,23 +224,195 @@ class FornecedorController extends Controller
             GROUP BY pa.id
         ');
         
-        $pagamentoMed = DB::select('SELECT 
-            (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND deleted_at is null) 
-            -
-            ((SELECT IFNULL(sum(peso)/2, 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) between 30 and 59) AND deleted_at is null ) + 
-            (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) >= 60) AND deleted_at is null ) ) AS total,
-            (SELECT nome from pessoas WHERE f.pessoa_id = id) as fornecedor,
-            f.id as fornecedor_id
-            FROM fornecedores f',
-            [
-                'Crédito', 'Débito', 'Débito'
-            ]
+        $mes = date('m');
+        $Op = DB::select('SELECT 
+                MONTH(p.data_parcela) AS mes, 
+                SUM(p.valor_parcela) AS total_devedor, 
+                SUM((SELECT SUM(valor) FROM pagamentos_representantes pr WHERE pr.parcela_id = p.id  AND pr.deleted_at is null)) AS total_pago
+            FROM
+                parcelas p
+                    LEFT JOIN
+                vendas v ON v.id = p.venda_id
+                    INNER JOIN
+                clientes c ON c.id = v.cliente_id
+                    INNER JOIN
+                pessoas pe ON pe.id = c.pessoa_id
+            WHERE
+                p.forma_pagamento IN (?, ?, ?)
+                    AND p.status LIKE ?
+                    AND year(p.data_parcela) = year(CURDATE())
+                    AND v.deleted_at is null
+                AND p.deleted_at is null
+                    GROUP BY MONTH(p.data_parcela)
+                    ORDER BY 1',
+            ['Cheque' , 'Pix', 'Transferência Bancária', 'Aguardando Pagamento']
         );
+
+        $chequesAguardandoEnvio = DB::select('SELECT 
+            SUM(VALOR_PARCELA) AS valor, MONTH(data_parcela) AS mes
+            FROM parcelas where forma_pagamento like ? 
+            AND status like ?
+            AND deleted_at is null
+            GROUP BY MONTH(data_parcela)
+            ORDER BY MONTH(data_parcela)',
+            ['Cheque', 'Aguardando Envio']
+        );
+        $chequesAguardandoEnvioTotal = 0;
+        $totalDevedorGeral = 0;
+        $totalPagoGeral = 0;
+        $opsVencidasDevedoras = 0;
+        $opsPagas = 0;
+        
+        // $pagamentoMed = DB::select('SELECT 
+        //     (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND deleted_at is null) 
+        //     -
+        //     ((SELECT IFNULL(sum(peso)/2, 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) between 30 and 59) AND deleted_at is null ) + 
+        //     (SELECT IFNULL(sum(peso), 0) FROM conta_corrente WHERE balanco like ? and fornecedor_id = f.id AND (datediff(curdate(), data) >= 60) AND deleted_at is null ) ) AS total,
+        //     (SELECT nome from pessoas WHERE f.pessoa_id = id) as fornecedor,
+        //     f.id as fornecedor_id
+        //     FROM fornecedores f',
+        //     [
+        //         'Crédito', 'Débito', 'Débito'
+        //     ]
+        // );
         $hoje = date('d/m/Y');
 
-        // dd($adiamentos);
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('fornecedor.pdf.diario', compact('fornecedores', 'carteira', 'representantes', 'devolvidos', 'pagamentoMed', 'adiamentos', 'hoje', 'parceiros') );
+        $pdf->loadView(
+            'fornecedor.pdf.diario', 
+            compact(
+                'fornecedores', 
+                'carteira', 
+                'representantes', 
+                'devolvidos', 
+                'adiamentos', 
+                'hoje', 
+                'parceiros', 
+                'totalCarteira',
+                'Op', 
+                'mes',
+                'opsVencidasDevedoras',
+                'opsPagas',
+                'totalDevedorGeral',
+                'totalPagoGeral',
+                'chequesAguardandoEnvio',
+                'chequesAguardandoEnvioTotal'
+            ) 
+        );
+        
+        return $pdf->stream();
+    }
+
+    public function pdf_mov_diario()
+    {
+        $adiamentos = DB::select("SELECT 
+                p.data_parcela, 
+                p.valor_parcela, 
+                p.nome_cheque AS nome_cheque,
+                a.nova_data,
+                a.juros_totais,
+                (SELECT nome FROM pessoas p WHERE p.id = pp.pessoa_id) as nome_parceiro,
+                (SELECT nome FROM pessoas p WHERE p.id = r.pessoa_id) as nome_representante
+            FROM parcelas p 
+            INNER JOIN adiamentos a ON a.parcela_id = p.id 
+            LEFT JOIN parceiros pp ON p.parceiro_id = pp.id
+            LEFT JOIN representantes r ON r.id = p.representante_id 
+            WHERE 
+                DATE_FORMAT(a.created_at, '%Y-%m-%d') = CURDATE()
+                AND p.deleted_at is null
+            ORDER BY r.id, p.data_parcela, p.valor_parcela");
+
+        $cc_fornecedor = DB::select("SELECT 
+                cc.peso, 
+                p.nome, 
+                cc.cotacao, 
+                cc.valor,
+                cc.balanco,
+                cc.observacao
+            FROM conta_corrente cc 
+            INNER JOIN fornecedores f ON f.id = cc.fornecedor_id
+            INNER JOIN pessoas p ON p.id = f.pessoa_id 
+            WHERE 
+                DATE_FORMAT(cc.created_at, '%Y-%m-%d') = CURDATE() 
+                AND cc.deleted_at is null");
+    
+        $cc_representante = DB::select("SELECT 
+                cc.peso,
+                cc.fator,
+                cc.balanco, 
+                p.nome, 
+                cc.observacao 
+            FROM conta_corrente_representante cc 
+            INNER JOIN representantes r ON r.id = cc.representante_id 
+            INNER JOIN pessoas p ON p.id = r.pessoa_id 
+            WHERE 
+                DATE_FORMAT(cc.created_at, '%Y-%m-%d') = CURDATE() 
+                AND cc.deleted_at is null");
+
+            $devolvidos = DB::select('SELECT 
+                p.nome_cheque ,
+                p.valor_parcela,
+                p.data_parcela,
+                mc.status,
+                mc.motivo,
+                (SELECT nome FROM pessoas WHERE pessoas.id = r.pessoa_id) AS nome_representante,
+                (SELECT nome FROM pessoas WHERE pessoas.id = pa.pessoa_id) AS nome_parceiro
+                FROM
+                movimentacoes_cheques mc
+                    INNER JOIN
+                parcelas p ON p.id = mc.parcela_id
+                    LEFT JOIN
+                representantes r ON r.id = p.representante_id
+                    LEFT JOIN
+                parceiros pa ON pa.id = p.parceiro_id
+                WHERE
+                p.status IN (?,?)
+                AND CONVERT( mc.data , DATE) = CURDATE()', 
+                ['Resgatado', 'Devolvido']
+            );
+
+            $depositados = DB::select('SELECT 
+                p.nome_cheque ,
+                p.valor_parcela,
+                p.data_parcela,
+                p.status,
+                p.motivo,
+                (SELECT nome FROM pessoas WHERE pessoas.id = r.pessoa_id) AS nome_representante                FROM
+                movimentacoes_cheques mc
+                    INNER JOIN
+                parcelas p ON p.id = mc.parcela_id
+                    LEFT JOIN
+                representantes r ON r.id = p.representante_id
+                    LEFT JOIN
+                parceiros pa ON pa.id = p.parceiro_id
+                WHERE
+                p.status IN (?)
+                AND CONVERT( mc.data , DATE) = CURDATE()', 
+                ['Depositado']
+            );
+    
+        $hoje = date('Y-m-d');
+        $juros_totais = 0;
+        $total_devolvido = 0;
+        $total_depositado = 0;
+
+            
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView(
+            'fornecedor.pdf.mov_diario', 
+            compact(
+                'total_depositado',
+                'depositados',
+                'total_devolvido',
+                'devolvidos',
+                'juros_totais',
+                'hoje',
+                'cc_representante', 
+                'adiamentos', 
+                'cc_fornecedor'
+            ) 
+        );
         
         return $pdf->stream();
     }

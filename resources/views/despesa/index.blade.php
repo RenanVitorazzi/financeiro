@@ -12,6 +12,7 @@ Despesas
 <div class='mb-2 d-flex justify-content-between'>
     <h3> Despesas </h3>
     <div>
+        <x-botao-imprimir class="mr-2" href="{{ route('pdf_despesa_mensal', $mes) }}"></x-botao-imprimir>
         <x-botao-novo href="{{ route('despesas.create') }}"></x-botao-novo>
     </div>
 </div>

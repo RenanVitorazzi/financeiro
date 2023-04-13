@@ -9,6 +9,8 @@ use App\Http\Requests\RequestFormPessoa;
 use App\Models\Venda;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
 {
@@ -113,4 +115,30 @@ class ClienteController extends Controller
         ]);
     }
     
+    public function pdf_clientes(Request $request, $representante_id)
+    {
+        $representante = Representante::findOrFail($representante_id);
+        
+        $clientes = DB::select('SELECT 
+                UPPER(p.nome) as nome,
+                UPPER(p.estado) as estado,
+                UPPER(p.municipio) as municipio,
+                UPPER(p.cep) as cep,
+                UPPER(p.bairro) as bairro,
+                UPPER(p.logradouro) as logradouro,
+                p.numero,
+                p.telefone, 
+                p.celular, 
+                UPPER(p.complemento) as complemento
+
+            FROM clientes c 
+            INNER JOIN pessoas p ON p.id = c.pessoa_id 
+               WHERE representante_id =' . $representante_id . 
+            ' ORDER BY p.estado, p.municipio');
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('cliente.pdf.pdf_cliente', compact('clientes', 'representante') )->setPaper('a4', 'landscape');
+            
+        return $pdf->stream();
+    }
 }

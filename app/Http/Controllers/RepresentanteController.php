@@ -130,6 +130,59 @@ class RepresentanteController extends Controller {
         return redirect()->route('representantes.show', $representante_id);
 
     }
+
+    public function pdf_cc_representante ($representante_id) 
+    {
+        $representante = Representante::findOrFail($representante_id);
+        
+        $saldos = DB::select('SELECT * FROM (
+                SELECT 
+                    pr.data as data, 
+                    pr.valor as valor, 
+                    CONCAT(?, p.forma_pagamento, ?, p.status, ?, p.nome_cheque, ?,DATE_FORMAT(p.data_parcela, ?), ?, pr.forma_pagamento, ?, c.nome) AS nome,
+                    ? as status 
+                FROM 
+                    pagamentos_representantes pr 
+                        LEFT JOIN parcelas p ON p.id = pr.parcela_id
+                        LEFT JOIN contas c ON c.id = pr.conta_id
+                WHERE 
+                    pr.representante_id = ? 
+                    AND pr.baixado IS NULL 
+                    AND pr.deleted_at IS NULL
+                    AND p.forma_pagamento like ?
+                UNION ALL 
+                
+                SELECT 
+                    date(pr.created_at) as data, 
+                    p.valor_parcela as valor, 
+                    CONCAT(p.nome_cheque, ?, DATE_FORMAT(p.data_parcela, ?), ?, p.status, ?, ?, p.numero_cheque, ?) as nome,
+                    pr.representante_status as status
+                FROM
+                    parcelas_representantes pr
+                        INNER JOIN
+                    parcelas p ON p.id = pr.parcela_id
+                WHERE
+                    p.representante_id = ?
+            ) a
+            ORDER BY data, valor', 
+            [
+                'Crédito Ref. ', ' ', ' - ', ' (', '%d/%m/%Y',') - ', ' ', 
+                'Crédito', 
+                $representante_id, 
+                'Cheque', 
+                ' - ', '%d/%m/%Y',' - ', ' - ', ' (nº ', ')', 
+                $representante_id
+            ]
+        );
+        // dd($saldos);
+        $saldo_total = 0;
+        
+        $pdf = App::make('dompdf.wrapper');
+        $hoje = date('Y-m-d');
+        $pdf->loadView('representante.pdf.pdf_cc_representante', compact('saldos', 'representante', 'saldo_total', 'hoje') );
+        
+        return $pdf->stream();
+    }
 } 
 
 ?>

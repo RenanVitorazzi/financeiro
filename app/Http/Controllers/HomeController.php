@@ -6,6 +6,7 @@ use App\Models\Adiamento;
 use App\Models\DespesaFixa;
 use App\Models\Local;
 use App\Models\Parcela;
+use App\Models\Despesa as ModelsDespesa;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Facades\DB;
@@ -18,13 +19,13 @@ class HomeController extends Controller
     }
 
     public function index()
-    {  
+    { 
         $depositos = Parcela::where([
-            ['data_parcela','<=', DB::raw('CURDATE()')],
-            ['parceiro_id', NULL],
-            ['status', 'Aguardando'],
-            ['forma_pagamento', 'Cheque'],
-        ])
+                ['data_parcela','<=', DB::raw('CURDATE()')],
+                ['parceiro_id', NULL],
+                ['status', 'Aguardando'],
+                ['forma_pagamento', 'Cheque'],
+            ])
             ->orderBy('data_parcela')
             ->orderBy('valor_parcela')
             ->orderBy('nome_cheque')
@@ -32,14 +33,15 @@ class HomeController extends Controller
         
         $qtdDiasParaSexta = 5 - Carbon::now()->dayOfWeek;
 
-        $ordensPagamentoParaSemana = Parcela::with('representante')
-            ->where([
-                ['forma_pagamento', 'Depósito'],
-                ['status', 'Aguardando'],
-                ['data_parcela', '<=', DB::raw('DATE_ADD(curdate(), INTERVAL '.$qtdDiasParaSexta.' day)')],
-            ])
-            ->orderBy('data_parcela')
-            ->orderBy('valor_parcela')
+        $idFixasPagas = ModelsDespesa::with('local')
+            ->where(DB::raw('MONTH(data_vencimento)'), DB::raw('MONTH(CURDATE())'))
+            ->whereNotNull('fixas_id')
+            ->orderBy('local_id')
+            ->pluck('fixas_id');
+            
+        $fixasNaoPagas = DespesaFixa::with('local')
+            ->whereNotIn('id', $idFixasPagas)
+            ->where('dia_vencimento', '<=', DB::raw('DAY(CURDATE()+7)'))
             ->get();
 
         $adiamentos = DB::select('SELECT 
@@ -59,6 +61,6 @@ class HomeController extends Controller
             ORDER BY pa.id'
         );
             
-        return view('home', compact('depositos', 'adiamentos', 'ordensPagamentoParaSemana'));
-    }
+        return view('home', compact('depositos', 'adiamentos', 'fixasNaoPagas'));
+    }   
 }

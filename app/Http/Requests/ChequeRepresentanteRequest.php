@@ -15,8 +15,11 @@ class ChequeRepresentanteRequest extends FormRequest
     {
         return [
             'representante_id' => ['numeric', 'required', 'min:1'],
+            'data_troca' => ['date', 'required'],
             'nome_cheque' => ['array', 'min:1'],
             'nome_cheque.*' => ['required', 'string'],
+            'numero_banco' => ['array', 'min:1'],
+            'numero_banco.*' => ['required', 'integer'],
             'numero_cheque' => ['array', 'min:1'],
             'numero_cheque.*' => ['required', 'string'],
             'valor_parcela' => ['array', 'min:1'],

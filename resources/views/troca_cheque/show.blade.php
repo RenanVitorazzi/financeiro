@@ -12,33 +12,12 @@
 </nav>
 
 <div class='mb-2 d-flex justify-content-between'>
-    <h3> {{ $troca->titulo }} </h3>
+    <h3> {{ $troca->titulo }} ({{ $troca->taxa_juros }}%)</h3>
     <div>
         <x-botao-imprimir class="mr-2" href="{{ route('pdf_troca', $troca->id) }}"></x-botao-imprimir>
     </div>
 </div>
 
-<x-table>
-      <x-table-header>
-            <tr>
-                <th>Data da Troca</th>
-                <th>Total Bruto</th>
-                <th>Total Juros</th>
-                <th>Total Líquido</th>
-                <th>Taxa</th>
-            </tr>
-      </x-table-header>
-      <tbody>
-            <tr>
-                <td><b>@data($troca->data_troca)</b></td>
-                <td><b>@moeda($troca->valor_bruto)</b></td>
-                <td><b>@moeda($troca->valor_juros)</b></td>
-                <td><b>@moeda($troca->valor_liquido)</b></td>
-                <td><b>{{ $troca->taxa_juros }}%</b></td>
-            </tr>
-      </tbody>
-</x-table>
-<p></p>
 <x-table id="dataTable">
     <x-table-header>
         <tr>
@@ -58,33 +37,38 @@
                 <td><p>{{ $cheque->parcelas->nome_cheque }}</p></td>
                 <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
                 <td>
-                    <s>@data($cheque->parcelas->data_parcela)</s>
                     <p>@data($cheque->parcelas->adiamentos->nova_data)</p>
                 </td>
+                <td>{{ $cheque->dias }}</td>
+                <td><p>{{ $cheque->parcelas->valor_parcela }}</p></td>
                 <td>
-                    <s>{{ $cheque->dias }}</s>
-                </td>
-                <td><p>@moeda($cheque->parcelas->valor_parcela)</p></td>
-                <td>
-                    <p>@moeda($cheque->valor_juros)</p>
+                    <p>{{ $cheque->valor_juros }}</p>
                 </td>
                 <td>
-                    <p>@moeda($cheque->valor_liquido)</p>
+                    <p>{{ $cheque->valor_liquido }}</p>
                 </td>
             </tr>
             @else
             <tr>
                 <td>{{ $cheque->parcelas->nome_cheque }}</td>
-                <td><p>{{ $cheque->parcelas->numero_cheque }}</p></td>
+                <td>{{ $cheque->parcelas->numero_cheque }}</td>
                 <td>@data($cheque->parcelas->data_parcela)</td>
                 <td>{{ $cheque->dias }}</td>
-                <td>@moeda($cheque->parcelas->valor_parcela)</td>
-                <td>@moeda($cheque->valor_juros)</td>
-                <td>@moeda($cheque->valor_liquido)</td>
+                <td>{{ $cheque->parcelas->valor_parcela }}</td>
+                <td>{{ $cheque->valor_juros }}</td>
+                <td>{{ $cheque->valor_liquido }}</td>
             </tr>
             @endif
         @endforeach
     </tbody>
+    <tfoot>
+            <tr>
+                  <th colspan=4>Total</th>
+                  <th><b>{{ $troca->valor_bruto }}</b></th>
+                  <th><b>{{ $troca->valor_juros }}</b></th>
+                  <th><b>{{ $troca->valor_liquido }}</b></th>
+            </tr>
+      </tfoot>
 </x-table>
 
 @endsection

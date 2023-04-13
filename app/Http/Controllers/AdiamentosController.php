@@ -6,6 +6,7 @@ use App\Http\Requests\AdiamentoFormRequest;
 use App\Models\Adiamento;
 use App\Models\Feriados;
 use App\Models\Parceiro;
+use App\Models\MovimentacaoCheque;
 use App\Models\Parcela;
 use App\Models\Representante;
 use App\Models\TrocaAdiamento as ModelsTrocaAdiamento;
@@ -35,9 +36,9 @@ class AdiamentosController extends Controller
         $nova_data = new DateTime($request->nova_data);
         $feriados = Feriados::all();
 
-        while (in_array($nova_data->format('w'), [0, 6]) || !$feriados->where('data_feriado', $nova_data->format('Y-m-d'))->isEmpty()) {
-            $nova_data->modify('+1 weekday');
-        }
+        // while (in_array($nova_data->format('w'), [0, 6]) || !$feriados->where('data_feriado', $nova_data->format('Y-m-d'))->isEmpty()) {
+        //     $nova_data->modify('+1 weekday');
+        // }
 
         $porcentagem = $request->taxa_juros / 100;
         $cheque = Parcela::findOrFail($request->parcela_id);
@@ -88,6 +89,12 @@ class AdiamentosController extends Controller
             'observacao' => $request->observacao,
             'parcela_id' => $cheque->id
         ]);
+
+        MovimentacaoCheque::create([
+            'parcela_id' => $cheque->id,
+            'status' => 'Adiado',
+            'adiamento_id' => $adiamento->id
+        ]); 
 
         return json_encode([
             'title' => 'Sucesso',
