@@ -101,15 +101,24 @@ class ClienteController extends Controller
 
     public function procurarCliente(Request $request)
     {
-        $clientes = Cliente::query()
-            ->with('pessoa')
-            ->whereHas('pessoa', function (Builder $query) use ($request) {
-                $query->where('nome', 'like', '%'.$request->dado.'%');
-                $query->orWhere('cpf', 'like', $request->dado);
-            })
-            ->where('representante_id', $request->representante_id)
-            ->get();
-
+        if (!$request->dado) {
+            return Cliente::select(['clientes.*','pessoas.nome'])
+                ->join('pessoas', 'pessoas.id', '=', 'clientes.pessoa_id')
+                ->where('representante_id', $request->representante_id)
+                ->orderBy('pessoas.nome')
+                ->get()
+                ->toJson();
+        } else {
+            $clientes = Cliente::query()
+                ->with('pessoa')
+                ->whereHas('pessoa', function (Builder $query) use ($request) {
+                    $query->where('nome', 'like', '%'.$request->dado.'%');
+                    $query->orWhere('cpf', 'like', $request->dado);
+                })
+                ->where('representante_id', $request->representante_id)
+                ->get();
+        }
+        
         return json_encode([
             'clientes' => $clientes
         ]);

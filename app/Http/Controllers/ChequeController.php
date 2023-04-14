@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 
 class ChequeController extends Controller
 {
+    public $feriados;
+    
     public function __construct()
     {
         $this->feriados = Feriados::all();
@@ -113,7 +115,7 @@ class ChequeController extends Controller
 
     public function store(ChequeRepresentanteRequest $request)
     {
-        $hoje = date('Y-m-d');
+        $hoje = date('d-m-Y');
         if ($request->nova_troca == 'Sim') {
 
             $representante = Representante::with('pessoa')->find($request->representante_id);

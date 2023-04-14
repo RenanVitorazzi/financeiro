@@ -42,6 +42,11 @@ class Representante extends Model
         }]);
     }
 
+    public function scopeEmpresa($query)
+    {
+        return $query->where('atacado', NULL);
+    }
+
     protected static function booted()
     {
         if (auth()->user()->is_representante && !auth()->user()->is_admin) {

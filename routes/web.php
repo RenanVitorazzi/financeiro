@@ -10,6 +10,7 @@ use App\Http\Controllers\ContaCorrenteController;
 use App\Http\Controllers\ContaCorrenteRepresentanteController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ChequeController;
+use App\Http\Controllers\ConsignadoController;
 use App\Http\Controllers\ContaCorrenteAnexoController;
 use App\Http\Controllers\ContaCorrenteRepresentanteAnexoController;
 use App\Http\Controllers\DespesaController;
@@ -53,6 +54,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('fornecedores', FornecedorController::class);
         Route::resource('representantes', RepresentanteController::class);
         Route::resource('parceiros', ParceiroController::class);
+        Route::resource('consignado', ConsignadoController::class);
         
         //? Financeiro
         Route::resource('conta_corrente', ContaCorrenteController::class);
@@ -89,7 +91,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_despesa_mensal/{mes}', [DespesaController::class, 'pdf_despesa_mensal'])->name('pdf_despesa_mensal');
         Route::get('pdf_cheques_entregues/{representante_id}', [EntregaParcelaController::class, 'pdf_cheques_entregues'])->name('pdf_cheques_entregues');
         Route::get('pdf_estoque', [EstoqueController::class, 'pdf_estoque'])->name('pdf_estoque');
-        
+        Route::get('pdf_consignados', [ConsignadoController::class, 'pdf_consignados'])->name('pdf_consignados');
         //? Anexos 
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
             'index', 'create', 'store', 'destroy'
