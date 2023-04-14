@@ -5,7 +5,16 @@ Consignados
 <?php $__env->startSection('body'); ?>
 <div class='mb-2 d-flex justify-content-between'>
     <h3> Consignados </h3>
-    <?php if (isset($component)) { $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd = $component; } ?>
+    
+    <div class="d-flex">
+        <a href="<?php echo e(route('pdf_consignados_geral')); ?>" class="btn btn-dark mr-2" target="_blank">
+            Relação representante <i class="fas fa-print"></i>
+        </a>
+        <a href="<?php echo e(route('pdf_consignados')); ?>" class="btn btn-dark mr-2" target="_blank">
+            Relação cliente <i class="fas fa-print"></i>
+        </a>
+        
+        <?php if (isset($component)) { $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\BotaoNovo::class, []); ?>
 <?php $component->withName('botao-novo'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -16,6 +25,7 @@ Consignados
 <?php $component = $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd; ?>
 <?php unset($__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd); ?>
 <?php endif; ?>
+    </div>
 </div>
 <?php if (isset($component)) { $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Table::class, []); ?>

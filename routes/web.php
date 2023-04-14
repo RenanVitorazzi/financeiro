@@ -92,6 +92,8 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_cheques_entregues/{representante_id}', [EntregaParcelaController::class, 'pdf_cheques_entregues'])->name('pdf_cheques_entregues');
         Route::get('pdf_estoque', [EstoqueController::class, 'pdf_estoque'])->name('pdf_estoque');
         Route::get('pdf_consignados', [ConsignadoController::class, 'pdf_consignados'])->name('pdf_consignados');
+        Route::get('pdf_consignados_geral', [ConsignadoController::class, 'pdf_consignados_geral'])->name('pdf_consignados_geral');
+
         //? Anexos 
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
             'index', 'create', 'store', 'destroy'

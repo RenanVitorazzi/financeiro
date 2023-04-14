@@ -134,13 +134,38 @@ class ConsignadoController extends Controller
     }
 
     public function pdf_consignados() {
-        $consignados = Consignado::with(['representante' => function ($query) {
-            $query->empresa();
-        }])->get();
-        dd($consignados);
-        // $pdf = App::make('dompdf.wrapper');
-        // $pdf->loadView('cheque.pdf.pdf_cheques', compact('consginados') );
+        $consignados = Consignado::with('cliente')
+            ->where('baixado', NULL)
+            ->orderBy('representante_id')
+            ->orderBy('data')
+            ->get();
         
-        // return $pdf->stream();
+        $representantesEmpresa = Representante::with('pessoa')->empresa()->get();
+        // $consignados->where('representante_id', 5)->sum('peso');
+        // dd($consignados);
+        
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('consignado.pdf.pdf_consignados', 
+            compact('consignados', 'representantesEmpresa') 
+        );
+        
+        return $pdf->stream();
+    }
+
+    public function pdf_consignados_geral() {
+        $consignados = Consignado::with('cliente')
+            ->where('baixado', NULL)
+            ->orderBy('representante_id')
+            ->orderBy('data')
+            ->get();
+        
+        $representantesEmpresa = Representante::with('pessoa')->empresa()->get();
+        
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('consignado.pdf.pdf_consignados_geral', 
+            compact('consignados', 'representantesEmpresa') 
+        );
+        
+        return $pdf->stream();
     }
 }
