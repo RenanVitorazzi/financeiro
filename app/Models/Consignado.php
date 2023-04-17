@@ -11,6 +11,7 @@ class Consignado extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
+    protected $with = ['cliente', 'representante'];
 
     public function representante() 
     {

@@ -46,7 +46,7 @@
         </div>
     </div>
 </div>
-<div class="page-wrapper chiller-theme toggled">
+<div class="page-wrapper chiller-theme">
   <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
     <i class="fas fa-bars"></i>
   </a>

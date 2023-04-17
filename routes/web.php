@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('baixarDebitosRepresentantes/{representante_id}', [RepresentanteController::class, 'baixarDebitosRepresentantes'])->name('baixarDebitosRepresentantes');
         Route::post('depositar_diario', [ChequeController::class, 'depositar_diario'])->name('depositar_diario');
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
+        Route::get('procurarConsignado', [ConsignadoController::class, 'procurarConsignado'])->name('procurarConsignado');
 
         //? Cadastros auxiliares
         Route::resource('fornecedores', FornecedorController::class);

@@ -168,4 +168,13 @@ class ConsignadoController extends Controller
         
         return $pdf->stream();
     }
+
+    public function procurarConsignado(Request $request)
+    {
+        return Consignado::where([
+            ['baixado', '=', NULL],
+            ['representante_id', '=', $request->representante_id],
+            ['cliente_id', '=', $request->cliente_id]
+        ])->get()->toJson();
+    }
 }

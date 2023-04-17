@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use App\Http\Requests\SalvarVendaRequest;
+use App\Models\Consignado;
 use App\Models\ContaCorrenteRepresentante;
 use App\Models\Parcela;
 use App\Models\Venda;
 use App\Models\Representante;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +68,13 @@ class VendaController extends Controller
             ]);
         }
         
+        if ($request->baixar) {
+            Consignado::where('id', $request->baixar)->update([
+                'baixado' => Carbon::now(),
+                'venda_id' => $venda->id
+            ]);
+        }
+
         return redirect()->route('venda.show', $venda->representante_id);
     }
 

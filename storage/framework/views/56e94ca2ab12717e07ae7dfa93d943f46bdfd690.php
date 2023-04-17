@@ -58,9 +58,12 @@ Adicionar vendas
                 </div>
             </div>
         </div>
+    </div>
         
-        <input type="hidden" name="balanco" value="Venda">
-        <input type="hidden" name="representante_id" id="representante_id" value="<?php echo e($representante_id); ?>">
+    <div id="consignado"></div>
+        
+    <input type="hidden" name="balanco" value="Venda">
+    <input type="hidden" name="representante_id" id="representante_id" value="<?php echo e($representante_id); ?>">
         
         <?php if (isset($component)) { $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Table::class, []); ?>
@@ -147,29 +150,29 @@ Adicionar vendas
 <?php $component = $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6; ?>
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
-
-        <div class="col-4 form-group">
-            <label for="metodo_pagamento">Método de Pagamento</label>
-            <?php if (isset($component)) { $__componentOriginal9664ac210be45add4be058f3177c16028511e71a = $component; } ?>
+        <div class='row'>
+            <div class="col-4 form-group">
+                <label for="metodo_pagamento">Método de Pagamento</label>
+                <?php if (isset($component)) { $__componentOriginal9664ac210be45add4be058f3177c16028511e71a = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Select::class, []); ?>
 <?php $component->withName('select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes(['name' => 'metodo_pagamento','required' => true]); ?>
-                <option value=""></option>
-                <?php $__currentLoopData = $metodo_pagamento; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $metodo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option  <?php echo e(old('metodo_pagamento') == $metodo ? 'selected' : ''); ?> value="<?php echo e($metodo); ?>"><?php echo e($metodo); ?></option>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-             <?php echo $__env->renderComponent(); ?>
+                    <option value=""></option>
+                    <?php $__currentLoopData = $metodo_pagamento; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $metodo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option  <?php echo e(old('metodo_pagamento') == $metodo ? 'selected' : ''); ?> value="<?php echo e($metodo); ?>"><?php echo e($metodo); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginal9664ac210be45add4be058f3177c16028511e71a)): ?>
 <?php $component = $__componentOriginal9664ac210be45add4be058f3177c16028511e71a; ?>
 <?php unset($__componentOriginal9664ac210be45add4be058f3177c16028511e71a); ?>
 <?php endif; ?> 
-        </div>
-        <div class="col-4 form-group" id="groupDiaVencimento">
-            <label for="dia_vencimento">Dia de vencimento</label>
-            <?php if (isset($component)) { $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7 = $component; } ?>
+            </div>
+            <div class="col-4 form-group" id="groupDiaVencimento">
+                <label for="dia_vencimento">Dia de vencimento</label>
+                <?php if (isset($component)) { $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Input::class, []); ?>
 <?php $component->withName('input'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -180,10 +183,10 @@ Adicionar vendas
 <?php $component = $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7; ?>
 <?php unset($__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7); ?>
 <?php endif; ?>
-        </div>
-        <div class="col-4 form-group" id="groupParcelas">
-            <label for="parcelas">Quantidade de parcelas</label>
-            <?php if (isset($component)) { $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7 = $component; } ?>
+            </div>
+            <div class="col-4 form-group" id="groupParcelas">
+                <label for="parcelas">Quantidade de parcelas</label>
+                <?php if (isset($component)) { $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Input::class, []); ?>
 <?php $component->withName('input'); ?>
 <?php if ($component->shouldRender()): ?>
@@ -194,8 +197,8 @@ Adicionar vendas
 <?php $component = $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7; ?>
 <?php unset($__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7); ?>
 <?php endif; ?>
-        </div>
-    </div> 
+            </div>
+        </div> 
     
     <div id="infoCheques" class="row">
         <?php if(old('parcelas') && old('parcelas') > 0): ?>
@@ -466,6 +469,7 @@ unset($__errorArgs, $__bag); ?>
 <script>
     const FORMA_PAGAMENTO = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Pix']
     let option = `<option></option>`
+    let representanteId = $("#representante_id").val()
 
     FORMA_PAGAMENTO.forEach(element => {
         option += `<option value="${element}">${element}</option>`;
@@ -861,8 +865,57 @@ unset($__errorArgs, $__bag); ?>
                     console.error(errorThrown)
                 }
             });
+
+            $.ajax({
+                type: 'GET',
+                url: '/procurarConsignado',
+                data: {
+                    'cliente_id': clienteId,
+                    'representante_id': representanteId
+                },
+                dataType: 'json',
+                beforeSend: () => {
+                    swal.showLoading()
+                },
+                success: (response) => {
+                    criarTextoAlertaConsignado(response)
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error(jqXHR)
+                    console.error(textStatus)
+                    console.error(errorThrown)
+                }
+            });
         } 
     })
+
+    function criarTextoAlertaConsignado(response) {
+        
+        if (response.length === 0) {
+            $("#consignado").html('')
+            return
+        }
+
+        let arrayDataConsignado = response[0].data.split('-')
+        let dataConsignadoTratada = arrayDataConsignado[2] + '/' + arrayDataConsignado[1] + '/' + arrayDataConsignado[0]
+
+        let html = `
+            <div class='alert alert-dark'>
+                <h5>Dados do consignado</h5>
+                <hr>  
+                <p>Data: <b>${dataConsignadoTratada}</b></p>
+                <p>Peso: <b>${response[0].peso}</b></p>
+                <p>Fator: <b>${response[0].fator}</b></p> 
+               
+                <div class="form-group">
+                    <label for="baixar"><b>Baixar consignado?</b></label>
+                    <input type="checkbox" id="baixar" name="baixar" checked value="${response[0].id}">
+                </div>
+            </div>
+        `
+
+        $("#consignado").html(html)
+    }
 
     listenerFormaPagamentoParcela ()
 
@@ -903,7 +956,7 @@ unset($__errorArgs, $__bag); ?>
                 }
             })
         }
-        
+        form.submit();
     })
 </script>
 <?php $__env->stopSection(); ?>

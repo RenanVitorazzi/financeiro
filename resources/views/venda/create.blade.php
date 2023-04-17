@@ -37,9 +37,12 @@ Adicionar vendas
                 </div>
             </div>
         </div>
+    </div>
         
-        <input type="hidden" name="balanco" value="Venda">
-        <input type="hidden" name="representante_id" id="representante_id" value="{{ $representante_id }}">
+    <div id="consignado"></div>
+        
+    <input type="hidden" name="balanco" value="Venda">
+    <input type="hidden" name="representante_id" id="representante_id" value="{{ $representante_id }}">
         
         <x-table class="table-striped table-bordered">
             <thead class="thead-dark">
@@ -66,25 +69,25 @@ Adicionar vendas
                 </tr>
             </tbody>
         </x-table>
-
-        <div class="col-4 form-group">
-            <label for="metodo_pagamento">Método de Pagamento</label>
-            <x-select name="metodo_pagamento" required>
-                <option value=""></option>
-                @foreach ($metodo_pagamento as $metodo)
-                    <option  {{ old('metodo_pagamento') == $metodo ? 'selected' : '' }} value="{{ $metodo }}">{{ $metodo }}</option>
-                @endforeach
-            </x-select> 
-        </div>
-        <div class="col-4 form-group" id="groupDiaVencimento">
-            <label for="dia_vencimento">Dia de vencimento</label>
-            <x-input name="dia_vencimento" type="number" value="{{old('dia_vencimento')}}"></x-input>
-        </div>
-        <div class="col-4 form-group" id="groupParcelas">
-            <label for="parcelas">Quantidade de parcelas</label>
-            <x-input name="parcelas" type="number" value="{{old('parcelas')}}"></x-input>
-        </div>
-    </div> 
+        <div class='row'>
+            <div class="col-4 form-group">
+                <label for="metodo_pagamento">Método de Pagamento</label>
+                <x-select name="metodo_pagamento" required>
+                    <option value=""></option>
+                    @foreach ($metodo_pagamento as $metodo)
+                        <option  {{ old('metodo_pagamento') == $metodo ? 'selected' : '' }} value="{{ $metodo }}">{{ $metodo }}</option>
+                    @endforeach
+                </x-select> 
+            </div>
+            <div class="col-4 form-group" id="groupDiaVencimento">
+                <label for="dia_vencimento">Dia de vencimento</label>
+                <x-input name="dia_vencimento" type="number" value="{{old('dia_vencimento')}}"></x-input>
+            </div>
+            <div class="col-4 form-group" id="groupParcelas">
+                <label for="parcelas">Quantidade de parcelas</label>
+                <x-input name="parcelas" type="number" value="{{old('parcelas')}}"></x-input>
+            </div>
+        </div> 
     
     <div id="infoCheques" class="row">
         @if (old('parcelas') && old('parcelas') > 0)
@@ -242,6 +245,7 @@ Adicionar vendas
 <script>
     const FORMA_PAGAMENTO = ['Dinheiro', 'Cheque', 'Transferência Bancária', 'Pix']
     let option = `<option></option>`
+    let representanteId = $("#representante_id").val()
 
     FORMA_PAGAMENTO.forEach(element => {
         option += `<option value="${element}">${element}</option>`;
@@ -637,8 +641,57 @@ Adicionar vendas
                     console.error(errorThrown)
                 }
             });
+
+            $.ajax({
+                type: 'GET',
+                url: '/procurarConsignado',
+                data: {
+                    'cliente_id': clienteId,
+                    'representante_id': representanteId
+                },
+                dataType: 'json',
+                beforeSend: () => {
+                    swal.showLoading()
+                },
+                success: (response) => {
+                    criarTextoAlertaConsignado(response)
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error(jqXHR)
+                    console.error(textStatus)
+                    console.error(errorThrown)
+                }
+            });
         } 
     })
+
+    function criarTextoAlertaConsignado(response) {
+        
+        if (response.length === 0) {
+            $("#consignado").html('')
+            return
+        }
+
+        let arrayDataConsignado = response[0].data.split('-')
+        let dataConsignadoTratada = arrayDataConsignado[2] + '/' + arrayDataConsignado[1] + '/' + arrayDataConsignado[0]
+
+        let html = `
+            <div class='alert alert-dark'>
+                <h5>Dados do consignado</h5>
+                <hr>  
+                <p>Data: <b>${dataConsignadoTratada}</b></p>
+                <p>Peso: <b>${response[0].peso}</b></p>
+                <p>Fator: <b>${response[0].fator}</b></p> 
+               
+                <div class="form-group">
+                    <label for="baixar"><b>Baixar consignado?</b></label>
+                    <input type="checkbox" id="baixar" name="baixar" checked value="${response[0].id}">
+                </div>
+            </div>
+        `
+
+        $("#consignado").html(html)
+    }
 
     listenerFormaPagamentoParcela ()
 
@@ -679,7 +732,7 @@ Adicionar vendas
                 }
             })
         }
-        
+        form.submit();
     })
 </script>
 @endsection

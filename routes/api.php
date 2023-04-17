@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdiamentosController;
 use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ConsignadoController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\TrocaChequeController;
