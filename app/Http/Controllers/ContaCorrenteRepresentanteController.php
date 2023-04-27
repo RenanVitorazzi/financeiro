@@ -81,17 +81,27 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function show($id)
     {
-        $contaCorrente = DB::select("SELECT cc.*,
-            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso,
-            sum(cc.fator_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_fator
-            FROM conta_corrente_representante cc
-            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY cc.data, cc.id ",
-            [$id]
+        $contaCorrente = DB::select("SELECT cc.*, 
+            (SELECT SUM(peso_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_peso,
+                    (SELECT SUM(fator_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_fator
+            FROM conta_corrente_representante cc 
+            WHERE representante_id = ?
+            AND deleted_at IS NULL 
+            ORDER BY data, id",
+            [$id, $id, $id]
         );
 
         $representante = Representante::with('pessoa')->findOrFail($id);
         $impresso = 'impresso_ccr';
+
         if ($representante->atacado) {
             $impresso = 'impresso_ccr2';
         }
@@ -182,13 +192,22 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function impresso($id)
     {
-        $contaCorrente = DB::select("SELECT cc.*,
-            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso,
-            sum(cc.fator_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_fator
-            FROM conta_corrente_representante cc
-            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY data, cc.id",
-            [$id]
+        $contaCorrente = DB::select("SELECT cc.*, 
+                (SELECT SUM(peso_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_peso,
+                (SELECT SUM(fator_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_fator
+            FROM conta_corrente_representante cc 
+            WHERE representante_id = ?
+            AND deleted_at IS NULL 
+            ORDER BY data, id",
+            [$id, $id, $id]
         );
 
         $representante = Representante::with('pessoa')->findOrFail($contaCorrente[0]->representante_id);
@@ -201,12 +220,22 @@ class ContaCorrenteRepresentanteController extends Controller
 
     public function impresso2($id)
     {
-        $contaCorrente = DB::select("SELECT cc.*,
-            sum(cc.peso_agregado) OVER (ORDER BY cc.data, cc.id) as saldo_peso
-            FROM conta_corrente_representante cc
-            WHERE cc.representante_id = ? AND cc.deleted_at IS NULL
-            ORDER BY data asc, id asc",
-            [$id]
+        $contaCorrente = DB::select("SELECT cc.*, 
+            (SELECT SUM(peso_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_peso,
+                    (SELECT SUM(fator_agregado) 
+                    FROM conta_corrente_representante 
+                    WHERE representante_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo_fator
+            FROM conta_corrente_representante cc 
+            WHERE representante_id = ?
+            AND deleted_at IS NULL 
+            ORDER BY data, id",
+            [$id, $id, $id]
         );
 
         $representante = Representante::with('pessoa')->findOrFail($contaCorrente[0]->representante_id);

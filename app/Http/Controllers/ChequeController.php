@@ -20,15 +20,15 @@ use Illuminate\Support\Facades\DB;
 class ChequeController extends Controller
 {
     public $feriados;
-    
+
     public function __construct()
     {
         $this->feriados = Feriados::all();
     }
 
-    public function index() 
+    public function index()
     {
-        $cheques = DB::select('SELECT 
+        $cheques = DB::select('SELECT
                                     par.id,
                                     par.nome_cheque,
                                     par.numero_cheque,
@@ -38,7 +38,7 @@ class ChequeController extends Controller
                                     par.venda_id,
                                     (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
                                     IF(par.status = ?,
-                                        (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1), 
+                                        (SELECT nova_data FROM adiamentos WHERE parcela_id = par.id ORDER BY id desc LIMIT 1),
                                         par.data_parcela
                                     ) as data_parcela
                                 FROM
@@ -52,12 +52,12 @@ class ChequeController extends Controller
                                         AND parceiro_id IS NULL
                                         AND forma_pagamento LIKE ?
                                 ORDER BY data_parcela ASC, valor_parcela ASC', ['Adiado','Adiado','Aguardando', 'Cheque']);
-        
+
         $arrayCores = [
-            'Devolvido' => 'text-danger', 
-            'Adiado' => 'text-warning', 
-            'Sustado' => 'text-danger', 
-            'Pago' => 'text-success', 
+            'Devolvido' => 'text-danger',
+            'Adiado' => 'text-warning',
+            'Sustado' => 'text-danger',
+            'Pago' => 'text-success',
             'Aguardando' => 'text-muted',
             'Resgatado' => 'text-warning',
             'Depositado' => 'text-muted'    ,
@@ -74,7 +74,7 @@ class ChequeController extends Controller
         return view('cheque.edit', compact('cheque', 'situacoesCheque'));
     }
 
-    public function update(ChequeRequest $request, $id) 
+    public function update(ChequeRequest $request, $id)
     {
         $cheque = Parcela::findOrFail($id);
         $status_antigo = $cheque->status;
@@ -85,9 +85,9 @@ class ChequeController extends Controller
         if ( in_array($cheque->status,$arrayStatus) ) {
             if ( $cheque->parceiro_id != NULL ) {
                 $troca_parcela = TrocaParcela::where('parcela_id', $cheque->id)->first();
-                $troca_parcela->update(['pago' => NULL]);       
+                $troca_parcela->update(['pago' => NULL]);
             }
-            
+
             ParcelaRepresentante::firstOrCreate(
                 ['parcela_id' => $cheque->id],
                 ['representante_status' => $cheque->status]
@@ -100,16 +100,16 @@ class ChequeController extends Controller
                 'parcela_id' => $cheque->id,
                 'status' => $cheque->status,
                 'motivo' => $cheque->motivo
-            ]); 
+            ]);
         }
-        
+
         return redirect()->route('cheques.index');
     }
 
     public function create()
     {
         $representantes = Representante::with('pessoa')->get();
-    
+
         return view('cheque.create', compact('representantes'));
     }
 
@@ -126,11 +126,11 @@ class ChequeController extends Controller
                 'taxa_juros' => $request->taxa_juros,
                 'observacao' => 'Gerado automaticamente',
             ]);
-            
+
             $dataInicio = new DateTime($novaTroca->data_troca);
         }
-        
-        for ($i = 0; $i < $request->quantidade_cheques; $i++) { 
+
+        for ($i = 0; $i < $request->quantidade_cheques; $i++) {
             $cheque = Parcela::create([
                 'representante_id' => $request->representante_id,
                 'nome_cheque' => $request->nome_cheque[$i],
@@ -140,15 +140,15 @@ class ChequeController extends Controller
                 'data_parcela' => $request->data_parcela[$i],
                 'forma_pagamento' => 'Cheque',
                 'status' => 'Aguardando',
-            ]);    
-    
+            ]);
+
             if ($request->nova_troca == 'Sim') {
                 $taxa_troca = $novaTroca->taxa_juros/100;
 
                 $dataFim = new DateTime($cheque->data_parcela);
-                
-                //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado 
-                while (in_array($dataFim->format('w'), [0, 6]) 
+
+                //* Confere se é sábado ou domingo ou se o próximo dia útil não é feriado
+                while (in_array($dataFim->format('w'), [0, 6])
                     || !$this->feriados->where('data_feriado', $dataFim->format('Y-m-d'))->isEmpty()) {
                     $dataFim->modify('+1 weekday');
                 }
@@ -156,7 +156,7 @@ class ChequeController extends Controller
                 $diferencaDias = $dataInicio->diff($dataFim);
                 $juros = ( ($cheque->valor_parcela * $taxa_troca) / 30 ) * $diferencaDias->days;
                 $valorLiquido = $cheque->valor_parcela - $juros;
-                
+
                 TrocaParcela::create([
                     'parcela_id' => $cheque->id,
                     'troca_id' => $novaTroca->id,
@@ -181,7 +181,7 @@ class ChequeController extends Controller
         return redirect()->route('cheques.index');
     }
 
-    public function carteira_cheque_total () 
+    public function carteira_cheque_total ()
     {
 
         $carteira = Parcela::select(DB::raw('sum(valor_parcela) as `valor`, YEAR(data_parcela) year, LPAD (MONTH(data_parcela),2,0) month'))
@@ -198,13 +198,13 @@ class ChequeController extends Controller
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('cheque.pdf.carteira', compact('carteira') );
-        
+
         return $pdf->stream();
     }
 
     public function consulta_cheque(Request $request)
-    { 
-        $cheques = DB::select('SELECT 
+    {
+        $cheques = DB::select('SELECT
                 par.id,
                 UPPER(par.nome_cheque) as nome_cheque,
                 par.data_parcela,
@@ -229,16 +229,16 @@ class ChequeController extends Controller
                 adiamentos a ON a.parcela_id = par.id
             LEFT JOIN
                 vendas v ON par.venda_id = v.id
-            WHERE 
-                NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id) 
+            WHERE
+                NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id)
                 AND par.deleted_at IS NULL
                 AND par.forma_pagamento like ?
                 AND par.'.$request->tipo_select.' = ?
-                ORDER BY par.data_parcela', 
+                ORDER BY par.data_parcela',
             ['R$ ' ,'de_DE', 'Cheque', $request->texto_pesquisa]
         );
 
-        $blackList = DB::select('SELECT DISTINCT 
+        $blackList = DB::select('SELECT DISTINCT
                 pa.nome_cheque,
                 GROUP_CONCAT(pa.nome_cheque) as nome_cheque,
                 GROUP_CONCAT(v.cliente_id) as cliente_id
@@ -246,8 +246,8 @@ class ChequeController extends Controller
                 movimentacoes_cheques p
                     INNER JOIN
                 parcelas pa ON pa.id = p.parcela_id
-                    LEFT JOIN 
-                vendas v ON v.id = pa.venda_id 
+                    LEFT JOIN
+                vendas v ON v.id = pa.venda_id
             WHERE
                 p.status LIKE ?
                 AND p.parcela_id IN (SELECT parcela_id FROM movimentacoes_cheques WHERE status LIKE ? AND p.parcela_id = parcela_id)',
@@ -265,7 +265,7 @@ class ChequeController extends Controller
             ['forma_pagamento', 'Cheque'],
             ['status', 'Aguardando']
         ])->pluck('id');
-        
+
         Parcela::where([
             ['data_parcela','<=', DB::raw('CURDATE()')],
             ['parceiro_id', NULL],
@@ -274,22 +274,22 @@ class ChequeController extends Controller
         ])->update(['status' => 'Depositado']);
 
         $hoje = date('Y-m-d');
-        
+
         foreach($parcelas as $parcela) {
             $movCheque = MovimentacaoCheque::create([
                 'parcela_id' => $parcela,
                 'status' => 'Depositado'
-            ]); 
-        
+            ]);
+
         }
-        
+
         return redirect()->route('home');
     }
 
-    public function pdf_cheques ($representante_id) 
+    public function pdf_cheques ($representante_id)
     {
         $representante = Representante::findOrFail($representante_id);
-        
+
         $parcelas = Parcela::where([
             ['data_parcela','>=', DB::raw('CURDATE()')],
             ['representante_id', $representante_id],
@@ -299,70 +299,78 @@ class ChequeController extends Controller
         // ->orderBy('nome_cheque')
         ->orderBy('data_parcela')
         ->orderBy('valor_parcela')
-        
+
         ->orderBy('numero_cheque')
         ->get();
         // dd($parcelas);
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('cheque.pdf.pdf_cheques', compact('parcelas', 'representante') );
-        
+
         return $pdf->stream();
     }
 
     public function consulta_parcela_pagamento(Request $request)
     {
-        $cheques = DB::select(' SELECT 
-                                    par.id,
-                                    UPPER(par.nome_cheque) as nome_cheque,
-                                    par.data_parcela,
-                                    par.numero_cheque,
-                                    Concat(?,Format(valor_parcela, 2, ?) ) AS valor_parcela_tratado,
-                                    par.valor_parcela,
-                                    UPPER(par.status) AS status,
-                                    par.representante_id,
-                                    (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
-                                    (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = pa.pessoa_id) AS nome_parceiro,
-                                    par.numero_banco,
-                                    par.parceiro_id,
-                                    a.nova_data,
-                                    (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = c.pessoa_id) AS nome_cliente,
-                                    par.forma_pagamento
-                                FROM
-                                    parcelas par
-                                LEFT JOIN
-                                    representantes r ON r.id = par.representante_id
-                                LEFT JOIN
-                                    parceiros pa ON pa.id = par.parceiro_id
-                                LEFT JOIN
-                                    adiamentos a ON a.parcela_id = par.id
-                                LEFT JOIN
-                                    vendas v ON v.id = par.venda_id
-								LEFT JOIN
-									clientes c ON c.id = v.cliente_id
-                                LEFT JOIN
-                                    pessoas p ON p.id = c.pessoa_id
-                                WHERE 
-                                    NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id) 
-                                    AND par.deleted_at IS NULL
-                                    AND par.status NOT LIKE ?
-                                    AND (par.'.$request->tipo_select.' = ? OR p.nome LIKE ?)
-                                    ORDER BY par.data_parcela', 
-                                [
-                                    'R$ ',
-                                    'de_DE',
-                                    'Aguardando',
-                                    $request->texto_pesquisa,
-                                    $request->texto_pesquisa
-                                ]
-        );
+        // $cheques = DB::select(' SELECT
+        //                             par.id,
+        //                             UPPER(par.nome_cheque) as nome_cheque,
+        //                             par.data_parcela,
+        //                             par.numero_cheque,
+        //                             Concat(?,Format(valor_parcela, 2, ?) ) AS valor_parcela_tratado,
+        //                             par.valor_parcela,
+        //                             UPPER(par.status) AS status,
+        //                             par.representante_id,
+        //                             (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = r.pessoa_id) AS nome_representante,
+        //                             (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = pa.pessoa_id) AS nome_parceiro,
+        //                             par.numero_banco,
+        //                             par.parceiro_id,
+        //                             a.nova_data,
+        //                             (SELECT UPPER(p.nome) FROM pessoas p WHERE p.id = c.pessoa_id) AS nome_cliente,
+        //                             par.forma_pagamento
+        //                         FROM
+        //                             parcelas par
+        //                         LEFT JOIN
+        //                             representantes r ON r.id = par.representante_id
+        //                         LEFT JOIN
+        //                             parceiros pa ON pa.id = par.parceiro_id
+        //                         LEFT JOIN
+        //                             adiamentos a ON a.parcela_id = par.id
+        //                         LEFT JOIN
+        //                             vendas v ON v.id = par.venda_id
+		// 						LEFT JOIN
+		// 							clientes c ON c.id = v.cliente_id
+        //                         LEFT JOIN
+        //                             pessoas p ON p.id = c.pessoa_id
+        //                         WHERE
+        //                             NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id)
+        //                             AND par.deleted_at IS NULL
+        //                             AND par.status NOT LIKE ?
+        //                             AND (par.'.$request->tipo_select.' = ? OR p.nome LIKE ?)
+        //                             ORDER BY par.data_parcela',
+        //                         [
+        //                             'R$ ',
+        //                             'de_DE',
+        //                             'Aguardando',
+        //                             $request->texto_pesquisa,
+        //                             $request->texto_pesquisa
+        //                         ]
+        // );
 
-        return json_encode($cheques);
+        // return ($cheques);
+
+        return Parcela::with(['venda', 'representante', 'parceiro', 'adiamentos'])
+            ->whereIn('status', ['Devolvido', 'Resgatado', 'Aguardando pagamento', 'Aguardando envio'])
+            ->where($request->tipo_select, $request->texto_pesquisa)
+
+            ->orWhere('nome_cheque', 'like', '%'. $request->texto_pesquisa . '%')
+            ->get()
+            ->toJson();
     }
 
     public function titularDoUltimoCheque(Request $request)
     {
-        $titular = DB::select('SELECT DISTINCT 
+        $titular = DB::select('SELECT DISTINCT
                 p.nome_cheque, p.numero_banco
             FROM
                 vendas v
@@ -371,7 +379,7 @@ class ChequeController extends Controller
             WHERE
                 v.cliente_id = ?
                 AND p.forma_pagamento LIKE ?
-            ORDER BY p.id DESC', 
+            ORDER BY p.id DESC',
             [$request->cliente_id, 'Cheque']
         );
 

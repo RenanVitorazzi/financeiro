@@ -172,7 +172,6 @@ Adicionar recebimento
         </form>
         <div id="table_div"></div>
     `)
-    
 
     $("#form_procura_cheque").submit( (e) => {
             
@@ -192,60 +191,51 @@ Adicionar recebimento
             },
             success: (response) => {
                 let tableBody = ''
-                console.log(response)
-                response.forEach(element => {
-                    let dataTratada = transformaData(element.data_parcela)
-                    let ondeEstaCheque = carteiraOuParceiro(element.parceiro_id, element.nome_parceiro)
-                    let numero_banco = tratarNulo(element.numero_banco)
-                    let numero_cheque = tratarNulo(element.numero_cheque)
-                    let representante = tratarNulo(element.nome_representante)
-                    let cliente = tratarNulo(element.nome_cliente)
-                    if (element.status === 'ADIADO') {
+                if (response.length > 0) {
+                    
+                    response.forEach(element => {
+                        
+                        let nome = element.nome_cheque ?? element.venda.cliente.pessoa.nome 
+                        let representante = ''
+                        let parceiro = 'Carteira'
+
+                        if (element.representante_id) {
+                            representante = element.representante.pessoa.nome
+                        }
+
+                        if (element.parceiro_id) {
+                            parceiro = element.parceiro.pessoa.nome
+                        } 
+
                         tableBody += `
                             <tr>
-                                <td>${element.nome_cheque ?? element.nome_cliente}</td>
-                                <td><span class="text-muted">(${dataTratada})</span> ${transformaData(element.nova_data)}</td>
-                                <td>${element.valor_parcela_tratado}</td>
+                                <td>${nome}</td>
+                                <td>${transformaData(element.data_parcela)}</td>
+                                <td>${moeda.format(element.valor_parcela)}</td>
                                 <td>${representante}</td>
-                                <td>${ondeEstaCheque}</td>
-                                <td>${element.forma_pagamento} ${numero_cheque}<br>${element.status}</td>
+                                <td>${parceiro}</td>
+                                <td>${element.forma_pagamento} ${element.numero_cheque}</td>
                                 <td> 
                                     <div class="btn btn-dark btn-selecionar-cheque" 
                                         data-id="${element.id}" 
                                         data-dia="${element.data_parcela}" 
                                         data-valor="${element.valor_parcela}" 
-                                        data-nome="${element.nome_cheque}"
+                                        data-nome="${nome}"
                                         data-parceiro_id="${element.parceiro_id}"
                                         data-representante_id="${element.representante_id}"
-                                        data-cliente="${element.nome_cliente}"
                                     > Selecionar </div>   
                                 </td> 
                             </tr>
                         `
-                    } else {
-                        tableBody += `
-                            <tr>
-                                <td>${element.nome_cheque ?? element.nome_cliente}</td>
-                                <td>${dataTratada}</td>
-                                <td>${element.valor_parcela_tratado}</td>
-                                <td>${representante}</td>
-                                <td>${ondeEstaCheque}</td>
-                                <td>${element.forma_pagamento} ${numero_cheque}<br>${element.status}</td>
-                                <td> 
-                                    <div class="btn btn-dark btn-selecionar-cheque" 
-                                        data-id="${element.id}" 
-                                        data-dia="${element.data_parcela}" 
-                                        data-valor="${element.valor_parcela}" 
-                                        data-nome="${element.nome_cheque}"
-                                        data-parceiro_id="${element.parceiro_id}"
-                                        data-representante_id="${element.representante_id}"
-                                        data-cliente="${element.nome_cliente}"
-                                    > Selecionar </div>   
-                                </td> 
-                            </tr>
-                        `
-                    }
-                })
+                    })
+
+                } else {
+                    tableBody += `
+                        <tr>
+                            <td colspan=7>Nenhum resultado</td>
+                        </tr>
+                    `
+                }
 
                 $(".modal-body > #table_div").html(`
                     <x-table>
@@ -271,8 +261,7 @@ Adicionar recebimento
 
                 $(".btn-selecionar-cheque").each( (index, element) => {
                     $(element).click( (e) => {
-                        console.log(e.target)
-                        $("#nome_parcela").val($(e.target).data('nome') ?? $(e.target).data('cliente'))
+                        $("#nome_parcela").val($(e.target).data('nome'))
                         $("#valor_parcela").val($(e.target).data('valor'))
                         $("#valor").val($(e.target).data('valor'))
                         $("#data_parcela").val($(e.target).data('dia'))
@@ -282,14 +271,13 @@ Adicionar recebimento
 
                         $("#modal2").modal("hide")
 
-                        
-                        //procurar no banco infos de pagamento desse cheque
                         let pagamentos = procurarPagamentos($(e.target).data('id'))
                     }) 
                 
                 })
             
                 Swal.close()
+                
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 console.error(jqXHR)

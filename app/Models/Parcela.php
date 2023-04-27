@@ -14,19 +14,22 @@ class Parcela extends Model
 
     use HasFactory, SoftDeletes;
 
-    public function venda() 
+    public function venda()
     {
-        return $this->belongsTo(Venda::class);
-    } 
+        return $this->belongsTo(Venda::class)->with('cliente');
+    }
 
     public function representante()
     {
-        return $this->belongsTo(Representante::class);
+        return $this->belongsTo(Representante::class)
+            ->with('pessoa');
     }
 
     public function parceiro()
     {
-        return $this->belongsTo(Parceiro::class)->withDefault('Carteira');
+        return $this->belongsTo(Parceiro::class)
+            ->with('pessoa')
+            ->withDefault('Carteira');
     }
 
     public function adiamentos()

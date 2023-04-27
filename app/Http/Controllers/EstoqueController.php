@@ -25,8 +25,14 @@ class EstoqueController extends Controller
                 ccf.fornecedor_id,
                 ccf.observacao AS observacao_fornecedor, 
                 ccr.observacao AS observacao_representante,
-                sum(e.peso_agregado) OVER (ORDER BY e.data, e.id) AS saldo_peso,
-                sum(e.fator_agregado) OVER (ORDER BY e.data, e.id) AS saldo_fator,
+                (SELECT SUM(peso_agregado) 
+                    FROM estoque 
+                    WHERE deleted_at IS NULL 
+                    AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_peso,
+                (SELECT SUM(fator_agregado) 
+                    FROM estoque 
+                    WHERE deleted_at IS NULL 
+                    AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_fator,
                 r.atacado AS representante_atacado
             FROM estoque e
             LEFT JOIN conta_corrente ccf ON ccf.id = e.cc_fornecedor_id AND ccf.deleted_at IS NULL
@@ -229,8 +235,14 @@ class EstoqueController extends Controller
                 ccf.fornecedor_id,
                 ccf.observacao AS observacao_fornecedor, 
                 ccr.observacao AS observacao_representante,
-                sum(e.peso_agregado) OVER (ORDER BY e.data, e.id) AS saldo_peso,
-                sum(e.fator_agregado) OVER (ORDER BY e.data, e.id) AS saldo_fator,
+                (SELECT SUM(peso_agregado) 
+                    FROM estoque 
+                    WHERE deleted_at IS NULL 
+                    AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_peso,
+                (SELECT SUM(fator_agregado) 
+                    FROM estoque 
+                    WHERE deleted_at IS NULL 
+                    AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_fator,
                 r.atacado AS representante_atacado
             FROM estoque e
             LEFT JOIN conta_corrente ccf ON ccf.id = e.cc_fornecedor_id AND ccf.deleted_at IS NULL

@@ -183,6 +183,47 @@ class RepresentanteController extends Controller {
         
         return $pdf->stream();
     }
+
+    public function pdf_cheques_devolvidos_escritorio ($representante_id) 
+    {
+        $representante = Representante::findOrFail($representante_id);
+        
+        $cheques = DB::select('SELECT 
+            p.id,
+            p.numero_cheque,
+            p.numero_banco,
+            p.nome_cheque,
+            p.data_parcela,
+            p.valor_parcela,
+            SUM(pr.valor) AS valor_pago
+        FROM
+            parcelas p
+                INNER JOIN
+            movimentacoes_cheques mc ON p.id = mc.parcela_id
+                AND mc.status LIKE ?
+                LEFT JOIN
+            entrega_parcela e ON e.parcela_id = p.id
+                AND entregue_parceiro IS NOT NULL
+                AND entregue_representante IS NULL
+                LEFT JOIN
+            pagamentos_representantes pr ON pr.parcela_id = p.id
+                AND pr.deleted_at IS NULL
+                AND p.deleted_at IS NULL
+        WHERE
+            p.representante_id = ?
+                AND p.status NOT LIKE ?
+        GROUP BY p.id , mc.status , e.parcela_id
+        ORDER BY p.nome_cheque , data_parcela , valor_parcela',
+        ['Devolvido', $representante->id, 'Pago']);
+
+        $saldo_total = 0;
+
+        $pdf = App::make('dompdf.wrapper');
+        $hoje = date('Y-m-d');
+        $pdf->loadView('representante.pdf.pdf_cheques_devolvidos_escritorio', compact('cheques', 'representante', 'saldo_total', 'hoje') );
+        
+        return $pdf->stream();
+    }
 } 
 
 ?>

@@ -31,7 +31,7 @@ Recebimentos
                 <td>@data($pgto->data)</td>
                 <td>{{ $pgto->parcela->nome_cheque ??  $pgto->parcela->venda->cliente->pessoa->nome}}</td>
                 <td>@moeda($pgto->valor)</td>
-                <td>{{ $pgto->conta->nome }}</td>
+                <td>{{ $pgto->conta->nome ?? ''}}</td>
                 <td>{{ $pgto->confirmado ? 'Sim' : 'Não' }}</td>
                 <td>{{ $pgto->parcela->representante->pessoa->nome }}</td>
                 <td>{{ $pgto->parcela->forma_pagamento}} - {{ $pgto->parcela->status }} </td>

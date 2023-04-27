@@ -22,7 +22,7 @@ use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\RecebimentosController;
 use App\Http\Controllers\EntregaParcelaController;
 
-Route::get('/', function () {   
+Route::get('/', function () {
     return view('welcome');
 });
 
@@ -49,14 +49,16 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('baixarDebitosRepresentantes/{representante_id}', [RepresentanteController::class, 'baixarDebitosRepresentantes'])->name('baixarDebitosRepresentantes');
         Route::post('depositar_diario', [ChequeController::class, 'depositar_diario'])->name('depositar_diario');
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
+        Route::view('import', 'despesa.import')->name('import');
         Route::get('procurarConsignado', [ConsignadoController::class, 'procurarConsignado'])->name('procurarConsignado');
+        Route::post('despesa/import', [DespesaController::class, 'importDespesas'])->name('importDespesas');
 
         //? Cadastros auxiliares
         Route::resource('fornecedores', FornecedorController::class);
         Route::resource('representantes', RepresentanteController::class);
         Route::resource('parceiros', ParceiroController::class);
         Route::resource('consignado', ConsignadoController::class);
-        
+
         //? Financeiro
         Route::resource('conta_corrente', ContaCorrenteController::class);
         Route::resource('troca_cheques', TrocaChequeController::class);
@@ -76,6 +78,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_cc_parceiro/{parceiro_id}', [ParceiroController::class, 'pdf_cc_parceiro'])->name('pdf_cc_parceiro');
         Route::get('pdf_cc_representante/{representante_id}', [RepresentanteController::class, 'pdf_cc_representante'])->name('pdf_cc_representante');
+        Route::get('pdf_cheques_devolvidos_escritorio/{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
         Route::get('pdf_fornecedor/{id}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
@@ -95,7 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_consignados', [ConsignadoController::class, 'pdf_consignados'])->name('pdf_consignados');
         Route::get('pdf_consignados_geral', [ConsignadoController::class, 'pdf_consignados_geral'])->name('pdf_consignados_geral');
 
-        //? Anexos 
+        //? Anexos
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
             'index', 'create', 'store', 'destroy'
         ]);

@@ -10,6 +10,9 @@ use Despesa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\DespesaImport;
+use Illuminate\Support\Facades\Storage;
 
 class DespesaController extends Controller
 {
@@ -25,7 +28,7 @@ class DespesaController extends Controller
             ->whereNotNull('fixas_id')
             ->orderBy('local_id')
             ->pluck('fixas_id');
-            
+
         $fixasNaoPagas = DespesaFixa::with('local')
             ->orderBy('dia_vencimento')
             ->whereNotIn('id', $idFixasPagas)
@@ -53,7 +56,7 @@ class DespesaController extends Controller
             ->orderBy('local_id')
             ->get()
             ->toJson();
-        
+
         return view('despesa.create', compact('locais', 'fixas'));
     }
 
@@ -113,7 +116,7 @@ class DespesaController extends Controller
     {
         $despesa = ModelsDespesa::findOrFail($id);
         $despesa->update($request->validated());
-       
+
         $request
             ->session()
             ->flash(
@@ -134,9 +137,9 @@ class DespesaController extends Controller
     public function destroy(Request $request, $id)
     {
         ModelsDespesa::destroy($id);
-        
+
         $request
-            ->session() 
+            ->session()
             ->flash(
                 'message',
                 'Registro deletado com sucesso!'
@@ -145,17 +148,27 @@ class DespesaController extends Controller
         return redirect()->route('despesas.index');
     }
 
-    public function pdf_despesa_mensal ($mes) 
+    public function importDespesas (Request $request)
+    {
+        // dd($request->file('importacao'));
+        // $contents = Storage::disk('public');
+        // dd($contents);
+        Excel::import(new DespesaImport, $request->file('importacao'));
+
+        // return redirect('back')->with('success', 'All good!');
+    }
+
+    public function pdf_despesa_mensal ($mes)
     {
         $despesas = ModelsDespesa::with('local')
             ->where(DB::raw('MONTH(data_vencimento)'), DB::raw($mes))
             ->where(DB::raw('YEAR(data_vencimento)'), DB::raw('YEAR(CURDATE())'))
             ->orderBy('local_id')
             ->get();
-            
+
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('despesa.pdf.pdf_despesa_mensal', compact('despesas', 'mes') );
-        
+
         return $pdf->stream();
     }
 }

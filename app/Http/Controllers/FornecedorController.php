@@ -65,14 +65,18 @@ class FornecedorController extends Controller
                 balanco, 
                 peso, 
                 observacao, 
-                sum(peso_agregado) OVER (ORDER BY data, id) AS saldo 
+                (SELECT SUM(peso_agregado) 
+                    FROM conta_corrente 
+                    WHERE fornecedor_id = ? 
+                    AND deleted_at IS NULL 
+                    AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo
             FROM 
-                conta_corrente 
+                conta_corrente cc
             WHERE 
                 fornecedor_id = ? 
                 AND deleted_at IS NULL
             ORDER BY data, id", 
-            [$id]
+            [$id, $id]
         );
         
         return view('fornecedor.show',  compact('fornecedor', 'registrosContaCorrente'));    
@@ -136,10 +140,15 @@ class FornecedorController extends Controller
     {
         $fornecedor = Fornecedor::with('pessoa')->findOrFail($id);
 
-        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, sum(peso_agregado) OVER (ORDER BY data) AS saldo 
-        FROM conta_corrente 
+        $registrosContaCorrente = DB::select("SELECT id, data, balanco, peso, observacao, (SELECT SUM(peso_agregado) 
+            FROM conta_corrente 
+            WHERE fornecedor_id = ? 
+            AND deleted_at IS NULL 
+            AND (data < cc.data OR (data = cc.data AND id <= cc.id))) as saldo 
+        FROM conta_corrente cc
         WHERE fornecedor_id = ? 
-        AND deleted_at IS NULL", [$id]);
+        AND deleted_at IS NULL
+        ORDER BY data, id", [$id, $id]);
         
         // dd($contas);
         $pdf = App::make('dompdf.wrapper');
