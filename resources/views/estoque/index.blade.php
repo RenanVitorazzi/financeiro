@@ -15,7 +15,7 @@ Estoque
 <h5 class="alert alert-warning">
     Você tem {{ count($lancamentos_pendentes) }} lançamentos pendentes
     <div class="btn btn-warning btn-lancar">Lançar</div>
-</h5>    
+</h5>
 
 <x-table id="tabelaBalanco">
     <x-table-header>
@@ -40,11 +40,11 @@ Estoque
                 <td>@peso($lancamento->peso) <br> @fator($lancamento->fator)</td>
                 <td>
                     @if ($lancamento->representante_id)
-                        {{ $lancamento->balanco_representante }} 
+                        {{ $lancamento->balanco_representante }}
                         {{ $lancamento->nome_representante }}
                         {{ $lancamento->observacao_representante }}
                     @elseif ($lancamento->fornecedor_id)
-                        {{ $lancamento->balanco_fornecedor }} 
+                        {{ $lancamento->balanco_fornecedor }}
                         {{ $lancamento->nome_fornecedor }}
                         {{ $lancamento->observacao_fornecedor }}
                     @endif
@@ -58,7 +58,7 @@ Estoque
             </tr>
         @empty
         <tr>
-            <td colspan=3>Nenhum registro</td>
+            <td colspan=6>Nenhum registro</td>
         </tr>
         @endforelse
     </tbody>
@@ -68,7 +68,7 @@ Estoque
 @section('script')
 <script>
     const LANCAMENTOS_PENDENTES = @json($lancamentos_pendentes);
-    
+
     let tbody = ``;
 
     $(LANCAMENTOS_PENDENTES).each( (index, element) => {
@@ -85,7 +85,7 @@ Estoque
                 <td>${element.peso}</td>
                 <td>
                     <a class="btn btn-dark" href="${route}">
-                        <i class="fas fa-edit"></i> 
+                        <i class="fas fa-edit"></i>
                     </a>
                 </td>
         `;
@@ -94,7 +94,7 @@ Estoque
     $(".modal-body").html(`
         <x-table>
             <x-table-header>
-                <tr>  
+                <tr>
                     <th>Data</th>
                     <th>Nome</th>
                     <th>Lançamento (g)</th>

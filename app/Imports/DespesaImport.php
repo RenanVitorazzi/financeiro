@@ -11,6 +11,11 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class DespesaImport implements ToCollection
 {
+    public array $arrayDados = [];
+    public $dataInicio;
+    public $dataFim;
+    public $conta;
+
     public function collection(Collection $rows)
     {
         $agencia_banco = $rows[3][1];
@@ -22,20 +27,16 @@ class DespesaImport implements ToCollection
 
         $periodo = $rows[7][1];
         $regexDatas = "/[0-9]{1,2}\\/[0-9]{1,2}\\/[0-9]{4}/";
-        $regexChequeDevolvido = "";
         preg_match_all($regexDatas, $periodo, $datas);
-
         $data1 = DateTime::createFromFormat('d/m/Y', $datas[0][0])->format('Y-m-d');
         $data2 = DateTime::createFromFormat('d/m/Y', $datas[0][1])->format('Y-m-d');
 
-        // $despesas = Despesa::whereBetween('data_vencimento', [$data1, $data2]);
-        // dd($despesas);
-        // $pagamentos = PagamentosRepresentantes::whereBetween('data', [$data1, $data2]);
-
-        $arrayLancamentosPendentes = [];
+        $this->dataInicio = $data1;
+        $this->dataFim = $data2;
+        $this->conta = $conta;
 
         foreach ($rows as $index => $row) {
-            if ($index < 23 || $row[3] == NULL) continue;
+            if ($index < 10 || $row[3] == NULL) continue;
 
             $valor = number_format(abs($row[3]), 2, ".", "");
 
@@ -43,7 +44,11 @@ class DespesaImport implements ToCollection
 
             if ($row[3] < 0) {
                 // retira os cheques devolvidos na conta
-                if (str_contains($row[1], 'DEV CH') === true) continue;
+                if ( (
+                    str_contains($row[1], 'DEV CH') ||
+                    str_contains($row[1], 'TAR ADAPT') ||
+                    str_contains($row[1], 'TAR PLANO')
+                ) === true) continue;
 
                 $despesaFiltrada = Despesa::whereBetween('data_vencimento', [$data1, $data2])
                     ->where([
@@ -54,8 +59,15 @@ class DespesaImport implements ToCollection
 
                 if ($despesaFiltrada->isNotEmpty()) continue;
 
-                array_push($arrayLancamentosPendentes, $row);
+                array_push($this->arrayDados, $row);
             } else {
+                //confere se foi depósito, reapresentação ou rendimento
+                if ( (
+                    str_contains($row[1], 'DEP CHQ') ||
+                    str_contains($row[1], 'REAPR AUT') ||
+                    str_contains($row[1], 'REND PAGO')
+                ) === true) continue;
+
                 $pagamentosFiltrados = PagamentosRepresentantes::whereBetween('data', [$data1, $data2])
                     ->where([
                         ['valor', '=', $valor],
@@ -65,10 +77,10 @@ class DespesaImport implements ToCollection
 
                 if ($pagamentosFiltrados->isNotEmpty()) continue;
 
-                array_push($arrayLancamentosPendentes, $row);
+                array_push($this->arrayDados, $row);
             }
 
         }
-        dd($arrayLancamentosPendentes);
+
     }
 }

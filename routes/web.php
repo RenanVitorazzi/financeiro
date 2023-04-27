@@ -49,9 +49,8 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('baixarDebitosRepresentantes/{representante_id}', [RepresentanteController::class, 'baixarDebitosRepresentantes'])->name('baixarDebitosRepresentantes');
         Route::post('depositar_diario', [ChequeController::class, 'depositar_diario'])->name('depositar_diario');
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
-        Route::view('import', 'despesa.import')->name('import');
         Route::get('procurarConsignado', [ConsignadoController::class, 'procurarConsignado'])->name('procurarConsignado');
-        Route::post('despesa/import', [DespesaController::class, 'importDespesas'])->name('importDespesas');
+
 
         //? Cadastros auxiliares
         Route::resource('fornecedores', FornecedorController::class);
@@ -73,6 +72,13 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('entrega_parcela', EntregaParcelaController::class);
         Route::get('entrega_parcela/receber_parceiro/{parceiro_id}', [EntregaParcelaController::class, 'receber_parceiro'])->name('receber_parceiro');
         Route::get('entrega_parcela/entrega_representante/{representante_id}', [EntregaParcelaController::class, 'entrega_representante'])->name('entrega_representante');
+
+        //Importacao
+        Route::view('import', 'despesa.import')->name('import');
+        Route::post('despesa/import', [DespesaController::class, 'importDespesas'])->name('importDespesas');
+        Route::view('despesa/importacao', 'despesa.importacao')->name('importacao');
+        Route::get('despesas/criarDespesaImportacao/{data}/{descricao}/{valor}/{conta}', [DespesaController::class, 'criarDespesaImportacao'])->name('criarDespesaImportacao');
+        Route::get('recebimentos/criarRecebimentoImportacao/{data}/{descricao}/{valor}/{conta}', [RecebimentosController::class, 'criarRecebimentoImportacao'])->name('criarRecebimentoImportacao');
 
         //? PDF
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');

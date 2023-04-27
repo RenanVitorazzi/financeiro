@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Adicionar recebimento
 <?php $__env->stopSection(); ?>
@@ -21,9 +20,9 @@ Adicionar recebimento
     <div class="card mb-2">
         <div class="card-body">
             <h5 class="card-title">Cadastrar</h5>
-            
+
             <div class="btn btn-dark informar_parcela">Relacionar o pagamento à um cheque ou parcela</div>
-            
+
             <div>
                 <hr>
                 <div class="row">
@@ -132,11 +131,11 @@ Adicionar recebimento
             <div class="row">
                 <div class="col-4">
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['type' => 'date','name' => 'data','value' => ''.e(old('data') ?? date('Y-m-d')).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['type' => 'date','name' => 'data','value' => ''.e(old('data', $data) ?? date('Y-m-d')).'']]); ?>
 <?php $component->withName('form-group'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['type' => 'date','name' => 'data','value' => ''.e(old('data') ?? date('Y-m-d')).'']); ?>Data <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['type' => 'date','name' => 'data','value' => ''.e(old('data', $data) ?? date('Y-m-d')).'']); ?>Data <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
 <?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
@@ -145,18 +144,18 @@ Adicionar recebimento
                 </div>
                 <div class="col-4">
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['name' => 'valor','value' => ''.e(old('valor')).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['name' => 'valor','value' => ''.e(old('valor', $valor)).'']]); ?>
 <?php $component->withName('form-group'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['name' => 'valor','value' => ''.e(old('valor')).'']); ?>Valor <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['name' => 'valor','value' => ''.e(old('valor', $valor)).'']); ?>Valor <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
 <?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
                 </div>
-                
+
                 <div class="col-4 form-group">
                     <label for="conta_id">Conta</label>
                     <?php if (isset($component)) { $__componentOriginal9664ac210be45add4be058f3177c16028511e71a = $component; } ?>
@@ -167,7 +166,7 @@ Adicionar recebimento
 <?php $component->withAttributes(['name' => 'conta_id']); ?>
                         <option></option>
                         <?php $__currentLoopData = $contas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $conta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value=<?php echo e($conta->id); ?> <?php echo e(old('conta_id') == $conta->id ? 'selected' : ''); ?>><?php echo e($conta->nome); ?></option>
+                            <option value=<?php echo e($conta->id); ?> <?php echo e(old('conta_id', $contaImportacao) == $conta->id ? 'selected' : ''); ?>><?php echo e($conta->nome); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             <option value="999">Conta de Parceiro</option>
                      <?php echo $__env->renderComponent(); ?>
@@ -288,7 +287,7 @@ Adicionar recebimento
                     <input type="file" id="anexo" name="anexo[]" class="form-control-file">
                 </div>
                  -->
-            </div> 
+            </div>
         </div>
     </div>
 
@@ -296,7 +295,7 @@ Adicionar recebimento
 </form>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
-<script>    
+<script>
     $("#modal-body2").html(`
         <form id="form_procura_cheque" method="POST" action="<?php echo e(route('consulta_parcela_pagamento')); ?>">
             <?php echo csrf_field(); ?>
@@ -322,7 +321,7 @@ Adicionar recebimento
 <?php unset($__componentOriginal9664ac210be45add4be058f3177c16028511e71a); ?>
 <?php endif; ?>
                 </div>
-            
+
                 <div class="col-7 form-group">
                     <?php if (isset($component)) { $__componentOriginal11c02d5af8eef3b9ca8b54c54983d5cb581e68d7 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Input::class, []); ?>
@@ -340,16 +339,16 @@ Adicionar recebimento
                     <input type="submit" class='btn btn-dark'>
                 </div>
             </div>
-                
+
         </form>
         <div id="table_div"></div>
     `)
 
     $("#form_procura_cheque").submit( (e) => {
-            
+
         e.preventDefault()
-        let dataForm = $(e.target).serialize() 
-        
+        let dataForm = $(e.target).serialize()
+
         $.ajax({
             type: 'GET',
             url: e.target.action,
@@ -364,10 +363,10 @@ Adicionar recebimento
             success: (response) => {
                 let tableBody = ''
                 if (response.length > 0) {
-                    
+
                     response.forEach(element => {
-                        
-                        let nome = element.nome_cheque ?? element.venda.cliente.pessoa.nome 
+
+                        let nome = element.nome_cheque ?? element.venda.cliente.pessoa.nome
                         let representante = ''
                         let parceiro = 'Carteira'
 
@@ -377,7 +376,7 @@ Adicionar recebimento
 
                         if (element.parceiro_id) {
                             parceiro = element.parceiro.pessoa.nome
-                        } 
+                        }
 
                         tableBody += `
                             <tr>
@@ -387,16 +386,16 @@ Adicionar recebimento
                                 <td>${representante}</td>
                                 <td>${parceiro}</td>
                                 <td>${element.forma_pagamento} ${element.numero_cheque}</td>
-                                <td> 
-                                    <div class="btn btn-dark btn-selecionar-cheque" 
-                                        data-id="${element.id}" 
-                                        data-dia="${element.data_parcela}" 
-                                        data-valor="${element.valor_parcela}" 
+                                <td>
+                                    <div class="btn btn-dark btn-selecionar-cheque"
+                                        data-id="${element.id}"
+                                        data-dia="${element.data_parcela}"
+                                        data-valor="${element.valor_parcela}"
                                         data-nome="${nome}"
                                         data-parceiro_id="${element.parceiro_id}"
                                         data-representante_id="${element.representante_id}"
-                                    > Selecionar </div>   
-                                </td> 
+                                    > Selecionar </div>
+                                </td>
                             </tr>
                         `
                     })
@@ -423,7 +422,7 @@ Adicionar recebimento
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes([]); ?>
                             <tr>
-                                <th colspan=10>Número total de resultado: ${response.length}</th>  
+                                <th colspan=10>Número total de resultado: ${response.length}</th>
                             </tr>
                             <tr>
                                 <th>Titular</th>
@@ -432,7 +431,7 @@ Adicionar recebimento
                                 <th>Representante</th>
                                 <th>Parceiro</th>
                                 <th>Pgto</th>
-                                <th><i class="fas fa-check"></i></th>  
+                                <th><i class="fas fa-check"></i></th>
                             </tr>
                          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -464,12 +463,12 @@ Adicionar recebimento
                         $("#modal2").modal("hide")
 
                         let pagamentos = procurarPagamentos($(e.target).data('id'))
-                    }) 
-                
+                    })
+
                 })
-            
+
                 Swal.close()
-                
+
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 console.error(jqXHR)
@@ -477,13 +476,13 @@ Adicionar recebimento
                 console.error(errorThrown)
             }
         });
-            
+
     })
 
     $('.informar_parcela').click( () => {
         $("#modal2").modal('show')
         $("#modal-header2").text(`Procurar Cheque`)
-        
+
     })
 
     function procurarPagamentos(parcela_id) {
@@ -504,7 +503,7 @@ Adicionar recebimento
                 Swal.showLoading()
             },
             success: (response) => {
-                
+
                 response.forEach(element => {
                     let valorTratado = parseFloat(element.valor)
 
@@ -607,4 +606,5 @@ Adicionar recebimento
     })
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/recebimento/create.blade.php ENDPATH**/ ?>

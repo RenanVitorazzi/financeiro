@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Estoque
 <?php $__env->stopSection(); ?>
@@ -35,7 +34,7 @@ Estoque
 <h5 class="alert alert-warning">
     Você tem <?php echo e(count($lancamentos_pendentes)); ?> lançamentos pendentes
     <div class="btn btn-warning btn-lancar">Lançar</div>
-</h5>    
+</h5>
 
 <?php if (isset($component)) { $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Table::class, []); ?>
@@ -75,13 +74,15 @@ Estoque
                 <td><?php echo number_format($lancamento->peso, 2, ',', '.'); ?> <br> <?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
                 <td>
                     <?php if($lancamento->representante_id): ?>
-                        <?php echo e($lancamento->balanco_representante); ?> 
+                        <?php echo e($lancamento->balanco_representante); ?>
+
                         <?php echo e($lancamento->nome_representante); ?>
 
                         <?php echo e($lancamento->observacao_representante); ?>
 
                     <?php elseif($lancamento->fornecedor_id): ?>
-                        <?php echo e($lancamento->balanco_fornecedor); ?> 
+                        <?php echo e($lancamento->balanco_fornecedor); ?>
+
                         <?php echo e($lancamento->nome_fornecedor); ?>
 
                         <?php echo e($lancamento->observacao_fornecedor); ?>
@@ -107,7 +108,7 @@ Estoque
             </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <tr>
-            <td colspan=3>Nenhum registro</td>
+            <td colspan=6>Nenhum registro</td>
         </tr>
         <?php endif; ?>
     </tbody>
@@ -122,7 +123,7 @@ Estoque
 <?php $__env->startSection('script'); ?>
 <script>
     const LANCAMENTOS_PENDENTES = <?php echo json_encode($lancamentos_pendentes, 15, 512) ?>;
-    
+
     let tbody = ``;
 
     $(LANCAMENTOS_PENDENTES).each( (index, element) => {
@@ -139,7 +140,7 @@ Estoque
                 <td>${element.peso}</td>
                 <td>
                     <a class="btn btn-dark" href="${route}">
-                        <i class="fas fa-edit"></i> 
+                        <i class="fas fa-edit"></i>
                     </a>
                 </td>
         `;
@@ -158,7 +159,7 @@ Estoque
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes([]); ?>
-                <tr>  
+                <tr>
                     <th>Data</th>
                     <th>Nome</th>
                     <th>Lançamento (g)</th>
@@ -194,4 +195,5 @@ Estoque
     })
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/estoque/index.blade.php ENDPATH**/ ?>

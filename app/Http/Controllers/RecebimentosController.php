@@ -30,11 +30,11 @@ class RecebimentosController extends Controller
             ->take(15)
             ->get();
         // dd($pgtoRepresentante);
-        
+
         // $pgtoParceiro = PagamentosParceiros::with('parcela')
         //     ->where('confirmado', 0)
         //     ->get();
-        
+
         return view('recebimento.index', compact('pgtoRepresentante'));
     }
 
@@ -48,8 +48,12 @@ class RecebimentosController extends Controller
         $contas = Conta::all();
         $parceiros = Parceiro::all();
         $representantes = Representante::all();
+        $data = NULL;
+        $descricao = NULL;
+        $valor = NULL;
+        $contaImportacao = NULL;
 
-        return view('recebimento.create', compact('contas', 'parceiros', 'representantes'));
+        return view('recebimento.create', compact('contas', 'parceiros', 'representantes', 'data', 'descricao', 'valor', 'contaImportacao'));
     }
 
     /**
@@ -63,17 +67,17 @@ class RecebimentosController extends Controller
         if ($request->parcela_id) {
             $parcela = Parcela::find($request->parcela_id);
         }
-       
+
         if ($request->tipo_pagamento == 1) {
             $pagamentoParceiro = PagamentosParceiros::create($request->validated());
             if ($parcela) {
                 Parcela::where('id', $parcela->id)->update(['status' => 'Pago']);
             }
         } else if ($request->tipo_pagamento == 2) {
-            
+
             $pagamentoRepresentante = PagamentosRepresentantes::create(
                 array_merge(
-                    $request->validated(), 
+                    $request->validated(),
                     ['representante_id' => $request->representante_id]
                 )
             );
@@ -81,7 +85,7 @@ class RecebimentosController extends Controller
             if ($request->parcela_id) {
                 $valorTotalPago = PagamentosRepresentantes::where('parcela_id', $parcela->id)
                     ->sum('valor');
-            
+
                 if ($valorTotalPago >= $parcela->valor_parcela) {
 
                     Parcela::where('id', $parcela->id)->update(['status' => 'Pago']);
@@ -89,20 +93,20 @@ class RecebimentosController extends Controller
                         'parcela_id' => $parcela->id,
                         'status' => 'Pago representante',
                     ]);
-                    
+
                 }
             }
-            
+
         } else if ($request->tipo_pagamento == 3 && $request->tipo_pagamento == 4) {
-            
+
             $pagamentoRepresentante = PagamentosRepresentantes::create($request->validated());
-            
+
             $pagamentoParceiro = PagamentosParceiros::create($request->validated());
-            
+
             if ($parcela->id) {
                 $valorTotalPagoRepresentante = PagamentosRepresentantes::where('parcela_id', $parcela->id)
                     ->sum('valor');
-            
+
 
                 $valorTotalPagoParceiro = PagamentosParceiros::where('parcela_id', $parcela->id)
                     ->sum('valor');
@@ -119,10 +123,10 @@ class RecebimentosController extends Controller
                         'parcela_id' => $parcela->id,
                         'status' => 'Pago parceiro',
                     ]);
-                    
+
                 }
             }
-            
+
         }
 
         $request
@@ -198,7 +202,7 @@ class RecebimentosController extends Controller
     public function destroy(Request $request, $id)
     {
         PagamentosRepresentantes::destroy($id);
-        
+
         $request
         ->session()
         ->flash(
@@ -207,5 +211,14 @@ class RecebimentosController extends Controller
         );
 
         return redirect()->route('recebimentos.index');
+    }
+
+    public function criarRecebimentoImportacao($data, $descricao, $valor, $contaImportacao)
+    {
+        $contas = Conta::all();
+        $parceiros = Parceiro::all();
+        $representantes = Representante::all();
+
+        return view('recebimento.create', compact('contas', 'parceiros', 'representantes', 'data', 'descricao', 'valor', 'contaImportacao'));
     }
 }

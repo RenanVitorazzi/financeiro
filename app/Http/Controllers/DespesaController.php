@@ -49,7 +49,7 @@ class DespesaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $locais = Local::all();
         $fixas = DespesaFixa::with('local')
@@ -57,7 +57,12 @@ class DespesaController extends Controller
             ->get()
             ->toJson();
 
-        return view('despesa.create', compact('locais', 'fixas'));
+        $data = NULL;
+        $descricao = NULL;
+        $valor = NULL;
+        $conta = NULL;
+
+        return view('despesa.create', compact('locais', 'fixas', 'data', 'descricao', 'valor', 'conta' ));
     }
 
     /**
@@ -150,14 +155,23 @@ class DespesaController extends Controller
 
     public function importDespesas (Request $request)
     {
-        // dd($request->file('importacao'));
-        // $contents = Storage::disk('public');
-        // dd($contents);
-        Excel::import(new DespesaImport, $request->file('importacao'));
+        $import = new DespesaImport;
+        Excel::import($import, $request->file('importacao'));
+        // dd($import);
 
-        // return redirect('back')->with('success', 'All good!');
+        return view('despesa.importacao', compact('import'));
     }
 
+    public function criarDespesaImportacao($data, $descricao, $valor, $conta)
+    {
+        $locais = Local::all();
+        $fixas = DespesaFixa::with('local')
+            ->orderBy('local_id')
+            ->get()
+            ->toJson();
+
+        return view('despesa.create', compact('locais', 'fixas', 'data', 'descricao', 'valor', 'conta'));
+    }
     public function pdf_despesa_mensal ($mes)
     {
         $despesas = ModelsDespesa::with('local')

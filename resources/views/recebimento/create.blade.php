@@ -21,9 +21,9 @@ Adicionar recebimento
     <div class="card mb-2">
         <div class="card-body">
             <h5 class="card-title">Cadastrar</h5>
-            
+
             <div class="btn btn-dark informar_parcela">Relacionar o pagamento à um cheque ou parcela</div>
-            
+
             <div>
                 <hr>
                 <div class="row">
@@ -69,18 +69,18 @@ Adicionar recebimento
             <p></p>
             <div class="row">
                 <div class="col-4">
-                    <x-form-group type="date" name="data" value="{{ old('data') ?? date('Y-m-d') }}">Data</x-form-group>
+                    <x-form-group type="date" name="data" value="{{ old('data', $data) ?? date('Y-m-d') }}">Data</x-form-group>
                 </div>
                 <div class="col-4">
-                    <x-form-group name="valor" value="{{ old('valor') }}">Valor</x-form-group>
+                    <x-form-group name="valor" value="{{ old('valor', $valor) }}">Valor</x-form-group>
                 </div>
-                
+
                 <div class="col-4 form-group">
                     <label for="conta_id">Conta</label>
                     <x-select name="conta_id">
                         <option></option>
                         @foreach($contas as $conta)
-                            <option value={{ $conta->id }} {{ old('conta_id') == $conta->id ? 'selected' : '' }}>{{ $conta->nome }}</option>
+                            <option value={{ $conta->id }} {{ old('conta_id', $contaImportacao) == $conta->id ? 'selected' : '' }}>{{ $conta->nome }}</option>
                         @endforeach
                             <option value="999">Conta de Parceiro</option>
                     </x-select>
@@ -136,7 +136,7 @@ Adicionar recebimento
                     <input type="file" id="anexo" name="anexo[]" class="form-control-file">
                 </div>
                  -->
-            </div> 
+            </div>
         </div>
     </div>
 
@@ -144,7 +144,7 @@ Adicionar recebimento
 </form>
 @endsection
 @section('script')
-<script>    
+<script>
     $("#modal-body2").html(`
         <form id="form_procura_cheque" method="POST" action="{{ route('consulta_parcela_pagamento') }}">
             @csrf
@@ -160,7 +160,7 @@ Adicionar recebimento
                         <option value="status">Status</option>
                     </x-select>
                 </div>
-            
+
                 <div class="col-7 form-group">
                     <x-input name="texto_pesquisa"></x-input>
                 </div>
@@ -168,16 +168,16 @@ Adicionar recebimento
                     <input type="submit" class='btn btn-dark'>
                 </div>
             </div>
-                
+
         </form>
         <div id="table_div"></div>
     `)
 
     $("#form_procura_cheque").submit( (e) => {
-            
+
         e.preventDefault()
-        let dataForm = $(e.target).serialize() 
-        
+        let dataForm = $(e.target).serialize()
+
         $.ajax({
             type: 'GET',
             url: e.target.action,
@@ -192,10 +192,10 @@ Adicionar recebimento
             success: (response) => {
                 let tableBody = ''
                 if (response.length > 0) {
-                    
+
                     response.forEach(element => {
-                        
-                        let nome = element.nome_cheque ?? element.venda.cliente.pessoa.nome 
+
+                        let nome = element.nome_cheque ?? element.venda.cliente.pessoa.nome
                         let representante = ''
                         let parceiro = 'Carteira'
 
@@ -205,7 +205,7 @@ Adicionar recebimento
 
                         if (element.parceiro_id) {
                             parceiro = element.parceiro.pessoa.nome
-                        } 
+                        }
 
                         tableBody += `
                             <tr>
@@ -215,16 +215,16 @@ Adicionar recebimento
                                 <td>${representante}</td>
                                 <td>${parceiro}</td>
                                 <td>${element.forma_pagamento} ${element.numero_cheque}</td>
-                                <td> 
-                                    <div class="btn btn-dark btn-selecionar-cheque" 
-                                        data-id="${element.id}" 
-                                        data-dia="${element.data_parcela}" 
-                                        data-valor="${element.valor_parcela}" 
+                                <td>
+                                    <div class="btn btn-dark btn-selecionar-cheque"
+                                        data-id="${element.id}"
+                                        data-dia="${element.data_parcela}"
+                                        data-valor="${element.valor_parcela}"
                                         data-nome="${nome}"
                                         data-parceiro_id="${element.parceiro_id}"
                                         data-representante_id="${element.representante_id}"
-                                    > Selecionar </div>   
-                                </td> 
+                                    > Selecionar </div>
+                                </td>
                             </tr>
                         `
                     })
@@ -241,7 +241,7 @@ Adicionar recebimento
                     <x-table>
                         <x-table-header>
                             <tr>
-                                <th colspan=10>Número total de resultado: ${response.length}</th>  
+                                <th colspan=10>Número total de resultado: ${response.length}</th>
                             </tr>
                             <tr>
                                 <th>Titular</th>
@@ -250,7 +250,7 @@ Adicionar recebimento
                                 <th>Representante</th>
                                 <th>Parceiro</th>
                                 <th>Pgto</th>
-                                <th><i class="fas fa-check"></i></th>  
+                                <th><i class="fas fa-check"></i></th>
                             </tr>
                         </x-table-header>
                         <tbody>
@@ -272,12 +272,12 @@ Adicionar recebimento
                         $("#modal2").modal("hide")
 
                         let pagamentos = procurarPagamentos($(e.target).data('id'))
-                    }) 
-                
+                    })
+
                 })
-            
+
                 Swal.close()
-                
+
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 console.error(jqXHR)
@@ -285,13 +285,13 @@ Adicionar recebimento
                 console.error(errorThrown)
             }
         });
-            
+
     })
 
     $('.informar_parcela').click( () => {
         $("#modal2").modal('show')
         $("#modal-header2").text(`Procurar Cheque`)
-        
+
     })
 
     function procurarPagamentos(parcela_id) {
@@ -312,7 +312,7 @@ Adicionar recebimento
                 Swal.showLoading()
             },
             success: (response) => {
-                
+
                 response.forEach(element => {
                     let valorTratado = parseFloat(element.valor)
 
