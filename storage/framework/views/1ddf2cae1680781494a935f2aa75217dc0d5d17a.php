@@ -454,11 +454,15 @@ Adicionar recebimento
                     $(element).click( (e) => {
                         $("#nome_parcela").val($(e.target).data('nome'))
                         $("#valor_parcela").val($(e.target).data('valor'))
-                        $("#valor").val($(e.target).data('valor'))
+
                         $("#data_parcela").val($(e.target).data('dia'))
                         $("#parcela_id").val($(e.target).data('id'))
                         $("#representante_id").val($(e.target).data('representante_id'))
                         $("#parceiro_id").val($(e.target).data('parceiro_id'))
+
+                        if (!$("#valor").val()) {
+                            $("#valor").val($(e.target).data('valor'))
+                        }
 
                         $("#modal2").modal("hide")
 

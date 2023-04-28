@@ -59,7 +59,7 @@ Lançamentos não efetuados
                         <a class="btn btn-dark mr-2" target="_blank"
                             href="<?php echo e(route('criarRecebimentoImportacao', [
                                 'data' => DateTime::createFromFormat('d/m/Y', $item[0])->format('Y-m-d'),
-                                'descricao' => $item[1],
+                                'descricao' => str_replace('/', '-', $item[1]),
                                 'valor' => $item[3],
                                 'conta' => $import->conta->id
                             ])); ?>"
@@ -70,7 +70,7 @@ Lançamentos não efetuados
                         <a class="btn btn-dark mr-2" target="_blank"
                             href="<?php echo e(route('criarDespesaImportacao', [
                                 'data' => DateTime::createFromFormat('d/m/Y', $item[0])->format('Y-m-d'),
-                                'descricao' => $item[1],
+                                'descricao' => str_replace('/', '-', $item[1]),
                                 'valor' => $item[3],
                                 'conta' => $import->conta->id
                             ])); ?>"

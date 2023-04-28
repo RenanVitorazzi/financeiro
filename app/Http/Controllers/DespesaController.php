@@ -157,7 +157,6 @@ class DespesaController extends Controller
     {
         $import = new DespesaImport;
         Excel::import($import, $request->file('importacao'));
-        // dd($import);
 
         return view('despesa.importacao', compact('import'));
     }
@@ -172,6 +171,7 @@ class DespesaController extends Controller
 
         return view('despesa.create', compact('locais', 'fixas', 'data', 'descricao', 'valor', 'conta'));
     }
+
     public function pdf_despesa_mensal ($mes)
     {
         $despesas = ModelsDespesa::with('local')
