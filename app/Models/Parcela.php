@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use MovimentacoesCheques;
 
 class Parcela extends Model
 {
@@ -52,6 +53,11 @@ class Parcela extends Model
     public function scopeAcharRepresentante($query, $id)
     {
         return $query->where('representante_id', $id);
+    }
+
+    public function movimentacoes()
+    {
+        return $this->hasMany(MovimentacaoCheque::class);
     }
 
     protected static function booted()
