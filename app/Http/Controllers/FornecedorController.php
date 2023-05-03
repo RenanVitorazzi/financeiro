@@ -434,7 +434,6 @@ class FornecedorController extends Controller
     public function pdf_relatorio_mensal($mes, $ano)
     {
         $locais = Local::all();
-
         $despesa_mensal = Despesa::whereMonth('data_vencimento', $mes)
             ->whereYear('data_vencimento', $ano)
             ->orderBy('local_id')

@@ -18,7 +18,7 @@ Procurar cheque
                 <option value="status">Status</option>
             </x-select>
         </div>
-       
+
         <div class="col-lg-7 col-sm-6 form-group">
             <x-input name="texto_pesquisa"></x-input>
         </div>
@@ -26,7 +26,7 @@ Procurar cheque
             <input type="submit" class='btn btn-dark'>
         </div>
     </div>
-        
+
 </form>
 <div id="table_div"></div>
 @endsection
@@ -43,11 +43,11 @@ Procurar cheque
         let novaData = addDays(data.dia, 15)
         let jurosTotais = calcularNovosJuros(element, 15)
         MODAL.modal("show")
-        
+
         $("#modal-title").html("Prorrogação")
-        
+
         MODAL_BODY.html(`
-            <form id="formAdiamento" action="{{ route('adiamentos.store') }}"> 
+            <form id="formAdiamento" action="{{ route('adiamentos.store') }}">
                 <meta name="csrf-token-2" content="{{ csrf_token() }}">
                 <p>Titular: <b>${data.nome}</b></p>
                 <p>Valor do cheque: <b>${data.valor}</b></p>
@@ -56,7 +56,7 @@ Procurar cheque
 
                 <x-input hidden type="date" value="${data.dia}" name="parcela_data"></x-input>
                 <x-input hidden type="text" value="${data.id}" name="parcela_id"></x-input>
-                
+
                 <div class="form-group">
                     <label for="nova_data">Informe a nova data</label>
                     <x-input type="date" value="${novaData}" name="nova_data"></x-input>
@@ -69,7 +69,7 @@ Procurar cheque
                     <label for="juros_totais">Valor total de juros</label>
                     <x-input readonly type="number" value="${jurosTotais}" name="juros_totais"></x-input>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="observacao">Observação</label>
                     <x-textarea name="observacao"></x-textarea>
@@ -88,7 +88,7 @@ Procurar cheque
             $("#juros_totais").val(jurosNovos)
         })
 
-        
+
     }
 
     $(".modal-footer > .btn-primary").click( () => {
@@ -106,13 +106,13 @@ Procurar cheque
                 swal.showLoading()
             },
             success: (response) => {
-                
+
                 Swal.fire({
                     title: response.title,
                     icon: response.icon,
                     text: response.text
                 })
-                    
+
                 MODAL.modal("hide")
                 $("#form_procura_cheque").submit()
             },
@@ -122,7 +122,7 @@ Procurar cheque
                 $.each( response.errors, function( key, value) {
                     errorString += '<div>' + value + '</div>'
                 });
-        
+
                 Swal.fire({
                     title: 'Erro',
                     icon: 'error',
@@ -140,10 +140,10 @@ Procurar cheque
 
     function calcularNovosJuros (element, dias) {
         let taxa = $("#taxa_juros").val();
-        console.log(taxa);  
+        console.log(taxa);
         let valor_cheque = $(element).data("valor")
         let porcentagem = taxa / 100 || TAXA / 100 ;
-        
+
         return ( ( (valor_cheque * porcentagem) / 30 ) * dias).toFixed(2)
     }
 
@@ -157,7 +157,7 @@ Procurar cheque
                 text: 'A data de adiamento deve ser maior que a data do cheque!'
             })
         }
-        
+
         const diffTime = Math.abs(date2 - date1)
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     }
@@ -183,11 +183,11 @@ Procurar cheque
     })
 
     function procurarCheque () {
-        
+
         $("#form_procura_cheque").submit( (e) => {
-            
+
             e.preventDefault()
-            let dataForm = $(e.target).serialize() 
+            let dataForm = $(e.target).serialize()
 
             $.ajax({
                 type: 'GET',
@@ -204,29 +204,29 @@ Procurar cheque
                     let tableBody = ''
                     let arrayNomeBlackList = response.blackList[0].nome_cheque ? response.blackList[0].nome_cheque.split(',') : []
                     let arrayClienteIdBlackList = response.blackList[0].cliente_id ? response.blackList[0].cliente_id.split(',') : []
-                   
+
                     response.Cheques.forEach(element => {
                         let dataTratada = transformaData(element.data_parcela)
                         let ondeEstaCheque = carteiraOuParceiro(element.parceiro_id, element.nome_parceiro)
                         let numero_banco = tratarNulo(element.numero_banco)
                         let numero_cheque = tratarNulo(element.numero_cheque)
                         let representante = tratarNulo(element.nome_representante)
-                        
+
                         let ClienteBlackList = arrayNomeBlackList.includes(element.nome_cheque) || arrayClienteIdBlackList.includes(element.cliente_id)
-                        
-                        let botaoAdiar = ClienteBlackList ? 
-                            `<div class="btn btn-danger btn-adiar" 
+
+                        let botaoAdiar = ClienteBlackList ?
+                            `<div class="btn btn-danger btn-adiar"
                                 title="Adiou e o mesmo cheque foi devolvido"
-                                data-id="${element.id}" 
-                                data-dia="${element.data_parcela}" 
-                                data-valor="${element.valor_parcela}" 
+                                data-id="${element.id}"
+                                data-dia="${element.data_parcela}"
+                                data-valor="${element.valor_parcela}"
                                 data-nome="${element.nome_cheque}"
-                            > <i class="fas fa-exclamation-triangle"></i> </div>` 
-                            : 
-                            `<div class="btn btn-dark btn-adiar" 
-                                data-id="${element.id}" 
-                                data-dia="${element.data_parcela}" 
-                                data-valor="${element.valor_parcela}" 
+                            > <i class="fas fa-exclamation-triangle"></i> </div>`
+                            :
+                            `<div class="btn btn-dark btn-adiar"
+                                data-id="${element.id}"
+                                data-dia="${element.data_parcela}"
+                                data-valor="${element.valor_parcela}"
                                 data-nome="${element.nome_cheque}"
                             > <i class="far fa-clock"></i> </div>`
 
@@ -237,9 +237,10 @@ Procurar cheque
                                     <td>${dataTratada}</td>
                                     <td>${element.valor_parcela_tratado}</td>
                                     <td>${representante}</td>
-                                    <td>${ondeEstaCheque}</td>
+
                                     <td>${numero_banco}</td>
                                     <td>${numero_cheque}</td>
+                                    <td>${ondeEstaCheque}</td>
                                     <td>${element.status}</td>
                                     <td><x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar></td>
                                 </tr>
@@ -251,9 +252,10 @@ Procurar cheque
                                     <td><span class="text-muted">(${dataTratada})</span> ${transformaData(element.nova_data)}</td>
                                     <td>${element.valor_parcela_tratado}</td>
                                     <td>${representante}</td>
-                                    <td>${ondeEstaCheque}</td>
+
                                     <td>${numero_banco}</td>
                                     <td>${numero_cheque}</td>
+                                    <td>${ondeEstaCheque}</td>
                                     <td>${element.status}</td>
                                     <td>
                                         <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
@@ -268,9 +270,10 @@ Procurar cheque
                                     <td>${dataTratada}</td>
                                     <td>${element.valor_parcela_tratado}</td>
                                     <td>${representante}</td>
-                                    <td>${ondeEstaCheque}</td>
+
                                     <td>${numero_banco}</td>
                                     <td>${numero_cheque}</td>
+                                    <td>${ondeEstaCheque}</td>
                                     <td>${element.status}</td>
                                     <td>
                                         <x-botao-editar target='_blank' href='cheques/${element.id}/edit'></x-botao-editar>
@@ -281,21 +284,22 @@ Procurar cheque
                         }
 
                     })
-    
+
                     $("#table_div").html(`
                         <x-table>
                             <x-table-header>
                                 <tr>
-                                    <th colspan=10>Número total de resultado: ${response.Cheques.length}</th>  
+                                    <th colspan=10>Número total de resultado: ${response.Cheques.length}</th>
                                 </tr>
                                 <tr>
                                     <th>Titular</th>
                                     <th>Data</th>
                                     <th>Valor</th>
                                     <th>Representante</th>
-                                    <th>Parceiro</th>
+
                                     <th>Banco</th>
                                     <th>Nº</th>
+                                    <th>Parceiro</th>
                                     <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
@@ -305,13 +309,13 @@ Procurar cheque
                             </tbody>
                         </x-table>
                     `)
-    
+
                     $(".btn-adiar").each( (index, element) => {
                         $(element).click( () => {
                             adiarCheque(element)
                         })
                     });
-    
+
                     Swal.close()
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
@@ -342,6 +346,6 @@ Procurar cheque
         }
         return valor
     }
-    
+
 </script>
 @endsection
