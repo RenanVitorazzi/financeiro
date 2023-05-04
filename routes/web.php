@@ -104,6 +104,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_consignados', [ConsignadoController::class, 'pdf_consignados'])->name('pdf_consignados');
         Route::get('pdf_consignados_geral', [ConsignadoController::class, 'pdf_consignados_geral'])->name('pdf_consignados_geral');
         Route::get('pdf_relatorio_mensal/{mes}/{ano}', [FornecedorController::class, 'pdf_relatorio_mensal'])->name('pdf_relatorio_mensal');
+        Route::get('pdf_confirmar_depositos', [RecebimentosController::class, 'pdf_confirmar_depositos'])->name('pdf_confirmar_depositos');
 
         //? Anexos
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
