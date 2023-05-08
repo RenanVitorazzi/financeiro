@@ -12,17 +12,21 @@ class PagamentosRepresentantes extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
-    protected $table = 'pagamentos_representantes'; 
+    protected $table = 'pagamentos_representantes';
 
     protected $with = ['conta', 'parcela'];
-    
+
     public function conta() {
         return $this->belongsTo(Conta::class);
-    } 
-    //Nao funcionando
+    }
+
     public function parcela() {
         return $this->belongsTo(Parcela::class);
-    } 
+    }
+
+    public function representante() {
+        return $this->belongsTo(Representante::class);
+    }
 
     protected static function booted()
     {

@@ -17,7 +17,7 @@
         text-align: center;
         font-size: 12px;
     }
-    
+
     tr:nth-child(even) {
         background-color: #e4e8ec;
     }
@@ -25,9 +25,9 @@
     h3 {
         text-align: center;
     }
-    
+
 </style>
-<body>  
+<body>
     <h3>Fechamento {{$representante->pessoa->nome}} (@data($hoje))</h3>
     <table>
         <thead>
@@ -91,11 +91,11 @@
                     <td>@data($adiamento->data_parcela)</td>
                     <td>@data($adiamento->nova_data)</td>
                     <td>{{ $adiamento->dias_totais }}</td>
-                    @if ($adiamento->status == 'Devolvido')
+                    {{-- @if ($adiamento->status == 'Devolvido')
                         <td><s>@moeda($adiamento->juros_totais)</s></td>
-                    @else
-                        <td>@moeda($adiamento->juros_totais)</td>
-                    @endif
+                    @else --}}
+                    <td>@moeda($adiamento->juros_totais)</td>
+                    {{-- @endif --}}
                 </tr>
             @empty
                 <tr>

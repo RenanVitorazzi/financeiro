@@ -51,7 +51,6 @@ Route::group(['middleware' => ['auth']], function() {
         Route::view('procura_cheque', 'cheque.procura_cheque')->name('procura_cheque');
         Route::get('procurarConsignado', [ConsignadoController::class, 'procurarConsignado'])->name('procurarConsignado');
 
-
         //? Cadastros auxiliares
         Route::resource('fornecedores', FornecedorController::class);
         Route::resource('representantes', RepresentanteController::class);

@@ -39,10 +39,10 @@
     }
     .tabelaloca {
         font-size: 14px;
-    } 
-    .vencido {
-        background-color:rgb(209, 92, 92);
     }
+    /* .vencido {
+        background-color:rgb(209, 92, 92);
+    } */
     .vencimento {
         width:10%;
     }
@@ -52,7 +52,7 @@
 </style>
 <body>
     <h3>Acerto de documentos - {{$representante->pessoa->nome}}</h3>
-   
+
     @foreach ($acertos as $acerto)
         <table>
             <thead>
@@ -70,7 +70,7 @@
             </thead>
             <tbody>
             @php
-                $sql = DB::select( "SELECT 
+                $sql = DB::select( "SELECT
                         p.data_parcela as vencimento,
                         p.valor_parcela AS valor,
                         p.status,
@@ -84,36 +84,36 @@
                         parcelas p ON p.venda_id = v.id
                             LEFT JOIN clientes c ON c.id = v.cliente_id
                             LEFT JOIN representantes r ON r.id = v.representante_id
-                            LEFT JOIN pagamentos_representantes pr ON pr.parcela_id = p.id 
+                            LEFT JOIN pagamentos_representantes pr ON pr.parcela_id = p.id
                     WHERE
                         p.deleted_at IS NULL
-                        AND v.deleted_at IS NULL 
+                        AND v.deleted_at IS NULL
                         AND r.id = ?
                         AND (
                         p.forma_pagamento like 'Cheque' AND p.status like 'Aguardando Envio'
-                        OR 
+                        OR
                         p.forma_pagamento != 'Cheque' AND p.status != 'Pago'
                         )
                         AND pr.deleted_at IS NULL
                         AND pr.baixado IS NULL
                         AND c.id = ?
                     GROUP BY p.id
-                    ORDER BY c.pessoa_id, data_parcela , valor_parcela", 
+                    ORDER BY c.pessoa_id, data_parcela , valor_parcela",
                     [$representante_id, $acerto->cliente_id]
                 );
 
                 $cliente_valor = 0;
                 $cliente_valor_pago = 0;
             @endphp
-                
+
                 @foreach ($sql as $divida)
                     @php
-                        $pgtos = DB::select( "SELECT c.nome as conta_nome, pr.* 
-                            FROM pagamentos_representantes pr 
+                        $pgtos = DB::select( "SELECT c.nome as conta_nome, pr.*
+                            FROM pagamentos_representantes pr
                             INNER JOIN contas c ON c.id=pr.conta_id
                             WHERE pr.parcela_id = ?
                                 AND pr.baixado IS NULL
-                                AND pr.deleted_at IS NULL", 
+                                AND pr.deleted_at IS NULL",
                             [$divida->parcela_id]
                         );
                         $cliente_valor += $divida->valor;
@@ -129,8 +129,8 @@
                         <td>@moeda($divida->valor)</td>
                         <td class='pagamentos'>
                             @foreach ($pgtos as $pgto)
-                                <div class="linha-pagamento"> 
-                                    @data($pgto->data) - @moeda($pgto->valor) ({{$pgto->conta_nome}}) 
+                                <div class="linha-pagamento">
+                                    @data($pgto->data) - @moeda($pgto->valor) ({{$pgto->conta_nome}})
                                     <b>{{$pgto->confirmado ? '' : 'PAGAMENTO NÃO CONFIRMADO'}}</b>
                                 </div>
                             @endforeach

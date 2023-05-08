@@ -4,8 +4,9 @@ Recebimentos
 @endsection
 @section('body')
 <div class='mb-2 d-flex justify-content-between'>
-    <h3>Recebimentos</h3>  
+    <h3>Recebimentos</h3>
     <div>
+        <x-botao-imprimir class='mr-2' href="{{ route('pdf_confirmar_depositos') }}"></x-botao-imprimir>
         <x-botao-novo href="{{ route('recebimentos.create') }}"></x-botao-novo>
     </div>
 </div>
@@ -35,7 +36,7 @@ Recebimentos
                 <td>{{ $pgto->confirmado ? 'Sim' : 'Não' }}</td>
                 <td>{{ $pgto->parcela->representante->pessoa->nome }}</td>
                 <td>{{ $pgto->parcela->forma_pagamento}} - {{ $pgto->parcela->status }} </td>
-                <td> 
+                <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href={{ route('recebimentos.edit', $pgto->id) }}>
                             <i class='fas fa-edit'></i>
@@ -49,7 +50,7 @@ Recebimentos
     </tbody>
 </x-table>
 
-        
+
 @endsection
 @section('script')
 <script>

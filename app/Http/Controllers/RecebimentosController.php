@@ -221,4 +221,18 @@ class RecebimentosController extends Controller
 
         return view('recebimento.create', compact('contas', 'parceiros', 'representantes', 'data', 'descricao', 'valor', 'contaImportacao'));
     }
+
+    public function pdf_confirmar_depositos()
+    {
+        $depositos = PagamentosRepresentantes::where('confirmado', 0)
+            ->whereNull('baixado')
+            ->orderBy('conta_id')
+            ->orderBy('data')
+            ->orderBy('valor')
+            ->get();
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('recebimento.pdf.pdf_confirmar_depositos', compact('depositos'));
+        return $pdf->stream();
+    }
 }

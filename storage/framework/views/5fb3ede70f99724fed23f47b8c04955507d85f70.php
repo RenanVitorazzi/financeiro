@@ -17,7 +17,7 @@
         text-align: center;
         font-size: 12px;
     }
-    
+
     tr:nth-child(even) {
         background-color: #e4e8ec;
     }
@@ -25,9 +25,9 @@
     h3 {
         text-align: center;
     }
-    
+
 </style>
-<body>  
+<body>
     <h3>Fechamento <?php echo e($representante->pessoa->nome); ?> (<?php echo date('d/m/Y', strtotime($hoje)); ?>)</h3>
     <table>
         <thead>
@@ -91,11 +91,9 @@
                     <td><?php echo date('d/m/Y', strtotime($adiamento->data_parcela)); ?></td>
                     <td><?php echo date('d/m/Y', strtotime($adiamento->nova_data)); ?></td>
                     <td><?php echo e($adiamento->dias_totais); ?></td>
-                    <?php if($adiamento->status == 'Devolvido'): ?>
-                        <td><s><?php echo 'R$ ' . number_format($adiamento->juros_totais, 2, ',', '.'); ?></s></td>
-                    <?php else: ?>
-                        <td><?php echo 'R$ ' . number_format($adiamento->juros_totais, 2, ',', '.'); ?></td>
-                    <?php endif; ?>
+                    
+                    <td><?php echo 'R$ ' . number_format($adiamento->juros_totais, 2, ',', '.'); ?></td>
+                    
                 </tr>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>

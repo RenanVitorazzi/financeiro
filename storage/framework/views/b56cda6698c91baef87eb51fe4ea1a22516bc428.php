@@ -1,11 +1,21 @@
-
 <?php $__env->startSection('title'); ?>
 Recebimentos
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('body'); ?>
 <div class='mb-2 d-flex justify-content-between'>
-    <h3>Recebimentos</h3>  
+    <h3>Recebimentos</h3>
     <div>
+        <?php if (isset($component)) { $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5 = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\BotaoImprimir::class, []); ?>
+<?php $component->withName('botao-imprimir'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['class' => 'mr-2','href' => ''.e(route('pdf_confirmar_depositos')).'']); ?> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5)): ?>
+<?php $component = $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5; ?>
+<?php unset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5); ?>
+<?php endif; ?>
         <?php if (isset($component)) { $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\BotaoNovo::class, []); ?>
 <?php $component->withName('botao-novo'); ?>
@@ -60,7 +70,7 @@ Recebimentos
                 <td><?php echo e($pgto->confirmado ? 'Sim' : 'Não'); ?></td>
                 <td><?php echo e($pgto->parcela->representante->pessoa->nome); ?></td>
                 <td><?php echo e($pgto->parcela->forma_pagamento); ?> - <?php echo e($pgto->parcela->status); ?> </td>
-                <td> 
+                <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href=<?php echo e(route('recebimentos.edit', $pgto->id)); ?>>
                             <i class='fas fa-edit'></i>
@@ -89,7 +99,7 @@ Recebimentos
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
 
-        
+
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
 <script>
@@ -98,4 +108,5 @@ Recebimentos
     <?php endif; ?>
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/recebimento/index.blade.php ENDPATH**/ ?>

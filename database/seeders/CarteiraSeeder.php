@@ -22,13 +22,13 @@ class CarteiraSeeder extends Seeder
     public function run()
     {
         $json = Storage::disk('public')->get('json/.json');
-        $json = json_decode($json, true);               
-        
+        $json = json_decode($json, true);
+
         foreach ($json['Carteira'] as $cheque => $info) {
             /*
             $parcela_filtrada = $this->parcelas->where('valor_parcela', $info['valor_parcela'])
                 ->where('representante_id', $info['id_representante'])
-                ->where('data_parcela', $info['data_parcela']); 
+                ->where('data_parcela', $info['data_parcela']);
 
             if (!$parcela_filtrada->isEmpty() && $info['observacao']) {
 
