@@ -11,6 +11,7 @@
         width:100%;
         border-collapse: collapse;
         font-size: 12px;
+        page-break-inside: avoid;
     }
     td, th {
         border: 1px solid black;
@@ -42,7 +43,7 @@
                         <th>Nome do cliente</th>
                         <th>Peso</th>
                         <th>Fator</th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +66,7 @@
                         <td><b><?php echo number_format($consignados->where('representante_id', $representante->id)->sum('peso'), 2, ',', '.'); ?></b></td>
                         <td><b><?php echo number_format($consignados->where('representante_id', $representante->id)->sum('fator'), 1, ',', '.'); ?></b></td>
                     </tr>
-                </tfoot>       
+                </tfoot>
             </table>
             <br>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

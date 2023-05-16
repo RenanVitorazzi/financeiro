@@ -11,6 +11,7 @@
         width:100%;
         border-collapse: collapse;
         font-size: 12px;
+        page-break-inside: avoid;
     }
     td, th {
         border: 1px solid black;
@@ -42,7 +43,7 @@
                         <th>Nome do cliente</th>
                         <th>Peso</th>
                         <th>Fator</th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +66,7 @@
                         <td><b>@peso($consignados->where('representante_id', $representante->id)->sum('peso'))</b></td>
                         <td><b>@fator($consignados->where('representante_id', $representante->id)->sum('fator'))</b></td>
                     </tr>
-                </tfoot>       
+                </tfoot>
             </table>
             <br>
         @endforeach

@@ -38,6 +38,11 @@ class Parcela extends Model
         return $this->hasOne(Adiamento::class);
     }
 
+    public function entrega()
+    {
+        return $this->hasOne(EntregaParcela::class);
+    }
+
     public function troca()
     {
         return $this->belongsTo(TrocaParcela::class);
@@ -58,6 +63,11 @@ class Parcela extends Model
     public function movimentacoes()
     {
         return $this->hasMany(MovimentacaoCheque::class);
+    }
+
+    public function pagamentos_representantes()
+    {
+        return $this->hasMany(PagamentosRepresentantes::class);
     }
 
     protected static function booted()

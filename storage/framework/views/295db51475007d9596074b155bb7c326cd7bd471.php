@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Entrega de cheques
 <?php $__env->stopSection(); ?>
@@ -12,7 +11,7 @@ Entrega de cheques
 </nav>
 <div class="d-flex justify-content-between">
     <h3>
-        Cheques - 
+        Cheques -
         <?php echo e($tipo == 'entregue_parceiro' ? $parceiro->pessoa->nome : $representante->pessoa->nome); ?>
 
     </h3>
@@ -23,7 +22,7 @@ Entrega de cheques
 <?php $component->withName('botao-imprimir'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['href' => ''.e(route('pdf_cheques_entregues', $representante->id)).'']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['href' => ''.e(route('pdf_cheques_entregues', ['representante_id' => $representante->id, 'data_entrega' => $hoje])).'']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5)): ?>
 <?php $component = $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5; ?>
@@ -86,7 +85,7 @@ Entrega de cheques
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
     <input class="btn btn-success" type="submit">
-    
+
 </form>
 
 <?php $__env->stopSection(); ?>
@@ -97,7 +96,7 @@ Entrega de cheques
     });
 
     $("#selecionaTodos").click( (e) => {
-        
+
         let status = $(e.target).prop("checked")
 
         $("input[name='cheque_id[]']").each( (index, element) => {
@@ -128,4 +127,5 @@ Entrega de cheques
     <?php endif; ?>
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/entrega_parcela/receber_parceiro.blade.php ENDPATH**/ ?>

@@ -28,16 +28,20 @@
         text-align: left;
         padding-left: 5px
     }
+    p {
+        margin: 0;
+    }
 </style>
 <body>
-    <h3>Relação de cheques empresa - {{$representante->pessoa->nome}} @data($hoje)</h3>
+    <h3>Relação de cheques no escritório - {{$representante->pessoa->nome}} @data($hoje)</h3>
     <table>
         <thead>
             <tr>
                 <th>Data</th>
                 <th>Titular</th>
-                <!-- <th>Número</th> -->
+                <th>Número</th>
                 <th>Valor cheque</th>
+                <th>Pagamentos</th>
                 <th>Total pago</th>
                 <th>Total devedor</th>
             </tr>
@@ -46,28 +50,33 @@
             @forelse ($cheques as $cheque)
                 <tr>
                     <td>@data($cheque->data_parcela)</td>
-                    <td class='titular'>{{$cheque->nome_cheque}}</td>    
-                    <!-- <td>{{ $cheque->numero_banco }} {{ $cheque->numero_cheque }}</td>   -->
-                    <td>@moeda($cheque->valor_parcela)</td>      
-                    <td>@moeda($cheque->valor_pago)</td>
-                    <td>@moeda($cheque->valor_parcela - $cheque->valor_pago)</td>
+                    <td class='titular'>{{$cheque->nome_cheque}}</td>
+                    <td>{{ $cheque->numero_cheque }}</td>
+                    <td>@moeda($cheque->valor_parcela)</td>
+                    <td>
+                        @forelse ($cheque->pagamentos_representantes as $pagamentos)
+                            <p>@data($pagamentos->data) - @moeda($pagamentos->valor) {{ $pagamentos->confirmado == 1 ? '' : '(Não confirmado)'}}</p>
+                        @empty
+                        @endforelse
+                    </td>
+                    <td>@moeda($cheque->pagamentos_representantes->sum('valor'))</td>
+                    <td>@moeda($cheque->valor_parcela - $cheque->pagamentos_representantes->sum('valor'))</td>
                 </tr>
-                @php
-                    $saldo_total += $cheque->valor_parcela - $cheque->valor_pago;
-                @endphp
             @empty
                 <tr>
-                    <td colspan=5>Nenhum registro</td>
+                    <td colspan=7>Nenhum registro</td>
                 </tr>
             @endforelse
             <tfoot>
                 <tr>
-                    <td colspan=4>Total</td>
-                    <td>@moeda($saldo_total)</td>
+                    <td colspan=3><b>Total</b></td>
+                    <td><b>@moeda($cheques->sum('valor_parcela'))</b></td>
+                    <td colspan=2><b>@moeda($totalPago)</b></td>
+                    <td><b>@moeda($cheques->sum('valor_parcela') - $totalPago)</b></td>
                 </tr>
             </tfoot>
         </tbody>
-      
+
     </table>
 </body>
 </html>

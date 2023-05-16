@@ -231,66 +231,69 @@ class VendaController extends Controller
     public function pdf_conferencia_relatorio_vendas($representante_id)
     {
 
-        $vendas = DB::select( "SELECT v.data_venda, peso,fator, valor_total, UPPER(SUBSTRING(p.nome, 1, 30)) as nome_cliente
-            from vendas  v
-            INNER JOIN clientes c ON c.id = v.cliente_id
-            INNER JOIN pessoas p ON p.id = c.pessoa_id
-            WHERE
-            enviado_conta_corrente is null
-            AND v.representante_id = ?
-            AND v.deleted_at is NULL
-            ORDER BY data_venda, v.created_at",
-            [$representante_id]
-        );
+        // $vendas = DB::select( "SELECT v.data_venda, peso,fator, valor_total, p.nome as nome_cliente
+        //     from vendas  v
+        //     INNER JOIN clientes c ON c.id = v.cliente_id
+        //     INNER JOIN pessoas p ON p.id = c.pessoa_id
+        //     WHERE
+        //     enviado_conta_corrente is null
+        //     AND v.representante_id = ?
+        //     AND v.deleted_at is NULL
+        //     ORDER BY data_venda, v.created_at",
+        //     [$representante_id]
+        // );
 
-        // $vendas = Venda::with('clientes')
-        // ->where([
-        //     ['enviado_conta_corrente', 'IS', NULL],
-        //     ['representante_id', '=', $representante_id]
-        // ])->get();
+        $vendas = Venda::with('cliente')
+            ->whereNull('enviado_conta_corrente')
+            ->where('representante_id', '=', $representante_id)
+            ->get();
+            // dd($vendas);
+        // $pagamentos = DB::select( "SELECT
+        //         SUM(valor_parcela) valor, forma_pagamento, status
+        //     FROM
+        //         parcelas
+        //     WHERE
+        //         venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL )
+        //     GROUP BY forma_pagamento , status",
+        //     [$representante_id]
+        // );
 
-        $pagamentos = DB::select( "SELECT
-                SUM(valor_parcela) valor, forma_pagamento, status
-            FROM
-                parcelas
-            WHERE
-                venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL )
-            GROUP BY forma_pagamento , status",
-            [$representante_id]
-        );
+        $pagamentos = Parcela::whereHas('venda', function (Builder $query) use ($representante_id) {
+                $query->whereNull('enviado_conta_corrente')
+                    ->where('representante_id', '=', $representante_id);
+            })
+            ->get();
 
-        // $pagamentos = Parcela::whereHas('venda', function (Builder $query) use ($representante_id) {
-        //         $query->whereNull('enviado_conta_corrente')
-        //             ->where('representante_id', '=', $representante_id);
-        //     })
-        //     ->get();
-
-        // $pagamentos = $pagamentos->groupBy('forma_pagamento')->groupBy('status');
-        // $pagamentos_total = $pagamentos->sum('valor_parcela');
-
+        $pagamentosPorForma = $pagamentos->groupBy('forma_pagamento')->groupBy('status')->first();
+        // dd($pagamentosPorForma->first()->sum('valor_parcela') );
+        $pagamentos_total = $pagamentos->sum('valor_parcela');
+        // dd($pagamentos_total);
         // dd($pagamentos);
 
-        $pagamentos_total = DB::select( "SELECT
-                SUM(valor_parcela) AS valor
-            FROM
-                parcelas
-            WHERE
-                venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL ) ",
-            [$representante_id]
-        );
+        // $pagamentos_total = DB::select( "SELECT
+        //         SUM(valor_parcela) AS valor
+        //     FROM
+        //         parcelas
+        //     WHERE
+        //         venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL ) ",
+        //     [$representante_id]
+        // );
 
-        $totalVendas = DB::select( "SELECT SUM(peso) AS peso, SUM(fator) AS fator, SUM(valor_total) AS valor_total
-            from vendas  v
-            WHERE enviado_conta_corrente is null
-            AND v.deleted_at is NULL
-            AND v.representante_id = ?",
-            [$representante_id]
-        );
+        // $totalVendas = DB::select( "SELECT SUM(peso) AS peso, SUM(fator) AS fator, SUM(valor_total) AS valor_total
+        //     from vendas  v
+        //     WHERE enviado_conta_corrente is null
+        //     AND v.deleted_at is NULL
+        //     AND v.representante_id = ?",
+        //     [$representante_id]
+        // );
+
 
         $representante = Representante::findOrFail($representante_id);
 
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('venda.pdf.pdf_conferencia_relatorio_vendas', compact('vendas', 'representante', 'totalVendas', 'pagamentos', 'pagamentos_total') );
+        $pdf->loadView('venda.pdf.pdf_conferencia_relatorio_vendas',
+            compact('vendas', 'representante', 'pagamentos', 'pagamentos_total', 'pagamentosPorForma')
+        );
 
         return $pdf->stream();
     }

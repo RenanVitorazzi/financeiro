@@ -12,13 +12,13 @@ Entrega de cheques
 </nav>
 <div class="d-flex justify-content-between">
     <h3>
-        Cheques - 
+        Cheques -
         {{ $tipo == 'entregue_parceiro' ? $parceiro->pessoa->nome : $representante->pessoa->nome }}
     </h3>
     @if ($tipo == 'entregue_representante')
         <div>
-            <x-botao-imprimir 
-                href="{{ route('pdf_cheques_entregues', $representante->id) }}"
+            <x-botao-imprimir
+                href="{{ route('pdf_cheques_entregues', ['representante_id' => $representante->id, 'data_entrega' => $hoje]) }}"
             ></x-botao-imprimir>
         </div>
     @endif
@@ -57,7 +57,7 @@ Entrega de cheques
         </tbody>
     </x-table>
     <input class="btn btn-success" type="submit">
-    
+
 </form>
 
 @endsection
@@ -68,7 +68,7 @@ Entrega de cheques
     });
 
     $("#selecionaTodos").click( (e) => {
-        
+
         let status = $(e.target).prop("checked")
 
         $("input[name='cheque_id[]']").each( (index, element) => {

@@ -98,7 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_conferencia_relatorio_vendas/{representante_id}', [VendaController::class, 'pdf_conferencia_relatorio_vendas'])->name('pdf_conferencia_relatorio_vendas');
         Route::get('pdf_acerto_documento/{representante_id}', [VendaController::class, 'pdf_acerto_documento'])->name('pdf_acerto_documento');
         Route::get('pdf_despesa_mensal/{mes}', [DespesaController::class, 'pdf_despesa_mensal'])->name('pdf_despesa_mensal');
-        Route::get('pdf_cheques_entregues/{representante_id}', [EntregaParcelaController::class, 'pdf_cheques_entregues'])->name('pdf_cheques_entregues');
+        Route::get('pdf_cheques_entregues/{representante_id}/{data_entrega}', [EntregaParcelaController::class, 'pdf_cheques_entregues'])->name('pdf_cheques_entregues');
         Route::get('pdf_estoque', [EstoqueController::class, 'pdf_estoque'])->name('pdf_estoque');
         Route::get('pdf_consignados', [ConsignadoController::class, 'pdf_consignados'])->name('pdf_consignados');
         Route::get('pdf_consignados_geral', [ConsignadoController::class, 'pdf_consignados_geral'])->name('pdf_consignados_geral');
