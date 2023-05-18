@@ -214,6 +214,7 @@ class FornecedorController extends Controller
         $representantes = Representante::with('pessoa')
             ->withSum('conta_corrente', 'peso_agregado')
             ->withSum('conta_corrente', 'fator_agregado')
+            ->orderBy('atacado')
             ->get();
 
         $adiamentos = Parcela::withSum('adiamentos', 'juros_totais')

@@ -25,6 +25,7 @@ class DespesaController extends Controller
     {
         $idFixasPagas = ModelsDespesa::with('local')
             ->where(DB::raw('MONTH(data_referencia)'), DB::raw('MONTH(CURDATE()) - 1'))
+            ->whereYear('data_referencia', DB::raw('YEAR(CURDATE())'))
             ->whereNotNull('fixas_id')
             ->orderBy('local_id')
             ->pluck('fixas_id');
@@ -36,6 +37,7 @@ class DespesaController extends Controller
 
         $despesas = ModelsDespesa::with('local')
             ->where(DB::raw('MONTH(data_referencia)'), DB::raw('MONTH(CURDATE()) - 1'))
+            ->whereYear('data_referencia', DB::raw('YEAR(CURDATE())'))
             ->orderBy('local_id')
             ->get();
 

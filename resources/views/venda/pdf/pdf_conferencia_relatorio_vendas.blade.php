@@ -60,6 +60,10 @@
                     <td>@moeda(($venda->peso * $venda->cotacao_peso) + ($venda->fator * $venda->cotacao_fator))</td>
                     <td>@moeda($venda->valor_total)</td>
                 </tr>
+                @php
+                    $totalVendaPeso += ($venda->peso * $venda->cotacao_peso);
+                    $totalVendaFator += ($venda->fator * $venda->cotacao_fator);
+                @endphp
             @empty
                 <tr>
                     <td colspan=8>Nenhum registro</td>
@@ -87,8 +91,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>@moeda($vendas->avg('cotacao_peso'))</td>
-                <td>@moeda($vendas->avg('cotacao_fator'))</td>
+                <td>@moeda($totalVendaPeso / $vendas->sum('peso') )</td>
+                <td>@moeda($totalVendaFator / $vendas->sum('fator'))</td>
                 <td>{{ $vendas->where('metodo_pagamento', '=', 'Parcelado')->count() }}</td>
                 <td>{{ $vendas->where('metodo_pagamento', '=', 'À vista')->count() }}</td>
             </tr>

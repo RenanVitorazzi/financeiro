@@ -61,6 +61,10 @@
                     <td><?php echo 'R$ ' . number_format(($venda->peso * $venda->cotacao_peso) + ($venda->fator * $venda->cotacao_fator), 2, ',', '.'); ?></td>
                     <td><?php echo 'R$ ' . number_format($venda->valor_total, 2, ',', '.'); ?></td>
                 </tr>
+                <?php
+                    $totalVendaPeso += ($venda->peso * $venda->cotacao_peso);
+                    $totalVendaFator += ($venda->fator * $venda->cotacao_fator);
+                ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan=8>Nenhum registro</td>
@@ -88,8 +92,8 @@
         </thead>
         <tbody>
             <tr>
-                <td><?php echo 'R$ ' . number_format($vendas->avg('cotacao_peso'), 2, ',', '.'); ?></td>
-                <td><?php echo 'R$ ' . number_format($vendas->avg('cotacao_fator'), 2, ',', '.'); ?></td>
+                <td><?php echo 'R$ ' . number_format($totalVendaPeso / $vendas->sum('peso'), 2, ',', '.'); ?></td>
+                <td><?php echo 'R$ ' . number_format($totalVendaFator / $vendas->sum('fator'), 2, ',', '.'); ?></td>
                 <td><?php echo e($vendas->where('metodo_pagamento', '=', 'Parcelado')->count()); ?></td>
                 <td><?php echo e($vendas->where('metodo_pagamento', '=', 'À vista')->count()); ?></td>
             </tr>

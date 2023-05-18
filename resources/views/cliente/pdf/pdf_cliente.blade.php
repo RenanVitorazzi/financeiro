@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Clientes {{$representante->pessoa->nome}}</title>
+    <title>CLIENTES {{$representante->pessoa->nome}}</title>
 </head>
 <style>
     table {
         width:100%;
         border-collapse: collapse;
+        font-size:12px;
     }
     td, th {
         border: 1px solid black;
@@ -21,7 +22,9 @@
     h1 {
         text-align: center;
     }
-    
+    .nome {
+        font-size:10px;
+    }
 </style>
 <body>
     <table>
@@ -43,18 +46,23 @@
             @forelse ($clientes as $cliente)
                 <tr>
                     <td>{{ $loop->index+1 }}</td>
-                    <td>{{ $cliente->nome }}</td>
+                    <td class='nome'>{{ $cliente->nome }}</td>
                     <td>{{ $cliente->estado }}</td>
-                    <td>{{ $cliente->municipio }}</td>
+                    <td>{{ substr($cliente->municipio,0,15) }}</td>
                     <td>{{ $cliente->cep }}</td>
-                    
+
                     @if ($cliente->cep)
-                        <td>{{ $cliente->bairro }}, {{ $cliente->logradouro }}, {{ $cliente->numero }} - {{ $cliente->complemento }}</td>
+                        <td>{{ $cliente->bairro }}, {{ $cliente->logradouro }}, {{ $cliente->numero }}</td>
                     @else
                         <td></td>
                     @endif
-                    
-                    <td>{{ $cliente->celular }} {{ $cliente->telefone }}</td>
+
+                    <td>{{ $cliente->celular }}
+                        @if ($cliente->telefone)
+                        <br>
+                        {{ $cliente->telefone }}
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr>

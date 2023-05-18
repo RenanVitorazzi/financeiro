@@ -36,12 +36,11 @@ class EntregaParcelaController extends Controller
             WHERE
                 ep.entregue_parceiro is not null
                 AND ep.entregue_representante is null
-                    AND p.forma_pagamento LIKE ?
                     AND p.representante_id = ?
 
             GROUP BY p.id
             ORDER BY data_parcela, valor_parcela',
-            ['Devolvido' , 'Resgatado', 'Cheque', $representante_id]
+            [ $representante_id]
         );
 
         // $cheques = DB::select('SELECT

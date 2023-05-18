@@ -289,10 +289,12 @@ class VendaController extends Controller
 
 
         $representante = Representante::findOrFail($representante_id);
+        $totalVendaPeso = 0;
+        $totalVendaFator = 0;
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('venda.pdf.pdf_conferencia_relatorio_vendas',
-            compact('vendas', 'representante', 'pagamentos', 'pagamentos_total', 'pagamentosPorForma')
+            compact('vendas', 'representante', 'pagamentos', 'pagamentos_total', 'pagamentosPorForma', 'totalVendaPeso', 'totalVendaFator')
         );
 
         return $pdf->stream();

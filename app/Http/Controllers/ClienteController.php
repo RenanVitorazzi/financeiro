@@ -18,14 +18,14 @@ class ClienteController extends Controller
     {
         $clientes = Cliente::with(['pessoa', 'representante'])->get();
         $message = $request->session()->get('message');
-        
+
         return view('cliente.index', compact('clientes', 'message'));
     }
 
     public function create()
     {
         $representantes = Representante::with('pessoa')->get();
-        
+
         return view('cliente.create', compact('representantes'));
     }
 
@@ -65,17 +65,17 @@ class ClienteController extends Controller
         return view('cliente.edit', compact('cliente', 'representantes'));
     }
 
-    public function update(RequestFormPessoa $request, $id) 
+    public function update(RequestFormPessoa $request, $id)
     {
         $cliente = Cliente::findOrFail($id);
         $pessoa = Pessoa::findOrFail($cliente->pessoa_id);
-        
+
         $pessoa->fill($request->validated())
             ->save();
-            
+
         $cliente->representante_id = $request->representante_id;
         $cliente->save();
-            
+
         $request
             ->session()
             ->flash(
@@ -85,7 +85,7 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index');
     }
 
-    public function destroy(Request $request, $id) 
+    public function destroy(Request $request, $id)
     {
         Cliente::destroy($id);
 
@@ -118,17 +118,17 @@ class ClienteController extends Controller
                 ->where('representante_id', $request->representante_id)
                 ->get();
         }
-        
+
         return json_encode([
             'clientes' => $clientes
         ]);
     }
-    
+
     public function pdf_clientes(Request $request, $representante_id)
     {
         $representante = Representante::findOrFail($representante_id);
-        
-        $clientes = DB::select('SELECT 
+
+        $clientes = DB::select('SELECT
                 UPPER(p.nome) as nome,
                 UPPER(p.estado) as estado,
                 UPPER(p.municipio) as municipio,
@@ -136,18 +136,19 @@ class ClienteController extends Controller
                 UPPER(p.bairro) as bairro,
                 UPPER(p.logradouro) as logradouro,
                 p.numero,
-                p.telefone, 
-                p.celular, 
+                p.telefone,
+                p.celular,
                 UPPER(p.complemento) as complemento
 
-            FROM clientes c 
-            INNER JOIN pessoas p ON p.id = c.pessoa_id 
-               WHERE representante_id =' . $representante_id . 
-            ' ORDER BY p.estado, p.municipio');
+            FROM clientes c
+            INNER JOIN pessoas p ON p.id = c.pessoa_id
+                WHERE c.representante_id = ?
+                AND c.deleted_at is null
+            ORDER BY p.estado, p.municipio', [$representante_id]);
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('cliente.pdf.pdf_cliente', compact('clientes', 'representante') )->setPaper('a4', 'landscape');
-            
+
         return $pdf->stream();
     }
 }
