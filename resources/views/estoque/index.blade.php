@@ -11,11 +11,12 @@ Estoque
         <x-botao-imprimir href="{{ route('pdf_estoque') }}"></x-botao-imprimir>
     </div>
 </div>
-
-<h5 class="alert alert-warning">
-    Você tem {{ count($lancamentos_pendentes) }} lançamentos pendentes
-    <div class="btn btn-warning btn-lancar">Lançar</div>
-</h5>
+@if (count($lancamentos_pendentes) > 0)
+    <h5 class="alert alert-warning">
+        Você tem {{ count($lancamentos_pendentes) }} lançamentos pendentes
+        <div class="btn btn-warning btn-lancar">Lançar</div>
+    </h5>
+@endif
 
 <x-table id="tabelaBalanco">
     <x-table-header>

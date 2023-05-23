@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Clientes
 <?php $__env->stopSection(); ?>
@@ -28,7 +27,7 @@ Clientes
 <?php $component->withName('table-header'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes([]); ?> 
+<?php $component->withAttributes([]); ?>
         <tr>
             <th>Nome</th>
             <th>Representante</th>
@@ -84,17 +83,18 @@ Clientes
 <?php if (isset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6)): ?>
 <?php $component = $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6; ?>
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
-<?php endif; ?> 
+<?php endif; ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
 <script>
     <?php if(Session::has('message')): ?>
         toastr["success"]("<?php echo e(Session::get('message')); ?>")
     <?php endif; ?>
-    
+
     $(document).ready( function () {
         $('#myTable').DataTable();
     } );
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/cliente/index.blade.php ENDPATH**/ ?>

@@ -73,13 +73,15 @@
                         <td><?php echo date('d/m/Y', strtotime($lancamento->data)); ?></td>
                         <td>
                             <?php if($lancamento->representante_id): ?>
-                                <?php echo e($lancamento->balanco_representante); ?> 
+                                <?php echo e($lancamento->balanco_representante); ?>
+
                                 <?php echo e($lancamento->nome_representante); ?>
 
                                 <?php echo e($lancamento->observacao_representante); ?>
 
                             <?php elseif($lancamento->fornecedor_id): ?>
-                                <?php echo e($lancamento->balanco_fornecedor); ?> 
+                                <?php echo e($lancamento->balanco_fornecedor); ?>
+
                                 <?php echo e($lancamento->nome_fornecedor); ?>
 
                                 <?php echo e($lancamento->observacao_fornecedor); ?>
@@ -98,7 +100,8 @@
                         <td><?php echo date('d/m/Y', strtotime($lancamento->data)); ?></td>
                         <td>
                             <?php if($lancamento->representante_id): ?>
-                                <?php echo e($lancamento->balanco_representante); ?> 
+                                <?php echo e($lancamento->balanco_representante); ?>
+
                                 <?php echo e($lancamento->nome_representante); ?>
 
                                 <?php echo e($lancamento->observacao_representante); ?>
@@ -110,6 +113,8 @@
 
                                 <?php echo e($lancamento->observacao_fornecedor); ?>
 
+                            <?php else: ?>
+                                Início registro
                             <?php endif; ?>
                         </td>
                         <td class='peso'><?php echo number_format($lancamento->peso, 2, ',', '.'); ?></td>

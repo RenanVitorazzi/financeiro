@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Conta Corrente - <?php echo e($fornecedor->pessoa->nome); ?>
 
@@ -19,7 +18,7 @@ Conta Corrente - <?php echo e($fornecedor->pessoa->nome); ?>
 <?php $component->withName('botao-imprimir'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['class' => 'mr-2','href' => ''.e(route('pdf_fornecedor', ['id' => $fornecedor->id])).'']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['class' => 'mr-2','href' => ''.e(route('pdf_fornecedor', ['id' => $fornecedor->id, 'data_inicio' => $hoje])).'']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5)): ?>
 <?php $component = $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5; ?>
@@ -42,7 +41,7 @@ Conta Corrente - <?php echo e($fornecedor->pessoa->nome); ?>
 <?php if(count($registrosContaCorrente) > 0): ?>
     <h3 class="<?php echo e($registrosContaCorrente[0]->saldo > 0 ? 'text-success' : 'text-danger'); ?> font-weight-bold">
         <?php echo e($registrosContaCorrente[count($registrosContaCorrente)-1]->saldo); ?>g
-    </h3> 
+    </h3>
 <?php endif; ?>
 <?php if (isset($component)) { $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\Table::class, []); ?>
@@ -72,7 +71,7 @@ Conta Corrente - <?php echo e($fornecedor->pessoa->nome); ?>
 <?php endif; ?>
     <tbody>
         <?php $__empty_1 = true; $__currentLoopData = $registrosContaCorrente; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $contaCorrente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <tr>
+            <tr <?php echo e($contaCorrente->peso_agregado == NULL ? "class=table-danger" : ''); ?>>
                 <td><?php echo date('d/m/Y', strtotime($contaCorrente->data)); ?></td>
                 <td><?php echo number_format($contaCorrente->peso, 2, ',', '.'); ?></td>
                 <td class="<?php echo e($contaCorrente->balanco == 'Crédito' ? 'text-success' : 'text-danger'); ?>">
@@ -122,4 +121,5 @@ Conta Corrente - <?php echo e($fornecedor->pessoa->nome); ?>
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/fornecedor/show.blade.php ENDPATH**/ ?>

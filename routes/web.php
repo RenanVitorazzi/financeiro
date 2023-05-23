@@ -84,10 +84,11 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_cc_parceiro/{parceiro_id}', [ParceiroController::class, 'pdf_cc_parceiro'])->name('pdf_cc_parceiro');
         Route::get('pdf_cc_representante/{representante_id}', [RepresentanteController::class, 'pdf_cc_representante'])->name('pdf_cc_representante');
         Route::get('pdf_cheques_devolvidos_escritorio/{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
-        Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
-        Route::get('pdf_fornecedor/{id}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
+        Route::get('pdf_fornecedores', [FornzxecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
+        Route::get('pdf_fornecedor/{id}/{data_inicio}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
         Route::get('pdf_diario', [FornecedorController::class, 'pdf_diario'])->name('pdf_diario');
+        Route::get('pdf_diario2', [FornecedorController::class, 'pdf_diario2'])->name('pdf_diario2');
         Route::get('pdf_mov_diario', [FornecedorController::class, 'pdf_mov_diario'])->name('pdf_mov_diario');
         Route::get('pdf_clientes/{representante_id}', [ClienteController::class, 'pdf_clientes'])->name('pdf_clientes');
         Route::get('adiamento_impresso/{representante_id}', [AdiamentosController::class, 'adiamento_impresso'])->name('adiamento_impresso');

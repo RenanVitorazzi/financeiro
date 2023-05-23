@@ -63,11 +63,11 @@
                         <td>@data($lancamento->data)</td>
                         <td>
                             @if ($lancamento->representante_id)
-                                {{ $lancamento->balanco_representante }} 
+                                {{ $lancamento->balanco_representante }}
                                 {{ $lancamento->nome_representante }}
                                 {{ $lancamento->observacao_representante }}
                             @elseif ($lancamento->fornecedor_id)
-                                {{ $lancamento->balanco_fornecedor }} 
+                                {{ $lancamento->balanco_fornecedor }}
                                 {{ $lancamento->nome_fornecedor }}
                                 {{ $lancamento->observacao_fornecedor }}
                             @endif
@@ -84,13 +84,15 @@
                         <td>@data($lancamento->data)</td>
                         <td>
                             @if ($lancamento->representante_id)
-                                {{ $lancamento->balanco_representante }} 
+                                {{ $lancamento->balanco_representante }}
                                 {{ $lancamento->nome_representante }}
                                 {{ $lancamento->observacao_representante }}
                             @elseif ($lancamento->fornecedor_id)
                                 {{ $lancamento->balanco_fornecedor == 'Débito' ? 'Compra' : 'Devolução'}}
                                 {{ $lancamento->nome_fornecedor }}
                                 {{ $lancamento->observacao_fornecedor }}
+                            @else
+                                Início registro
                             @endif
                         </td>
                         <td class='peso'>@peso($lancamento->peso)</td>

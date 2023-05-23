@@ -64,12 +64,19 @@ Recebimentos
             <?php $__currentLoopData = $pgtoRepresentante; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pgto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <tr class="<?php echo e(!$pgto->confirmado ? 'table-danger' : ''); ?>">
                 <td><?php echo date('d/m/Y', strtotime($pgto->data)); ?></td>
-                <td><?php echo e($pgto->parcela->nome_cheque ??  $pgto->parcela->venda->cliente->pessoa->nome); ?></td>
+                <td><?php echo e($pgto->parcela->nome_cheque ??''); ?></td>
                 <td><?php echo 'R$ ' . number_format($pgto->valor, 2, ',', '.'); ?></td>
                 <td><?php echo e($pgto->conta->nome ?? ''); ?></td>
                 <td><?php echo e($pgto->confirmado ? 'Sim' : 'Não'); ?></td>
-                <td><?php echo e($pgto->parcela->representante->pessoa->nome); ?></td>
-                <td><?php echo e($pgto->parcela->forma_pagamento); ?> - <?php echo e($pgto->parcela->status); ?> </td>
+                <td><?php echo e($pgto->representante->pessoa->nome); ?></td>
+                <td>
+                    <?php if($pgto->parcela): ?>
+                        <?php echo e($pgto->parcela->forma_pagamento); ?> - <?php echo e($pgto->parcela->status); ?>
+
+                    <?php else: ?>
+                        Crédito conta-corrente
+                    <?php endif; ?>
+                </td>
                 <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href=<?php echo e(route('recebimentos.edit', $pgto->id)); ?>>

@@ -21,11 +21,16 @@ Fornecedores
     <div class="col-12">
         <ul class="d-flex list-group list-group">
             @forelse ($fornecedores as $fornecedor)
-            
+
                 <li class='list-group-item d-flex justify-content-between'>
                     <div class='mt-2'>
-                        <span>{{ $fornecedor->pessoa->nome }}</span>
-                        <span class="font-weight-bold ml-2 badge badge-pill {{ $fornecedor->conta_corrente_sum_peso_agregado < 0 ? 'badge-danger' : 'badge-dark' }}">@peso($fornecedor->conta_corrente_sum_peso_agregado)</span>
+                        <span>{{ $fornecedor->pessoa->nome }} </span>
+                        <span>(@peso($fornecedor->conta_corrente_sum_peso_agregado)g)</span>
+                        @if ($fornecedor->conta_corrente_count > 0)
+                            <span class="font-weight-bold ml-2 badge badge-pill badge-danger">
+                                Lançamento pendente
+                            </span>
+                        @endif
                     </div>
                     <div class='d-flex'>
                         <a class="btn btn-dark mr-2" title="Conta corrente" href="{{ route('fornecedores.show', $fornecedor->id) }}">
@@ -44,7 +49,7 @@ Fornecedores
     {{-- <div class="col-6">
         <canvas id="myChart"></canvas>
     </div> --}}
-   
+
 </div>
 
 
@@ -58,7 +63,7 @@ Fornecedores
     @if(Session::has('message'))
         toastr["success"]("{{ Session::get('message') }}")
     @endif
-    
+
     // var poolColors = function (a) {
     //     var pool = [];
     //     for(i=0;i<a;i++){
@@ -78,9 +83,9 @@ Fornecedores
     //     labels: JSON.parse(LABELS),
     //     datasets: [{
     //         data: JSON.parse(DATA_GRAFICO),
-    //         backgroundColor: 
+    //         backgroundColor:
     //             poolColors(20)
-            
+
     //         ,
     //     }]
     // };
@@ -89,7 +94,7 @@ Fornecedores
     //     type: 'pie',
     //     data: data
     // };
-    
+
     // var myChart = new Chart(
     //     document.getElementById('myChart'),
     //     config

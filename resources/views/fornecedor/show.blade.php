@@ -13,7 +13,7 @@ Conta Corrente - {{ $fornecedor->pessoa->nome }}
 <div class="d-flex justify-content-between">
     <h3>{{ $fornecedor->pessoa->nome }}</h3>
     <div>
-        <x-botao-imprimir class="mr-2" href="{{ route('pdf_fornecedor', ['id' => $fornecedor->id]) }}"></x-botao-imprimir>
+        <x-botao-imprimir class="mr-2" href="{{ route('pdf_fornecedor', ['id' => $fornecedor->id, 'data_inicio' => $hoje]) }}"></x-botao-imprimir>
         <x-botao-novo href="{{ route('conta_corrente.create', ['fornecedor_id' => $fornecedor->id]) }}">
         </x-botao-novo>
     </div>
@@ -21,7 +21,7 @@ Conta Corrente - {{ $fornecedor->pessoa->nome }}
 @if (count($registrosContaCorrente) > 0)
     <h3 class="{{ $registrosContaCorrente[0]->saldo > 0 ? 'text-success' : 'text-danger' }} font-weight-bold">
         {{ $registrosContaCorrente[count($registrosContaCorrente)-1]->saldo }}g
-    </h3> 
+    </h3>
 @endif
 <x-table>
     <x-table-header>
@@ -36,7 +36,7 @@ Conta Corrente - {{ $fornecedor->pessoa->nome }}
     </x-table-header>
     <tbody>
         @forelse ($registrosContaCorrente as $contaCorrente)
-            <tr>
+            <tr {{$contaCorrente->peso_agregado == NULL ? "class=table-danger" : ''}}>
                 <td>@data($contaCorrente->data)</td>
                 <td>@peso($contaCorrente->peso)</td>
                 <td class="{{ $contaCorrente->balanco == 'Crédito' ? 'text-success' : 'text-danger' }}">

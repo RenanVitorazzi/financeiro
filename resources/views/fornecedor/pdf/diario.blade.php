@@ -17,13 +17,13 @@
         border: 1px solid black;
         text-align: center;
     }
-    tr:nth-child(even) {    
+    tr:nth-child(even) {
         background-color: #d9dde2;
     }
     h1 {
         text-align: center;
     }
-    
+
 </style>
 <body>
     <table>
@@ -38,10 +38,20 @@
         </thead>
         <tbody>
             @forelse ($carteira as $carteira_mensal)
-                <tr>
-                    <td>{{ $carteira_mensal->month }}/{{ $carteira_mensal->year }}</td>
-                    <td>@moeda($carteira_mensal->total_mes)</td>
-                </tr>
+                @if ($loop->iteration >= 7 && !$loop->last)
+                    {{ $totalCarteiraMaisSeisMeses += $carteira_mensal->total_mes; }}
+                @endif
+                @if($loop->last)
+                    <tr>
+                        <td>Próximos meses</td>
+                        <td>@moeda($totalCarteiraMaisSeisMeses)</td>
+                    </tr>
+                @elseif($loop->iteration < 7)
+                    <tr>
+                        <td>{{ $carteira_mensal->month }}/{{ $carteira_mensal->year }}</td>
+                        <td>@moeda($carteira_mensal->total_mes)</td>
+                    </tr>
+                @endif
             @empty
                 <tr>
                     <td colspan=2>Nenhum registro</td>
@@ -75,7 +85,7 @@
                         <td>{{ $fornecedor->pessoa->nome }}</td>
                         <td>@peso($fornecedor->conta_corrente_sum_peso_agregado)</td>
                         <!-- <td> {{ number_format($fornecedor->conta_corrente_sum_peso_agregado / $fornecedores->sum('conta_corrente_sum_peso_agregado') * 100, 2) }} % </td> -->
-                        {{-- <td>  
+                        {{-- <td>
                             @foreach ($pagamentoMed as $pagamento_fornecedor)
                                 @if ($pagamento_fornecedor->fornecedor_id === $fornecedor->id)
                                     {{ $pagamento_fornecedor->total }}
@@ -119,13 +129,9 @@
                 @if ($representante->conta_corrente_sum_peso_agregado != 0 || $representante->conta_corrente_sum_fator_agregado != 0)
                     <tr>
                         <td>{{ $representante->pessoa->nome }}</td>
-                        <td>@peso($representante->conta_corrente_sum_peso_agregado)</td>
-                        <td>@fator($representante->conta_corrente_sum_fator_agregado)</td>
-                        <td>@peso($representante->conta_corrente_sum_peso_agregado + ($representante->conta_corrente_sum_fator_agregado / 32) )</td>
-                        <!-- <td>@moeda($devolvidos->where('representante_id', $representante->id)->sum('valor_parcela'))</td>
-                        <td>
-                            @moeda($adiamentos->where('representante_id', $representante->id)->sum('adiamentos_sum_juros_totais'))
-                        </td> -->
+                        <td>@peso(abs($representante->conta_corrente_sum_peso_agregado))</td>
+                        <td>@fator(abs($representante->conta_corrente_sum_fator_agregado))</td>
+                        <td>@peso(abs($representante->conta_corrente_sum_peso_agregado + ($representante->conta_corrente_sum_fator_agregado / 32)) )</td>
                     </tr>
                 @endif
             @empty
@@ -135,12 +141,32 @@
             @endforelse
             <tfoot>
                 <tr>
+                    <td>ESTOQUE</td>
+                    <td>@peso($estoque->sum('peso_agregado'))</td>
+                    <td>@fator($estoque->sum('fator_agregado'))</td>
+                    <td>@peso($estoque->sum('peso_agregado') + ($estoque->sum('fator_agregado') / 32) )</td>
+                </tr>
+                <tr>
                     <td><b>Total</b></td>
-                    <td><b>@peso($representantes->sum('conta_corrente_sum_peso_agregado'))</b></td>
-                    <td><b>@fator($representantes->sum('conta_corrente_sum_fator_agregado'))</b></td>
-                    <td><b>@peso($representantes->sum('conta_corrente_sum_peso_agregado') + $representantes->sum('conta_corrente_sum_fator_agregado') / 32 )</b></td>
-                    <!--<td><b>@moeda($devolvidos->sum('valor_parcela')) </b></td> -->
-                    <!-- <td><b> </b></td> -->
+                    <td><b>@peso(abs($representantes->sum('conta_corrente_sum_peso_agregado')) + $estoque->sum('peso_agregado'))</b></td>
+                    <td>
+                        <b>
+                            @fator(
+                                abs($representantes->sum('conta_corrente_sum_fator_agregado'))
+                                + $estoque->sum('fator_agregado')
+                            )
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            @peso(
+                                abs($representantes->sum('conta_corrente_sum_peso_agregado'))
+                                + abs($representantes->sum('conta_corrente_sum_fator_agregado') / 32 )
+                                + $estoque->sum('peso_agregado')
+                                + ($estoque->sum('fator_agregado') / 32)
+                            )
+                        </b>
+                    </td>
                 </tr>
             </tfoot>
         </tbody>
@@ -184,7 +210,7 @@
         </thead>
         <tbody>
             @forelse ($Op as $OpMensal)
-            
+
                 @if($mes > $OpMensal->mes)
                     @php
                         $opsVencidasDevedoras += $OpMensal->total_devedor;
@@ -209,7 +235,7 @@
                 $totalDevedorGeral += $OpMensal->total_devedor;
                 $totalPagoGeral += $OpMensal->total_pago;
             @endphp
-               
+
             @empty
                 <tr>
                     <td colspan=4>Nenhum registro</td>
@@ -224,7 +250,7 @@
                 <th>@moeda($totalDevedorGeral - $totalPagoGeral)</th>
             </tr>
         </tfoot>
-    </table> 
+    </table>
     <br>
     <table>
         <thead>
@@ -257,7 +283,7 @@
                 <th>@moeda($chequesAguardandoEnvioTotal)</th>
             </tr>
         </tfoot>
-    </table> 
+    </table>
 </body>
 </html>
 

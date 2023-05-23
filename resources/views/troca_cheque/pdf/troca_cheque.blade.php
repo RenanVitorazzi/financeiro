@@ -8,6 +8,9 @@
     <title>{{ $troca->titulo }}</title>
 </head>
 <style>
+    * {
+        margin-top: 10px;
+    }
     table {
         width:100%;
         border-collapse: collapse;
@@ -17,24 +20,27 @@
         border: 1px solid black;
         text-align: center;
     }
-
     th {
         background-color:black;
         color:white;
     }
 
     tr:nth-child(even) {
-        background-color: #a9acb0;
+        background-color: #c9ced4;
     }
 
     h3 {
         text-align:center;
     }
+    .nome {
+        font-size: 10px;
+        text-align: left;
+        padding-left: 5px;
+    }
 </style>
 <body>
 <h3>
-    {{ $troca->parceiro->pessoa->nome ?? $troca->titulo }} - @data($troca->data_troca)<br> 
-    Taxa: {{ $troca->taxa_juros }}%
+    {{ $troca->titulo }} - @data($troca->data_troca) (Taxa: {{ $troca->taxa_juros }}%)
 </h3>
 
 <x-table>
@@ -51,7 +57,7 @@
     <tbody>
         @foreach ($cheques as $cheque)
             <tr>
-                <td>{{ substr($cheque->nome_cheque, 0, 25) }}</td>
+                <td class='nome'>{{ $cheque->nome_cheque }}</td>
                 <td>@data($cheque->data)</td>
                 <td>{{ $cheque->dias }}</td>
                 <td>@moeda($cheque->valor_parcela)</td>

@@ -30,12 +30,18 @@ Recebimentos
             @foreach ($pgtoRepresentante as $pgto)
             <tr class="{{ !$pgto->confirmado ? 'table-danger' : ''}}">
                 <td>@data($pgto->data)</td>
-                <td>{{ $pgto->parcela->nome_cheque ??  $pgto->parcela->venda->cliente->pessoa->nome}}</td>
+                <td>{{ $pgto->parcela->nome_cheque ??''}}</td>
                 <td>@moeda($pgto->valor)</td>
                 <td>{{ $pgto->conta->nome ?? ''}}</td>
                 <td>{{ $pgto->confirmado ? 'Sim' : 'Não' }}</td>
-                <td>{{ $pgto->parcela->representante->pessoa->nome }}</td>
-                <td>{{ $pgto->parcela->forma_pagamento}} - {{ $pgto->parcela->status }} </td>
+                <td>{{ $pgto->representante->pessoa->nome }}</td>
+                <td>
+                    @if($pgto->parcela)
+                        {{ $pgto->parcela->forma_pagamento}} - {{ $pgto->parcela->status }}
+                    @else
+                        Crédito conta-corrente
+                    @endif
+                </td>
                 <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href={{ route('recebimentos.edit', $pgto->id) }}>

@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Fornecedores
 <?php $__env->stopSection(); ?>
@@ -41,11 +40,16 @@ Fornecedores
     <div class="col-12">
         <ul class="d-flex list-group list-group">
             <?php $__empty_1 = true; $__currentLoopData = $fornecedores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $fornecedor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            
+
                 <li class='list-group-item d-flex justify-content-between'>
                     <div class='mt-2'>
-                        <span><?php echo e($fornecedor->pessoa->nome); ?></span>
-                        <span class="font-weight-bold ml-2 badge badge-pill <?php echo e($fornecedor->conta_corrente_sum_peso_agregado < 0 ? 'badge-danger' : 'badge-dark'); ?>"><?php echo number_format($fornecedor->conta_corrente_sum_peso_agregado, 2, ',', '.'); ?></span>
+                        <span><?php echo e($fornecedor->pessoa->nome); ?> </span>
+                        <span>(<?php echo number_format($fornecedor->conta_corrente_sum_peso_agregado, 2, ',', '.'); ?>g)</span>
+                        <?php if($fornecedor->conta_corrente_count > 0): ?>
+                            <span class="font-weight-bold ml-2 badge badge-pill badge-danger">
+                                Lançamento pendente
+                            </span>
+                        <?php endif; ?>
                     </div>
                     <div class='d-flex'>
                         <a class="btn btn-dark mr-2" title="Conta corrente" href="<?php echo e(route('fornecedores.show', $fornecedor->id)); ?>">
@@ -82,7 +86,7 @@ Fornecedores
         </ul>
     </div>
     
-   
+
 </div>
 
 
@@ -96,7 +100,7 @@ Fornecedores
     <?php if(Session::has('message')): ?>
         toastr["success"]("<?php echo e(Session::get('message')); ?>")
     <?php endif; ?>
-    
+
     // var poolColors = function (a) {
     //     var pool = [];
     //     for(i=0;i<a;i++){
@@ -116,9 +120,9 @@ Fornecedores
     //     labels: JSON.parse(LABELS),
     //     datasets: [{
     //         data: JSON.parse(DATA_GRAFICO),
-    //         backgroundColor: 
+    //         backgroundColor:
     //             poolColors(20)
-            
+
     //         ,
     //     }]
     // };
@@ -127,11 +131,12 @@ Fornecedores
     //     type: 'pie',
     //     data: data
     // };
-    
+
     // var myChart = new Chart(
     //     document.getElementById('myChart'),
     //     config
     // );
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/fornecedor/index.blade.php ENDPATH**/ ?>

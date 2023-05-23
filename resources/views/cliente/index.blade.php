@@ -8,7 +8,7 @@ Clientes
     <x-botao-novo href="{{ route('clientes.create') }}"></x-botao-novo>
 </div>
 <x-table id="myTable">
-    <x-table-header> 
+    <x-table-header>
         <tr>
             <th>Nome</th>
             <th>Representante</th>
@@ -34,14 +34,14 @@ Clientes
         </tr>
         @endforelse
     </tbody>
-</x-table> 
+</x-table>
 @endsection
 @section('script')
 <script>
     @if(Session::has('message'))
         toastr["success"]("{{ Session::get('message') }}")
     @endif
-    
+
     $(document).ready( function () {
         $('#myTable').DataTable();
     } );

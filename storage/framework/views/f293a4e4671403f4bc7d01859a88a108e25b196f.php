@@ -1,12 +1,10 @@
-
-
 <?php $__env->startSection('title'); ?>
 Representantes
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('body'); ?>
 <div class='mb-2 d-flex justify-content-between'>
-    <h3>Representantes</h3>  
+    <h3>Representantes</h3>
     <div class="d-flex">
         <?php if (isset($component)) { $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\BotaoImprimir::class, []); ?>
@@ -60,39 +58,40 @@ Representantes
 <?php endif; ?>
     <tbody>
         <?php $__empty_1 = true; $__currentLoopData = $representantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $representante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-        <tr>
-            <td><?php echo e($representante->pessoa->nome); ?></td>
-            <td><?php echo number_format($representante->conta_corrente->sum('peso_agregado'), 2, ',', '.'); ?>g</td>
-            <td><?php echo number_format($representante->conta_corrente->sum('fator_agregado'), 1, ',', '.'); ?>ft</td>
-            <!-- <td><?php echo 'R$ ' . number_format($devolvidos->where('representante_id', $representante->id)->sum('valor_parcela'), 2, ',', '.'); ?></td> -->
-            <td>
-                <a class="btn btn-dark" 
-                    title="Acerto de documentos" 
-                    target='_blank' 
-                    href="<?php echo e(route('pdf_acerto_documento', $representante->id)); ?>">
-                    Acertos
-                </a>
-                <a class="btn btn-dark" 
-                    title="Cheques Devolvidos " 
-                    target='_blank' 
-                    href="<?php echo e(route('pdf_cc_representante', $representante->id)); ?>">
-                    Chs Devolvidos 
-                </a>
-                <a class="btn btn-dark" 
-                    title="Conta Corrente" 
-                    target='_blank' 
-                    href="<?php echo e(route('conta_corrente_representante.show', $representante->id)); ?>">
-                    Conta Corrente
-                </a>
-                
-                <a class="btn btn-dark" 
-                    title="Vendas" 
-                    target='_blank' 
-                    href="<?php echo e(route('venda.show', $representante->id)); ?>">
-                    Vendas
-                </a>
-                
-            </td>
+        <?php if($representante->conta_corrente_sum_peso_agregado < 0|| $representante->conta_corrente_sum_fator_agregado < 0): ?>
+            <tr>
+                <td><?php echo e($representante->pessoa->nome); ?></td>
+                <td><?php echo number_format($representante->conta_corrente_sum_peso_agregado, 2, ',', '.'); ?></td>
+                <td><?php echo number_format($representante->conta_corrente_sum_fator_agregado, 1, ',', '.'); ?></td>
+                <td>
+                    <a class="btn btn-dark"
+                        title="Acerto de documentos"
+                        target='_blank'
+                        href="<?php echo e(route('pdf_acerto_documento', $representante->id)); ?>">
+                        Acertos
+                    </a>
+                    <a class="btn btn-dark"
+                        title="Cheques Devolvidos "
+                        target='_blank'
+                        href="<?php echo e(route('pdf_cc_representante', $representante->id)); ?>">
+                        Chs Devolvidos
+                    </a>
+                    <a class="btn btn-dark"
+                        title="Conta Corrente"
+                        target='_blank'
+                        href="<?php echo e(route('conta_corrente_representante.show', $representante->id)); ?>">
+                        Conta Corrente
+                    </a>
+
+                    <a class="btn btn-dark"
+                        title="Vendas"
+                        target='_blank'
+                        href="<?php echo e(route('venda.show', $representante->id)); ?>">
+                        Vendas
+                    </a>
+                    
+                </td>
+            <?php endif; ?>
         </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr>
@@ -114,4 +113,5 @@ Representantes
 <?php endif; ?>
 </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/representante/index.blade.php ENDPATH**/ ?>

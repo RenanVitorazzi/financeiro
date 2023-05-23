@@ -25,11 +25,15 @@
     tr:nth-child(even) {
         background-color: #a9acb0;
     }
+    .debito {
+        color: red;
+        font-weight: 300;
+    }
 </style>
 <body>
     <h1>
         <div>
-            {{ $fornecedor->pessoa->nome }} 
+            {{ $fornecedor->pessoa->nome }}
             (@peso($registrosContaCorrente[count($registrosContaCorrente)-1]->saldo))
         </div>
     </h1>
@@ -37,37 +41,47 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Balanço</th>
-                <th>Peso</th>
+                <th>Débito</th>
+                <th>Crédito</th>
                 <th>Observação</th>
                 <th>Total</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($registrosContaCorrente as $conta)
-                @if ($loop->last)
-                    <tr>
-                        <td><b>@data($conta->data)</b></td>
-                        <td><b>{{ $conta->balanco }}</b></td>
-                        <td><b>@peso($conta->peso)</b></td>
-                        <td><b>{{ $conta->observacao }}</b></td>
-                        <td><b>@peso($conta->saldo)</b></td>
-                    </tr>
-                @else
-                    <tr>
-                        <td>@data($conta->data)</td>
-                        <td>{{ $conta->balanco }}</td>
-                        <td>@peso($conta->peso)</td>
-                        <td>{{ $conta->observacao }}</td>
-                        <td>@peso($conta->saldo)</td>
-                    </tr>
-                @endif 
+                @if ($conta->data > $data_inicio)
+
+
+                    @if ($conta->balanco == 'Débito')
+                        <tr>
+                            <td>@data($conta->data)</td>
+                            <td>@peso($conta->peso)</td>
+                            <td></td>
+                            <td>{{ $conta->observacao }}</td>
+                            <td>@peso($conta->saldo)</td>
+                        </tr>
+                    @else
+                        <tr>
+                            <td>@data($conta->data)</td>
+                            <td></td>
+                            <td>@peso($conta->peso)</td>
+                            <td>{{ $conta->observacao }}</td>
+                            <td>@peso($conta->saldo)</td>
+                        </tr>
+                    @endif
+                @endif
             @empty
                 <tr>
                     <td colspan=5>Nenhum registro</td>
                 </tr>
             @endforelse
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan=4>Saldo atual</td>
+                <td class='debito'>@peso($registrosContaCorrente[count($registrosContaCorrente) - 1]->saldo)</td>
+            </tr>
+        </tfoot>
     </table>
 </body>
 </html>

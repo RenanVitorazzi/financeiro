@@ -8,6 +8,9 @@
     <title><?php echo e($troca->titulo); ?></title>
 </head>
 <style>
+    * {
+        margin-top: 10px;
+    }
     table {
         width:100%;
         border-collapse: collapse;
@@ -17,24 +20,27 @@
         border: 1px solid black;
         text-align: center;
     }
-
     th {
         background-color:black;
         color:white;
     }
 
     tr:nth-child(even) {
-        background-color: #a9acb0;
+        background-color: #c9ced4;
     }
 
     h3 {
         text-align:center;
     }
+    .nome {
+        font-size: 10px;
+        text-align: left;
+        padding-left: 5px;
+    }
 </style>
 <body>
 <h3>
-    <?php echo e($troca->parceiro->pessoa->nome ?? $troca->titulo); ?> - <?php echo date('d/m/Y', strtotime($troca->data_troca)); ?><br> 
-    Taxa: <?php echo e($troca->taxa_juros); ?>%
+    <?php echo e($troca->titulo); ?> - <?php echo date('d/m/Y', strtotime($troca->data_troca)); ?> (Taxa: <?php echo e($troca->taxa_juros); ?>%)
 </h3>
 
 <?php if (isset($component)) { $__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6 = $component; } ?>
@@ -66,7 +72,7 @@
     <tbody>
         <?php $__currentLoopData = $cheques; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cheque): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <tr>
-                <td><?php echo e(substr($cheque->nome_cheque, 0, 25)); ?></td>
+                <td class='nome'><?php echo e($cheque->nome_cheque); ?></td>
                 <td><?php echo date('d/m/Y', strtotime($cheque->data)); ?></td>
                 <td><?php echo e($cheque->dias); ?></td>
                 <td><?php echo 'R$ ' . number_format($cheque->valor_parcela, 2, ',', '.'); ?></td>
@@ -90,4 +96,5 @@
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
 </body>
-</html><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/troca_cheque/pdf/troca_cheque.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/troca_cheque/pdf/troca_cheque.blade.php ENDPATH**/ ?>
