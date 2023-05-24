@@ -279,7 +279,9 @@ class RepresentanteController extends Controller {
             ->whereHas('entrega', function ($query) {
                 $query->whereNull('entregue_representante');
             })
+            ->where('status', '<>', 'Pago')
             ->where('representante_id', $representante->id)
+            ->orderBy('nome_cheque')
             ->orderBy('data_parcela')
             ->get();
 

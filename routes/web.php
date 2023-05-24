@@ -72,7 +72,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('entrega_parcela/receber_parceiro/{parceiro_id}', [EntregaParcelaController::class, 'receber_parceiro'])->name('receber_parceiro');
         Route::get('entrega_parcela/entrega_representante/{representante_id}', [EntregaParcelaController::class, 'entrega_representante'])->name('entrega_representante');
 
-        //Importacao
+        //? Importação
         Route::view('import', 'despesa.import')->name('import');
         Route::post('despesa/import', [DespesaController::class, 'importDespesas'])->name('importDespesas');
         Route::view('despesa/importacao', 'despesa.importacao')->name('importacao');

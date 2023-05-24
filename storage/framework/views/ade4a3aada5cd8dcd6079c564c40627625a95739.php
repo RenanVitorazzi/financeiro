@@ -8,7 +8,7 @@
 </head>
 <style>
     table {
-        width:100%;
+        width: 100%;
         border-collapse: collapse;
         font-size: 12px;
     }
@@ -61,10 +61,6 @@
                     <td><?php echo 'R$ ' . number_format(($venda->peso * $venda->cotacao_peso) + ($venda->fator * $venda->cotacao_fator), 2, ',', '.'); ?></td>
                     <td><?php echo 'R$ ' . number_format($venda->valor_total, 2, ',', '.'); ?></td>
                 </tr>
-                <?php
-                    $totalVendaPeso += ($venda->peso * $venda->cotacao_peso);
-                    $totalVendaFator += ($venda->fator * $venda->cotacao_fator);
-                ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan=8>Nenhum registro</td>
@@ -81,21 +77,42 @@
         </tbody>
     </table>
     <br>
+
     <table>
         <thead>
+
             <tr>
-                <th>Média Preço Peso</th>
-                <th>Média Preço Fator</th>
-                <th>Total Vendas (Prazo)</th>
-                <th>Total Vendas (À Vista)</th>
+                <th>Porcentagem</th>
+                <th>Total de vendas (g)</th>
+                <th>Total de comissão (g)</th>
+                <th>Média de preço</th>
+                <th>Valor comissão</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><?php echo 'R$ ' . number_format($totalVendaPeso / $vendas->sum('peso'), 2, ',', '.'); ?></td>
-                <td><?php echo 'R$ ' . number_format($totalVendaFator / $vendas->sum('fator'), 2, ',', '.'); ?></td>
-                <td><?php echo e($vendas->where('metodo_pagamento', '=', 'Parcelado')->count()); ?></td>
-                <td><?php echo e($vendas->where('metodo_pagamento', '=', 'À vista')->count()); ?></td>
+                <td>Peso (<?php echo e($comissaoRepresentante["porcentagem_peso"]); ?> %)</td>
+                <td><?php echo number_format($vendas->sum('peso'), 2, ',', '.'); ?></td>
+                <td><?php echo number_format($vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100), 2, ',', '.'); ?></td>
+                <td><?php echo 'R$ ' . number_format($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso'), 2, ',', '.'); ?></td>
+                <td>
+                    <?php echo 'R$ ' . number_format(($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso')) * $vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100), 2, ',', '.'); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>Fator (<?php echo e($comissaoRepresentante["porcentagem_fator"]); ?> %)</td>
+                <td><?php echo number_format($vendas->sum('fator'), 1, ',', '.'); ?></td>
+                <td><?php echo number_format($vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100), 2, ',', '.'); ?></td>
+                <td><?php echo 'R$ ' . number_format($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator'), 2, ',', '.'); ?></td>
+                <td>
+                    <?php echo 'R$ ' . number_format(($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator')) * $vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100), 2, ',', '.'); ?>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=4>Total</td>
+                <td><?php echo 'R$ ' . number_format(($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso')) * $vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100)
+                    +
+                    ($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator')) * $vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100), 2, ',', '.'); ?></td>
             </tr>
         </tbody>
     </table>
@@ -123,7 +140,7 @@
             <tfoot>
                 <tr>
                     <td colspan=2><b>Total</b></td>
-                    <td><b><?php echo 'R$ ' . number_format($pagamentos_total, 2, ',', '.'); ?></b></td>
+                    <td><b><?php echo 'R$ ' . number_format($pagamentosTotal, 2, ',', '.'); ?></b></td>
                 </tr>
             </tfoot>
         </tbody>

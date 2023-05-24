@@ -55,6 +55,14 @@ class Parcela extends Model
             ->where('parceiro_id', NULL);
     }
 
+    public function scopeOps($query)
+    {
+        return $query->where([
+                    ['forma_pagamento', 'Transferência Bancária'],
+                    ['status', 'Aguardando Pagamento']
+                ])->whereNull('parceiro_id');
+    }
+
     public function scopeAcharRepresentante($query, $id)
     {
         return $query->where('representante_id', $id);
@@ -69,6 +77,11 @@ class Parcela extends Model
     {
         return $this->hasMany(PagamentosRepresentantes::class);
     }
+
+    // public function cliente()
+    // {
+    //     return $this->hasOneThrough(Cliente::class, Venda::class);
+    // }
 
     protected static function booted()
     {

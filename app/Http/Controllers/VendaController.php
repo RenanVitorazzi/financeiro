@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class VendaController extends Controller
 {
@@ -230,71 +231,52 @@ class VendaController extends Controller
 
     public function pdf_conferencia_relatorio_vendas($representante_id)
     {
-
-        // $vendas = DB::select( "SELECT v.data_venda, peso,fator, valor_total, p.nome as nome_cliente
-        //     from vendas  v
-        //     INNER JOIN clientes c ON c.id = v.cliente_id
-        //     INNER JOIN pessoas p ON p.id = c.pessoa_id
-        //     WHERE
-        //     enviado_conta_corrente is null
-        //     AND v.representante_id = ?
-        //     AND v.deleted_at is NULL
-        //     ORDER BY data_venda, v.created_at",
-        //     [$representante_id]
-        // );
-
         $vendas = Venda::with('cliente')
             ->whereNull('enviado_conta_corrente')
             ->where('representante_id', '=', $representante_id)
-            ->get();
-            // dd($vendas);
-        // $pagamentos = DB::select( "SELECT
-        //         SUM(valor_parcela) valor, forma_pagamento, status
-        //     FROM
-        //         parcelas
-        //     WHERE
-        //         venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL )
-        //     GROUP BY forma_pagamento , status",
-        //     [$representante_id]
-        // );
+        ->get();
 
         $pagamentos = Parcela::whereHas('venda', function (Builder $query) use ($representante_id) {
                 $query->whereNull('enviado_conta_corrente')
                     ->where('representante_id', '=', $representante_id);
             })
-            ->get();
+        ->get();
 
         $pagamentosPorForma = $pagamentos->groupBy('forma_pagamento')->groupBy('status')->first();
-        // dd($pagamentosPorForma->first()->sum('valor_parcela') );
-        $pagamentos_total = $pagamentos->sum('valor_parcela');
-        // dd($pagamentos_total);
-        // dd($pagamentos);
 
-        // $pagamentos_total = DB::select( "SELECT
-        //         SUM(valor_parcela) AS valor
-        //     FROM
-        //         parcelas
-        //     WHERE
-        //         venda_id IN (SELECT  id FROM vendas WHERE enviado_conta_corrente IS NULL  AND representante_id = ? AND deleted_at is NULL ) ",
-        //     [$representante_id]
-        // );
-
-        // $totalVendas = DB::select( "SELECT SUM(peso) AS peso, SUM(fator) AS fator, SUM(valor_total) AS valor_total
-        //     from vendas  v
-        //     WHERE enviado_conta_corrente is null
-        //     AND v.deleted_at is NULL
-        //     AND v.representante_id = ?",
-        //     [$representante_id]
-        // );
-
+        $pagamentosTotal = $pagamentos->sum('valor_parcela');
 
         $representante = Representante::findOrFail($representante_id);
-        $totalVendaPeso = 0;
-        $totalVendaFator = 0;
+
+        $totalVendaPesoAVista = 0;
+        $totalVendaFatorAVista = 0;
+
+        foreach( $vendas->where('metodo_pagamento', 'À vista') as $venda) {
+            $totalVendaPesoAVista += ($venda->peso * $venda->cotacao_peso);
+            $totalVendaFatorAVista += ($venda->fator * $venda->cotacao_fator);
+        }
+
+        // $pesoComissao = $totalVendaPesoAVista / ;
+        // $fatorComissao = ;
+
+        $comissao_json = Storage::disk('public')
+            ->get('comissao_representantes/porcentagem.json');
+        $comissao_array = json_decode($comissao_json, true);
+
+        $comissaoRepresentante = $comissao_array[$representante->id] ?? $comissao_array["Default"];
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('venda.pdf.pdf_conferencia_relatorio_vendas',
-            compact('vendas', 'representante', 'pagamentos', 'pagamentos_total', 'pagamentosPorForma', 'totalVendaPeso', 'totalVendaFator')
+            compact(
+                'vendas',
+                'representante',
+                'pagamentos',
+                'pagamentosTotal',
+                'pagamentosPorForma',
+                'totalVendaPesoAVista',
+                'totalVendaFatorAVista',
+                'comissaoRepresentante'
+            )
         );
 
         return $pdf->stream();

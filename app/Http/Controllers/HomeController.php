@@ -19,7 +19,7 @@ class HomeController extends Controller
     }
 
     public function index()
-    { 
+    {
         $depositos = Parcela::where([
                 ['data_parcela','<=', DB::raw('CURDATE()')],
                 ['parceiro_id', NULL],
@@ -30,7 +30,7 @@ class HomeController extends Controller
             ->orderBy('valor_parcela')
             ->orderBy('nome_cheque')
             ->get();
-        
+
         $qtdDiasParaSexta = 5 - Carbon::now()->dayOfWeek;
 
         $idFixasPagas = ModelsDespesa::with('local')
@@ -38,29 +38,36 @@ class HomeController extends Controller
             ->whereNotNull('fixas_id')
             ->orderBy('local_id')
             ->pluck('fixas_id');
-            
+
         $fixasNaoPagas = DespesaFixa::with('local')
             ->whereNotIn('id', $idFixasPagas)
             ->where('dia_vencimento', '<=', DB::raw('DAY(CURDATE()+7)'))
             ->get();
 
-        $adiamentos = DB::select('SELECT 
-                data_parcela, 
-                nome_cheque, 
-                valor_parcela, 
+        $adiamentos = DB::select('SELECT
+                data_parcela,
+                nome_cheque,
+                valor_parcela,
                 a.nova_data,
                 numero_cheque,
-                (SELECT nome from pessoas where pessoas.id = r.pessoa_id) as representante, 
-                (SELECT nome from pessoas where pessoas.id = pa.pessoa_id) as parceiro 
-            FROM 
-                parcelas p 
-            INNER JOIN adiamentos a ON a.parcela_id = p.id  
-            LEFT JOIN representantes r ON r.id = p.representante_id 
+                (SELECT nome from pessoas where pessoas.id = r.pessoa_id) as representante,
+                (SELECT nome from pessoas where pessoas.id = pa.pessoa_id) as parceiro
+            FROM
+                parcelas p
+            INNER JOIN adiamentos a ON a.parcela_id = p.id
+            LEFT JOIN representantes r ON r.id = p.representante_id
             LEFT JOIN parceiros pa ON pa.id = p.parceiro_id
             WHERE CONVERT(a.created_at, DATE) = CURDATE()
             ORDER BY pa.id'
         );
-            
-        return view('home', compact('depositos', 'adiamentos', 'fixasNaoPagas'));
-    }   
+
+        $ops = Parcela::ops()
+            ->with('representante.pessoa', 'venda.cliente.pessoa', 'pagamentos_representantes')
+            ->where('data_parcela', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->where('representante_id', '<>', 3)
+            ->orderBy('representante_id')
+            ->get();
+
+        return view('home', compact('depositos', 'adiamentos', 'fixasNaoPagas', 'ops'));
+    }
 }

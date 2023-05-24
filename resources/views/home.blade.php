@@ -90,6 +90,43 @@
     </tbody>
 </x-table>
 
+<x-table id="ops">
+    <x-tableheader>
+        <th colspan=6>Ordens de pagamentos dessa semana</th>
+    </x-tableheader>
+
+    <x-tableheader>
+        <th>#</th>
+        <th>Cliente</th>
+        <th>Data</th>
+        <th>Valor</th>
+        <th>Representante</th>
+        <th>Pagamentos</th>
+    </x-tableheader>
+    <tbody>
+    @forelse ($ops as $ordem)
+        <tr>
+            <td>{{ $loop->index + 1}}</td>
+            <td>{{ $ordem->venda->cliente->pessoa->nome ?? $ordem->nome_cheque}}</td>
+            <td>@data($ordem->data_parcela)</td>
+            <td>@moeda($ordem->valor_parcela)</td>
+            <td>{{ $ordem->representante->pessoa->nome }}</td>
+            <td>
+                @forelse ($ordem->pagamentos_representantes as $pagamento)
+                    <div>@data($pagamento->data) @moeda($pagamento->valor)</div>
+                @empty
+                    @moeda(0)
+                @endforelse
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan=8>Nenhuma ordem de pagamento</td>
+        </tr>
+    @endforelse
+    </tbody>
+</x-table>
+
 <a class="btn btn-dark" target="_blank" href="{{ route('pdf_diario') }}">Impresso diário</a>
 @endsection
 @section('script')
@@ -99,12 +136,12 @@
 
         toastr.success('Adiamentos copiados')
     })
-    
+
     function copyToClipboard() {
         let msg = '<b>PRORROGAÇÕES</b><br><br>';
 
         $("#adiamentos > tbody > tr").each( (index, element) => {
-            
+
             var nome = $(element).children("td").eq(1).html()
             var valor = $(element).children("td").eq(2).html()
             var data = $(element).children("td").eq(3).html()
@@ -116,7 +153,7 @@
         let aux = document.createElement("div");
         aux.setAttribute("contentEditable", true);
         aux.innerHTML = msg;
-        aux.setAttribute("onfocus", "document.execCommand('selectAll', false, null)"); 
+        aux.setAttribute("onfocus", "document.execCommand('selectAll', false, null)");
         document.body.appendChild(aux);
         aux.focus();
         document.execCommand("copy");

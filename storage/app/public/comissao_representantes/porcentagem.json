@@ -1,0 +1,22 @@
+{
+    "Default" : {
+        "porcentagem_peso" : 10,
+        "porcentagem_fator" : 20
+    },
+    "5" : {
+        "porcentagem_peso" : 8,
+        "porcentagem_fator" : 14
+    },
+    "3" : {
+        "porcentagem_peso" : 8,
+        "porcentagem_fator" : 14
+    },
+    "1" : {
+        "porcentagem_peso" : 10,
+        "porcentagem_fator" : 25
+    },
+    "24" : {
+        "porcentagem_peso" : 10,
+        "porcentagem_fator" : 25
+    }
+}

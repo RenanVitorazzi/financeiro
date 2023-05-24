@@ -8,7 +8,7 @@
 </head>
 <style>
     table {
-        width:100%;
+        width: 100%;
         border-collapse: collapse;
         font-size: 12px;
     }
@@ -60,10 +60,6 @@
                     <td>@moeda(($venda->peso * $venda->cotacao_peso) + ($venda->fator * $venda->cotacao_fator))</td>
                     <td>@moeda($venda->valor_total)</td>
                 </tr>
-                @php
-                    $totalVendaPeso += ($venda->peso * $venda->cotacao_peso);
-                    $totalVendaFator += ($venda->fator * $venda->cotacao_fator);
-                @endphp
             @empty
                 <tr>
                     <td colspan=8>Nenhum registro</td>
@@ -80,21 +76,44 @@
         </tbody>
     </table>
     <br>
+
     <table>
         <thead>
+
             <tr>
-                <th>Média Preço Peso</th>
-                <th>Média Preço Fator</th>
-                <th>Total Vendas (Prazo)</th>
-                <th>Total Vendas (À Vista)</th>
+                <th>Porcentagem</th>
+                <th>Total de vendas (g)</th>
+                <th>Total de comissão (g)</th>
+                <th>Média de preço</th>
+                <th>Valor comissão</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>@moeda($totalVendaPeso / $vendas->sum('peso') )</td>
-                <td>@moeda($totalVendaFator / $vendas->sum('fator'))</td>
-                <td>{{ $vendas->where('metodo_pagamento', '=', 'Parcelado')->count() }}</td>
-                <td>{{ $vendas->where('metodo_pagamento', '=', 'À vista')->count() }}</td>
+                <td>Peso ({{ $comissaoRepresentante["porcentagem_peso"] }} %)</td>
+                <td>@peso($vendas->sum('peso'))</td>
+                <td>@peso($vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100))</td>
+                <td>@moeda($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso'))</td>
+                <td>
+                    @moeda(($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso')) * $vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100))
+                </td>
+            </tr>
+            <tr>
+                <td>Fator ({{ $comissaoRepresentante["porcentagem_fator"] }} %)</td>
+                <td>@fator($vendas->sum('fator'))</td>
+                <td>@peso($vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100))</td>
+                <td>@moeda($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator'))</td>
+                <td>
+                    @moeda(($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator')) * $vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100))
+                </td>
+            </tr>
+            <tr>
+                <td colspan=4>Total</td>
+                <td>@moeda(
+                    ($totalVendaPesoAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('peso')) * $vendas->sum('peso') * ($comissaoRepresentante["porcentagem_peso"] / 100)
+                    +
+                    ($totalVendaFatorAVista / $vendas->where('metodo_pagamento', 'À vista')->sum('fator')) * $vendas->sum('fator') * ($comissaoRepresentante["porcentagem_fator"] / 100)
+                )</td>
             </tr>
         </tbody>
     </table>
@@ -122,7 +141,7 @@
             <tfoot>
                 <tr>
                     <td colspan=2><b>Total</b></td>
-                    <td><b>@moeda($pagamentos_total)</b></td>
+                    <td><b>@moeda($pagamentosTotal)</b></td>
                 </tr>
             </tfoot>
         </tbody>
