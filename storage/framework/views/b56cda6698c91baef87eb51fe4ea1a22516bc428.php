@@ -34,7 +34,7 @@ Recebimentos
 <?php $component->withName('table'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes([]); ?>
+<?php $component->withAttributes(['id' => 'tableRecebimentos']); ?>
     <?php if (isset($component)) { $__componentOriginalc30ad8c2a191ad4361a1cb232afac54beb39ce36 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\TableHeader::class, []); ?>
 <?php $component->withName('table-header'); ?>
@@ -51,7 +51,7 @@ Recebimentos
             <th>Conta</th>
             <th>Confirmado?</th>
             <th>Representante</th>
-            <th>Dados da dívida</th>
+            
             <th><i class='fas fa-edit'></i></th>
         </tr>
      <?php echo $__env->renderComponent(); ?>
@@ -64,19 +64,20 @@ Recebimentos
             <?php $__currentLoopData = $pgtoRepresentante; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pgto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <tr class="<?php echo e(!$pgto->confirmado ? 'table-danger' : ''); ?>">
                 <td><?php echo date('d/m/Y', strtotime($pgto->data)); ?></td>
-                <td><?php echo e($pgto->parcela->nome_cheque ??''); ?></td>
+                <td>
+                    <?php if(!$pgto->parcela()->exists()): ?>
+                        CRÉDITO CONTA-CORRENTE
+                    <?php else: ?>
+                        <?php echo e($pgto->parcela->venda_id !== NULL ? $pgto->parcela->venda->cliente->pessoa->nome : $pgto->parcela->nome_cheque); ?>
+
+                    <?php endif; ?>
+                </td>
+                
+
                 <td><?php echo 'R$ ' . number_format($pgto->valor, 2, ',', '.'); ?></td>
                 <td><?php echo e($pgto->conta->nome ?? ''); ?></td>
                 <td><?php echo e($pgto->confirmado ? 'Sim' : 'Não'); ?></td>
                 <td><?php echo e($pgto->representante->pessoa->nome); ?></td>
-                <td>
-                    <?php if($pgto->parcela): ?>
-                        <?php echo e($pgto->parcela->forma_pagamento); ?> - <?php echo e($pgto->parcela->status); ?>
-
-                    <?php else: ?>
-                        Crédito conta-corrente
-                    <?php endif; ?>
-                </td>
                 <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href=<?php echo e(route('recebimentos.edit', $pgto->id)); ?>>
@@ -106,13 +107,18 @@ Recebimentos
 <?php unset($__componentOriginale53a9d2e6d6c51019138cc2fcd3ba8ac893391c6); ?>
 <?php endif; ?>
 
-
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
 <script>
     <?php if(Session::has('message')): ?>
         toastr["success"]("<?php echo e(Session::get('message')); ?>")
     <?php endif; ?>
+
+    $(document).ready( function () {
+        $('#tableRecebimentos').DataTable({
+            order: []
+        });
+    } );
 </script>
 <?php $__env->stopSection(); ?>
 

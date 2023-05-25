@@ -10,7 +10,7 @@ Recebimentos
         <x-botao-novo href="{{ route('recebimentos.create') }}"></x-botao-novo>
     </div>
 </div>
-<x-table>
+<x-table id="tableRecebimentos">
     <x-table-header>
         <tr>
             <th colspan=8>Últimos lançamentos</th>
@@ -22,7 +22,7 @@ Recebimentos
             <th>Conta</th>
             <th>Confirmado?</th>
             <th>Representante</th>
-            <th>Dados da dívida</th>
+            {{-- <th>Dados da dívida</th> --}}
             <th><i class='fas fa-edit'></i></th>
         </tr>
     </x-table-header>
@@ -30,18 +30,19 @@ Recebimentos
             @foreach ($pgtoRepresentante as $pgto)
             <tr class="{{ !$pgto->confirmado ? 'table-danger' : ''}}">
                 <td>@data($pgto->data)</td>
-                <td>{{ $pgto->parcela->nome_cheque ??''}}</td>
+                <td>
+                    @if (!$pgto->parcela()->exists())
+                        CRÉDITO CONTA-CORRENTE
+                    @else
+                        {{ $pgto->parcela->venda_id !== NULL ? $pgto->parcela->venda->cliente->pessoa->nome : $pgto->parcela->nome_cheque }}
+                    @endif
+                </td>
+                {{-- <td>{{ $pgto->parcela->venda_id !== NULL ? $pgto->parcela->venda->cliente->pessoa->nome : $pgto->parcela->nome_cheque }}</td> --}}
+
                 <td>@moeda($pgto->valor)</td>
                 <td>{{ $pgto->conta->nome ?? ''}}</td>
                 <td>{{ $pgto->confirmado ? 'Sim' : 'Não' }}</td>
                 <td>{{ $pgto->representante->pessoa->nome }}</td>
-                <td>
-                    @if($pgto->parcela)
-                        {{ $pgto->parcela->forma_pagamento}} - {{ $pgto->parcela->status }}
-                    @else
-                        Crédito conta-corrente
-                    @endif
-                </td>
                 <td>
                     <div class='d-flex'>
                         <a class='btn btn-dark mr-2' href={{ route('recebimentos.edit', $pgto->id) }}>
@@ -56,12 +57,17 @@ Recebimentos
     </tbody>
 </x-table>
 
-
 @endsection
 @section('script')
 <script>
     @if(Session::has('message'))
         toastr["success"]("{{ Session::get('message') }}")
     @endif
+
+    $(document).ready( function () {
+        $('#tableRecebimentos').DataTable({
+            order: []
+        });
+    } );
 </script>
 @endsection

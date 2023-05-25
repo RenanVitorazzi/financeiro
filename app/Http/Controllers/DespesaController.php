@@ -176,14 +176,16 @@ class DespesaController extends Controller
 
     public function pdf_despesa_mensal ($mes)
     {
-        $despesas = ModelsDespesa::with('local')
-            ->where(DB::raw('MONTH(data_vencimento)'), DB::raw($mes))
+        $despesas = ModelsDespesa::where(DB::raw('MONTH(data_vencimento)'), DB::raw($mes))
             ->where(DB::raw('YEAR(data_vencimento)'), DB::raw('YEAR(CURDATE())'))
             ->orderBy('local_id')
+            ->orderBy('data_vencimento')
             ->get();
 
+        $local = Local::all();
+        // dd($despesas->where('local_id', 1)->sum('valor'));
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('despesa.pdf.pdf_despesa_mensal', compact('despesas', 'mes') );
+        $pdf->loadView('despesa.pdf.pdf_despesa_mensal', compact('despesas', 'mes', 'local') );
 
         return $pdf->stream();
     }

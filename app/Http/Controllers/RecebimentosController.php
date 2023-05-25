@@ -26,14 +26,10 @@ class RecebimentosController extends Controller
     public function index()
     {
         $pgtoRepresentante = PagamentosRepresentantes::with('parcela')
-            ->orderBy('id', 'desc')
-            ->take(15)
+            ->orderBy('data', 'desc')
+
             ->get();
         // dd($pgtoRepresentante);
-
-        // $pgtoParceiro = PagamentosParceiros::with('parcela')
-        //     ->where('confirmado', 0)
-        //     ->get();
 
         return view('recebimento.index', compact('pgtoRepresentante'));
     }

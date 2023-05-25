@@ -7,67 +7,76 @@
     <title>Despesas {{$mes}}</title>
 </head>
 <style>
+    * {
+        margin:5 10 10 5;
+    }
     table {
         width:100%;
         border-collapse: collapse;
         font-size: 12px;
+        page-break-inside: avoid;
     }
     td, th {
         border: 1px solid black;
         text-align: center;
     }
     th {
-        background-color:black;
-        color:white;
+        background-color:#d6dae0;
+        /* color:white; */
     }
-    tr:nth-child(even) {
-        background-color: #a9acb0;
-    }
-    h3 {
+
+    h5, h3 {
         text-align: center;
-    }
-    .credito {
-        background-color:palegreen;
-        font-size: 20px;
-    }
-    .debito {
-        background-color:crimson;
-        font-size: 20px;
     }
 </style>
 <body>
-    <h3>Despesas - Mês {{$mes}}</h3>
-    <table>
+    <h5>Despesas - Mês {{$mes}}</h5>
+
+    @foreach ($despesas->groupBy('local_id') as $key => $despesa_local)
+        <table>
+            <thead>
+                <tr>
+                    <th colspan=3>
+                        {{ $local->where('id', $key)->first()->nome }}
+                        (@moeda( $despesas->where('local_id', $key)->sum('valor')))
+                    </th>
+                </tr>
+                {{-- <tr>
+                    <th>Data</th>
+                    <th>Nome</th>
+                    <th>Valor</th>
+                </tr> --}}
+            </thead>
+            <tbody>
+                @forelse ($despesas->where('local_id', $key) as $despesa)
+                    <tr>
+                        <td>@data($despesa->data_vencimento)</td>
+                        <td class='nome'>{{$despesa->nome}}</td>
+                        <td>@moeda($despesa->valor)</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan=3>Nenhuma despesa</td>
+                    </tr>
+                @endforelse
+            </tbody>
+            {{-- <tfoot>
+                <tr>
+                    <td colspan=2>Total</td>
+                    <td>@moeda( $despesas->where('local_id', $key)->sum('valor') )</td>
+                </tr>
+            </tfoot> --}}
+        </table>
+    @endforeach
+    <h3>Total Geral: @moeda($despesas->sum('valor'))</h3>
+    {{-- <table>
         <thead>
             <tr>
-                <th>Data</th>
-                <th>Nome</th>
-                <th>Local</th>
-                <th>Valor</th>
-                
+                <th>Total geral</th>
+                <th>@moeda($despesas->sum('valor'))</th>
             </tr>
         </thead>
-        <tbody>
-            @forelse ($despesas as $despesa)
-                <tr>
-                    <td>@data($despesa->data_vencimento)</td>
-                    <td class='nome'>{{$despesa->nome}}</td>
-                    <td>{{ $despesa->local->nome }}</td>
-                    <td>@moeda($despesa->valor)</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan=4>Nenhum registro</td>
-                </tr>
-            @endforelse
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan=3><b>TOTAL</b></td>
-                <td colspan=1><b>@moeda($despesas->sum('valor'))</b></td>
-            </tr>
-        </tfoot>
-    </table>
+    </table> --}}
 </body>
 </html>
 
