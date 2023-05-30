@@ -122,13 +122,13 @@ class EntregaParcelaController extends Controller
                 p.numero_cheque,
                 ep.entregue_representante,
                 IF (
-					(SELECT id from movimentacoes_cheques WHERE parcela_id = p.id AND status like ?) > 0, ?, p.status
+					(SELECT id from movimentacoes_cheques WHERE parcela_id = p.id AND status like ? limit 1) > 0, ?, p.status
                 ) as status
             FROM parcelas p
             INNER JOIN entrega_parcela ep ON p.id = ep.parcela_id
             WHERE p.representante_id = ?
                 AND entregue_representante = ?
-            ORDER BY p.data_parcela,p.valor_parcela',
+            ORDER BY p.status, p.nome_cheque,p.data_parcela,p.valor_parcela',
             ['Pago representante', 'Pago', $representante_id, $data_entrega]
         );
 
