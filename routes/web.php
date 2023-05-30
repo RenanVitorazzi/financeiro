@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_cc_parceiro/{parceiro_id}', [ParceiroController::class, 'pdf_cc_parceiro'])->name('pdf_cc_parceiro');
         Route::get('pdf_cc_representante/{representante_id}', [RepresentanteController::class, 'pdf_cc_representante'])->name('pdf_cc_representante');
-        Route::get('pdf_cheques_devolvidos_escritorio/{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
+        Route::get('    /{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
         Route::get('pdf_fornecedor/{id}/{data_inicio}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
@@ -105,6 +105,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_consignados_geral', [ConsignadoController::class, 'pdf_consignados_geral'])->name('pdf_consignados_geral');
         Route::get('pdf_relatorio_mensal/{mes}/{ano}', [FornecedorController::class, 'pdf_relatorio_mensal'])->name('pdf_relatorio_mensal');
         Route::get('pdf_confirmar_depositos', [RecebimentosController::class, 'pdf_confirmar_depositos'])->name('pdf_confirmar_depositos');
+        Route::get('pdf_cc_representante_com_cheques_devolvidos/{representante_id}', [RepresentanteController::class, 'pdf_cc_representante_com_cheques_devolvidos'])->name('pdf_cc_representante_com_cheques_devolvidos');
 
         //? Anexos
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
