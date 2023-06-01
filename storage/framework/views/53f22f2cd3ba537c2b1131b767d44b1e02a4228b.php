@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title'); ?>
 Adicionar estoque
 <?php $__env->stopSection(); ?>
@@ -21,7 +20,7 @@ Adicionar estoque
                 <label for="balanco">Data</label>
                 <input class="form-control" disabled type="date" value="<?php echo e($conta_corrente->data); ?>"></input>
             </div>
-            
+
             <div class="col-3">
                 <label for="balanco">Nome</label>
                 <input class="form-control" disabled type="text" value="<?php echo e($conta_corrente->nome); ?>"></input>
@@ -34,7 +33,7 @@ Adicionar estoque
                 <label for="balanco">Balanço</label>
                 <input class="form-control" disabled type="text" value="<?php echo e($balancoReal); ?>"></input>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 <?php endif; ?>
@@ -63,11 +62,11 @@ Adicionar estoque
                 </div>
                 <div class="col-3">
                     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['type' => 'number','name' => 'peso','value' => ''.e(old('peso')).'']]); ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.form-group','data' => ['type' => 'text','name' => 'peso','value' => ''.e(old('peso')).'']]); ?>
 <?php $component->withName('form-group'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['type' => 'number','name' => 'peso','value' => ''.e(old('peso')).'']); ?>Peso <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['type' => 'text','name' => 'peso','value' => ''.e(old('peso')).'']); ?>Peso <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
 <?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
@@ -101,7 +100,7 @@ Adicionar estoque
                         <!-- REPOSIÇÃO/COMPRA DO REPRESENTANTE -->
                         <?php elseif( ($balancoReal=='Reposição' && $tabela == 'conta_corrente_representante')): ?>
                             <option value='Débito' selected>Débito (Saída)</option>
-                        <?php else: ?>                            
+                        <?php else: ?>
                             <option></option>
                             <option value='Crédito'>Crédito (Entrada)</option>
                             <option value='Débito'>Débito (Saída)</option>
@@ -113,7 +112,21 @@ Adicionar estoque
 <?php unset($__componentOriginal9664ac210be45add4be058f3177c16028511e71a); ?>
 <?php endif; ?>
                 </div>
-            </div> 
+                <div class='col-12'>
+                    <label for="observacao">Observação</label>
+                    <?php if (isset($component)) { $__componentOriginal3d2c91b5536e3d54aed1822705c324a24f801405 = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\TextArea::class, []); ?>
+<?php $component->withName('text-area'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['name' => 'observacao']); ?> <?php echo e(old('observacao')); ?>  <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal3d2c91b5536e3d54aed1822705c324a24f801405)): ?>
+<?php $component = $__componentOriginal3d2c91b5536e3d54aed1822705c324a24f801405; ?>
+<?php unset($__componentOriginal3d2c91b5536e3d54aed1822705c324a24f801405); ?>
+<?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
     <input type="submit" class='btn btn-success'>
@@ -122,4 +135,5 @@ Adicionar estoque
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\CAIXA\Desktop\financeiro\resources\views/estoque/create.blade.php ENDPATH**/ ?>

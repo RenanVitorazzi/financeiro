@@ -21,7 +21,7 @@ Adicionar estoque
                 <label for="balanco">Data</label>
                 <input class="form-control" disabled type="date" value="{{ $conta_corrente->data }}"></input>
             </div>
-            
+
             <div class="col-3">
                 <label for="balanco">Nome</label>
                 <input class="form-control" disabled type="text" value="{{ $conta_corrente->nome }}"></input>
@@ -34,7 +34,7 @@ Adicionar estoque
                 <label for="balanco">Balanço</label>
                 <input class="form-control" disabled type="text" value="{{ $balancoReal }}"></input>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 @endif
@@ -52,7 +52,7 @@ Adicionar estoque
                     <x-form-group type="date" name="data" value="{{ $conta_corrente->data ?? old('data') }}">Data</x-form-group>
                 </div>
                 <div class="col-3">
-                    <x-form-group type="number" name="peso" value="{{ old('peso') }}">Peso</x-form-group>
+                    <x-form-group type="text" name="peso" value="{{ old('peso') }}">Peso</x-form-group>
                 </div>
                 <div class="col-3">
                     <x-form-group type="text" name="fator" value="{{ old('fator') }}">Fator</x-form-group>
@@ -66,14 +66,18 @@ Adicionar estoque
                         <!-- REPOSIÇÃO/COMPRA DO REPRESENTANTE -->
                         @elseif( ($balancoReal=='Reposição' && $tabela == 'conta_corrente_representante'))
                             <option value='Débito' selected>Débito (Saída)</option>
-                        @else                            
+                        @else
                             <option></option>
                             <option value='Crédito'>Crédito (Entrada)</option>
                             <option value='Débito'>Débito (Saída)</option>
                         @endif
                     </x-select>
                 </div>
-            </div> 
+                <div class='col-12'>
+                    <label for="observacao">Observação</label>
+                    <x-text-area name='observacao'> {{old('observacao')}} </x-text-area>
+                </div>
+            </div>
         </div>
     </div>
     <input type="submit" class='btn btn-success'>

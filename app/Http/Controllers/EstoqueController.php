@@ -14,7 +14,7 @@ class EstoqueController extends Controller
 {
     public function index()
     {
-        $lancamentos =  DB::select('SELECT 
+        $lancamentos =  DB::select('SELECT
                 e.*,
                 e.balanco AS balanco_estoque,
                 (SELECT p.nome FROM  representantes r INNER JOIN pessoas p ON p.id =r.pessoa_id WHERE  ccr.representante_id = r.id ) AS nome_representante,
@@ -23,48 +23,49 @@ class EstoqueController extends Controller
                 ccr.balanco AS balanco_representante,
                 ccr.representante_id,
                 ccf.fornecedor_id,
-                ccf.observacao AS observacao_fornecedor, 
+                ccf.observacao AS observacao_fornecedor,
                 ccr.observacao AS observacao_representante,
-                (SELECT SUM(peso_agregado) 
-                    FROM estoque 
-                    WHERE deleted_at IS NULL 
+                (SELECT SUM(peso_agregado)
+                    FROM estoque
+                    WHERE deleted_at IS NULL
                     AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_peso,
-                (SELECT SUM(fator_agregado) 
-                    FROM estoque 
-                    WHERE deleted_at IS NULL 
+                (SELECT SUM(fator_agregado)
+                    FROM estoque
+                    WHERE deleted_at IS NULL
                     AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_fator,
                 r.atacado AS representante_atacado
             FROM estoque e
             LEFT JOIN conta_corrente ccf ON ccf.id = e.cc_fornecedor_id AND ccf.deleted_at IS NULL
             LEFT JOIN conta_corrente_representante ccr ON ccr.id = e.cc_representante_id AND ccr.deleted_at IS NULL
-            LEFT JOIN representantes r ON r.id = ccr.representante_id 
-            WHERE e.deleted_at is null'
+            LEFT JOIN representantes r ON r.id = ccr.representante_id
+            WHERE e.deleted_at is null
+            ORDER BY e.data'
         );
-        
+
         $lancamentos_pendentes = DB::select('SELECT * FROM (
-            SELECT 
+            SELECT
                 ccf.peso, ccf.balanco, p.nome, DATE_FORMAT(ccf.data, ?) AS data_tratada , ? AS tabela, ccf.data, ccf.id
-                FROM conta_corrente ccf 
-                INNER JOIN fornecedores f ON f.id = ccf.fornecedor_id 
+                FROM conta_corrente ccf
+                INNER JOIN fornecedores f ON f.id = ccf.fornecedor_id
                 INNER JOIN pessoas p ON p.id = f.pessoa_id
-                WHERE lancado_estoque IS NULL 
-                    AND balanco like ? 
-                    AND ccf.deleted_at IS NULL 
-                    AND f.deleted_at IS NULL 
-            UNION 
-        
+                WHERE lancado_estoque IS NULL
+                    AND balanco like ?
+                    AND ccf.deleted_at IS NULL
+                    AND f.deleted_at IS NULL
+            UNION
+
             SELECT ccr.peso, ccr.balanco, p.nome, DATE_FORMAT(ccr.data, ?) AS data_tratada, ? AS tabela, ccr.data, ccr.id
                 FROM conta_corrente_representante ccr
                 INNER JOIN representantes r ON r.id = ccr.representante_id AND r.atacado = 1
                 INNER JOIN pessoas p ON p.id = r.pessoa_id
-                WHERE lancado_estoque IS NULL 
-                AND ccr.deleted_at IS NULL 
+                WHERE lancado_estoque IS NULL
+                AND ccr.deleted_at IS NULL
                 AND balanco in (?,?)
             ) a
             ORDER BY data',
             ['%d/%m/%Y', 'conta_corrente', 'Débito', '%d/%m/%Y', 'conta_corrente_representante','Reposição','Devolução']
         );
-        
+
         return view('estoque.index', compact('lancamentos', 'lancamentos_pendentes'));
     }
 
@@ -75,6 +76,9 @@ class EstoqueController extends Controller
      */
     public function create()
     {
+        $conta_corrente = '';
+        $balancoReal = '';
+        $tabela = '';
         return view('estoque.create', compact('conta_corrente', 'balancoReal', 'tabela'));
     }
 
@@ -92,36 +96,41 @@ class EstoqueController extends Controller
         $cc_fornecedor_id = NULL;
         $peso_agregado = $request->peso;
         $fator_agregado = $request->fator;
-        
+
         if ($request->conta_corrente_id) {
-            
+
             if ($request->tabela == 'conta_corrente') {
 
                 ContaCorrente::where('id', $request->conta_corrente_id)->update(['lancado_estoque' => 1]);
-                
+
                 $contaCorrente = ContaCorrente::where('id', $request->conta_corrente_id)->first();
                 $fornecedor_id = $contaCorrente->fornecedor_id;
                 $cc_fornecedor_id = $contaCorrente->id;
-                
+
             } else if ($request->tabela == 'conta_corrente_representante') {
-                
+
                 if ($request->balanco == 'Reposição') {
                     $peso_agregado = -$request->peso;
                     $fator_agregado = -$request->fator;
-                } 
+                }
 
                 contaCorrenteRepresentante::where('id', $request->conta_corrente_id)
                     ->update([
                         'lancado_estoque' => 1
                     ]);
-            
+
                 $contaCorrenteRepresentante = contaCorrenteRepresentante::where('id', $request->conta_corrente_id)->first();
                 $representante_id = $contaCorrenteRepresentante->representante_id;
                 $cc_representante_id = $contaCorrenteRepresentante->id;
             }
+        } else {
+            if ($request->balanco == 'Débito') {
+                $peso_agregado = -$peso_agregado;
+                $fator_agregado = -$fator_agregado;
+            }
         }
 
-        $estoque = Estoque::create([
+        Estoque::create([
             'data' => $request->data,
             'balanco' => $request->balanco,
             'peso' => $request->peso,
@@ -132,7 +141,8 @@ class EstoqueController extends Controller
             'fator_agregado' => $fator_agregado,
             'user_id' => auth()->user()->id,
             'cc_representante_id' => $cc_representante_id,
-            'cc_fornecedor_id' => $cc_fornecedor_id
+            'cc_fornecedor_id' => $cc_fornecedor_id,
+            'observacao' => $request->observacao
         ]);
 
         return redirect("/estoque");
@@ -171,7 +181,7 @@ class EstoqueController extends Controller
      */
     public function update(AdicionarEstoqueRequest $request, $id)
     {
-      
+
         Estoque::findOrFail($id)->update($request->validated());
 
         return redirect("/estoque");
@@ -189,24 +199,24 @@ class EstoqueController extends Controller
     }
 
     public function lancar_cc_estoque($conta_corrente_id, $tabela) {
-       
+
         if ($tabela == 'conta_corrente_representante') {
             $conta_corrente = DB::select('SELECT p.nome, ccr.*
                 FROM conta_corrente_representante ccr
                 INNER JOIN representantes r ON r.id = ccr.representante_id
                 INNER JOIN pessoas p ON p.id = r.pessoa_id
-                WHERE ccr.id = ?', 
+                WHERE ccr.id = ?',
                 [$conta_corrente_id]
             );
 
             $balancoReal = $conta_corrente[0]->balanco;
-            
+
         } else {
             $conta_corrente = DB::select('SELECT p.nome, ccf.*
                 FROM conta_corrente ccf
                 INNER JOIN fornecedores f ON f.id = ccf.fornecedor_id
                 INNER JOIN pessoas p ON p.id = f.pessoa_id
-                WHERE ccf.id = ?', 
+                WHERE ccf.id = ?',
                 [$conta_corrente_id]
             );
 
@@ -216,7 +226,7 @@ class EstoqueController extends Controller
                 $balancoReal = 'Devolução';
             }
         }
-        
+
         $conta_corrente = $conta_corrente[0];
         return view('estoque.create', compact('conta_corrente', 'balancoReal', 'tabela'));
 
@@ -224,7 +234,7 @@ class EstoqueController extends Controller
 
     public function pdf_estoque()
     {
-        $lancamentos =  DB::select('SELECT 
+        $lancamentos =  DB::select('SELECT
                 e.*,
                 e.balanco AS balanco_estoque,
                 (SELECT p.nome FROM  representantes r INNER JOIN pessoas p ON p.id =r.pessoa_id WHERE  ccr.representante_id = r.id ) AS nome_representante,
@@ -233,27 +243,28 @@ class EstoqueController extends Controller
                 ccr.balanco AS balanco_representante,
                 ccr.representante_id,
                 ccf.fornecedor_id,
-                ccf.observacao AS observacao_fornecedor, 
+                ccf.observacao AS observacao_fornecedor,
                 ccr.observacao AS observacao_representante,
-                (SELECT SUM(peso_agregado) 
-                    FROM estoque 
-                    WHERE deleted_at IS NULL 
+                (SELECT SUM(peso_agregado)
+                    FROM estoque
+                    WHERE deleted_at IS NULL
                     AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_peso,
-                (SELECT SUM(fator_agregado) 
-                    FROM estoque 
-                    WHERE deleted_at IS NULL 
+                (SELECT SUM(fator_agregado)
+                    FROM estoque
+                    WHERE deleted_at IS NULL
                     AND (data < e.data OR (data = e.data AND id <= e.id))) as saldo_fator,
                 r.atacado AS representante_atacado
             FROM estoque e
             LEFT JOIN conta_corrente ccf ON ccf.id = e.cc_fornecedor_id AND ccf.deleted_at IS NULL
             LEFT JOIN conta_corrente_representante ccr ON ccr.id = e.cc_representante_id AND ccr.deleted_at IS NULL
-            LEFT JOIN representantes r ON r.id = ccr.representante_id 
-            WHERE e.deleted_at is null'
+            LEFT JOIN representantes r ON r.id = ccr.representante_id
+            WHERE e.deleted_at is null
+            ORDER BY e.data'
         );
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('estoque.pdf.pdf_estoque', compact('lancamentos') );
-        
+
         return $pdf->stream();
     }
 }

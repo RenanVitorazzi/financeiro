@@ -7,8 +7,9 @@ Estoque
 <div class='mb-2 d-flex justify-content-between'>
     <h3> Estoque </h3>
     <div>
-        <!-- <x-botao-novo href="{{ route('ops.create') }}"></x-botao-novo> -->
-        <x-botao-imprimir href="{{ route('pdf_estoque') }}"></x-botao-imprimir>
+
+        <x-botao-imprimir class='mr-2' href="{{ route('pdf_estoque') }}"></x-botao-imprimir>
+        <x-botao-novo href="{{ route('estoque.create') }}"></x-botao-novo>
     </div>
 </div>
 @if (count($lancamentos_pendentes) > 0)
@@ -33,11 +34,10 @@ Estoque
         @forelse ($lancamentos as $lancamento)
             <tr>
                 <td>@data($lancamento->data)</td>
-                    @if ($lancamento->balanco_estoque == 'Débito')
-                        <td class='text-danger'>{{ $lancamento->balanco_estoque }}</b></td>
-                    @elseif ($lancamento->balanco_estoque == 'Crédito')
-                        <td class='text-success'><b>{{ $lancamento->balanco_estoque }}</b></td>
-                    @endif
+
+                <td class={{ $lancamento->balanco_estoque == 'Débito' ? 'text-danger': 'text-success'}}>
+                    <b>{{ $lancamento->balanco_estoque }}</b>
+                </td>
                 <td>@peso($lancamento->peso) <br> @fator($lancamento->fator)</td>
                 <td>
                     @if ($lancamento->representante_id)
@@ -48,6 +48,8 @@ Estoque
                         {{ $lancamento->balanco_fornecedor }}
                         {{ $lancamento->nome_fornecedor }}
                         {{ $lancamento->observacao_fornecedor }}
+                    @else
+                        {{$lancamento->observacao}}
                     @endif
                 </td>
                 <td>@peso($lancamento->saldo_peso) <br> @fator($lancamento->saldo_fator)</td>

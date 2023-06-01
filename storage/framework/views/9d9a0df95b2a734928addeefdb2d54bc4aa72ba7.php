@@ -6,27 +6,28 @@ Estoque
 <div class='mb-2 d-flex justify-content-between'>
     <h3> Estoque </h3>
     <div>
-        <!-- <?php if (isset($component)) { $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd = $component; } ?>
-<?php $component = $__env->getContainer()->make(App\View\Components\BotaoNovo::class, []); ?>
-<?php $component->withName('botao-novo'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['href' => ''.e(route('ops.create')).'']); ?> <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd)): ?>
-<?php $component = $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd; ?>
-<?php unset($__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd); ?>
-<?php endif; ?> -->
+
         <?php if (isset($component)) { $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5 = $component; } ?>
 <?php $component = $__env->getContainer()->make(App\View\Components\BotaoImprimir::class, []); ?>
 <?php $component->withName('botao-imprimir'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['href' => ''.e(route('pdf_estoque')).'']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['class' => 'mr-2','href' => ''.e(route('pdf_estoque')).'']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5)): ?>
 <?php $component = $__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5; ?>
 <?php unset($__componentOriginale7af6f5f93c3f23c2bd6667675861a3352692bb5); ?>
+<?php endif; ?>
+        <?php if (isset($component)) { $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\BotaoNovo::class, []); ?>
+<?php $component->withName('botao-novo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['href' => ''.e(route('estoque.create')).'']); ?> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd)): ?>
+<?php $component = $__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd; ?>
+<?php unset($__componentOriginale4c265d4ffee8fab925ff5f69279324cd3ba69cd); ?>
 <?php endif; ?>
     </div>
 </div>
@@ -67,11 +68,10 @@ Estoque
         <?php $__empty_1 = true; $__currentLoopData = $lancamentos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lancamento): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tr>
                 <td><?php echo date('d/m/Y', strtotime($lancamento->data)); ?></td>
-                    <?php if($lancamento->balanco_estoque == 'Débito'): ?>
-                        <td class='text-danger'><?php echo e($lancamento->balanco_estoque); ?></b></td>
-                    <?php elseif($lancamento->balanco_estoque == 'Crédito'): ?>
-                        <td class='text-success'><b><?php echo e($lancamento->balanco_estoque); ?></b></td>
-                    <?php endif; ?>
+
+                <td class=<?php echo e($lancamento->balanco_estoque == 'Débito' ? 'text-danger': 'text-success'); ?>>
+                    <b><?php echo e($lancamento->balanco_estoque); ?></b>
+                </td>
                 <td><?php echo number_format($lancamento->peso, 2, ',', '.'); ?> <br> <?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
                 <td>
                     <?php if($lancamento->representante_id): ?>
@@ -87,6 +87,9 @@ Estoque
                         <?php echo e($lancamento->nome_fornecedor); ?>
 
                         <?php echo e($lancamento->observacao_fornecedor); ?>
+
+                    <?php else: ?>
+                        <?php echo e($lancamento->observacao); ?>
 
                     <?php endif; ?>
                 </td>

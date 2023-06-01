@@ -43,17 +43,16 @@
             <tr>
                 <th rowspan=2>Data</th>
                 <th rowspan=2>Descrição</th>
-                <th colspan=2>Peso</th>
-                <th colspan=2>Fator</th>
-                <th colspan=2>Saldo</th>
+                <th colspan=3>Peso</th>
+                <th colspan=3>Fator</th>
             </tr>
             <tr>
-                <th>Crédito</th>
                 <th>Débito</th>
                 <th>Crédito</th>
+                <th>Saldo</th>
                 <th>Débito</th>
-                <th>Peso</th>
-                <th>Fator</th>
+                <th>Crédito</th>
+                <th>Saldo</th>
             </tr>
         </x-table-header>
         <tbody>
@@ -70,13 +69,15 @@
                                 {{ $lancamento->balanco_fornecedor }}
                                 {{ $lancamento->nome_fornecedor }}
                                 {{ $lancamento->observacao_fornecedor }}
+                            @else
+                                {{ $lancamento->observacao}}
                             @endif
                         </td>
-                        <td class='peso'></td>
                         <td class='peso'>@peso($lancamento->peso)</td>
-                        <td></td>
-                        <td>@fator($lancamento->fator)</td>
+                        <td class='peso'></td>
                         <td class='peso'>@peso($lancamento->saldo_peso)</td>
+                        <td>@fator($lancamento->fator)</td>
+                        <td></td>
                         <td>@fator($lancamento->saldo_fator)</td>
                     </tr>
                 @elseif ($lancamento->balanco_estoque == 'Crédito')
@@ -88,18 +89,18 @@
                                 {{ $lancamento->nome_representante }}
                                 {{ $lancamento->observacao_representante }}
                             @elseif ($lancamento->fornecedor_id)
-                                {{ $lancamento->balanco_fornecedor == 'Débito' ? 'Compra' : 'Devolução'}}
+                                {{ $lancamento->balanco_fornecedor == 'Débito' ? 'COMPRA' : 'DEVOLUÇÃO'}}
                                 {{ $lancamento->nome_fornecedor }}
                                 {{ $lancamento->observacao_fornecedor }}
                             @else
-                                Início registro
+                                {{ $lancamento->observacao}}
                             @endif
                         </td>
-                        <td class='peso'>@peso($lancamento->peso)</td>
                         <td class='peso'></td>
-                        <td>@fator($lancamento->fator)</td>
-                        <td></td>
+                        <td class='peso'>@peso($lancamento->peso)</td>
                         <td class='peso'>@peso($lancamento->saldo_peso)</td>
+                        <td></td>
+                        <td>@fator($lancamento->fator)</td>
                         <td>@fator($lancamento->saldo_fator)</td>
                     </tr>
                 @endif

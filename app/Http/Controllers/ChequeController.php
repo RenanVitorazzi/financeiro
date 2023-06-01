@@ -204,6 +204,18 @@ class ChequeController extends Controller
 
     public function consulta_cheque(Request $request)
     {
+
+        // $cheques = Parcela::with(['venda.cliente.pessoa.nome', 'representante', 'parceiro', 'adiamentos'])
+        //     ->whereIn('status', ['Devolvido', 'Resgatado', 'Aguardando pagamento', 'Aguardando envio'])
+        //     ->where($request->tipo_select, '=', $request->texto_pesquisa)
+
+        //     ->orWhere('nome_cheque', 'like', '%'. $request->texto_pesquisa . '%')
+
+        //     ->where('forma_pagamento', 'Cheque')
+        //     ->get()
+        //     ->toArray();
+        $nome_cliente = '%'.$request->texto_pesquisa.'%';
+
         $cheques = DB::select('SELECT
                 par.id,
                 UPPER(par.nome_cheque) as nome_cheque,
@@ -233,11 +245,13 @@ class ChequeController extends Controller
                 NOT EXISTS( SELECT id FROM adiamentos AS M2 WHERE M2.parcela_id = a.parcela_id AND M2.id > a.id)
                 AND par.deleted_at IS NULL
                 AND par.forma_pagamento like ?
-                AND par.'.$request->tipo_select.' = ?
-                ORDER BY par.data_parcela',
-            ['R$ ' ,'de_DE', 'Cheque', $request->texto_pesquisa]
+                AND  ('.$request->tipo_select.' = ?
+                OR
+                    nome_cheque like ?)
+                ORDER BY par.data_parcela
+                LIMIT 150',
+            ['R$ ' ,'de_DE', 'Cheque', $request->texto_pesquisa, $nome_cliente]
         );
-
         $blackList = DB::select('SELECT DISTINCT
                 pa.nome_cheque,
                 GROUP_CONCAT(pa.nome_cheque) as nome_cheque,
@@ -356,8 +370,6 @@ class ChequeController extends Controller
         //                             $request->texto_pesquisa
         //                         ]
         // );
-
-        // return ($cheques);
 
         return Parcela::with(['venda', 'representante', 'parceiro', 'adiamentos'])
             ->whereIn('status', ['Devolvido', 'Resgatado', 'Aguardando pagamento', 'Aguardando envio'])

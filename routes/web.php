@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('pdf_troca/{id}', [TrocaChequeController::class, 'pdf_troca'])->name('pdf_troca');
         Route::get('pdf_cc_parceiro/{parceiro_id}', [ParceiroController::class, 'pdf_cc_parceiro'])->name('pdf_cc_parceiro');
         Route::get('pdf_cc_representante/{representante_id}', [RepresentanteController::class, 'pdf_cc_representante'])->name('pdf_cc_representante');
-        Route::get('    /{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
+        Route::get('pdf_cheques_devolvidos_escritorio/{representante_id}', [RepresentanteController::class, 'pdf_cheques_devolvidos_escritorio'])->name('pdf_cheques_devolvidos_escritorio');
         Route::get('pdf_fornecedores', [FornecedorController::class, 'pdf_fornecedores'])->name('pdf_fornecedores');
         Route::get('pdf_fornecedor/{id}/{data_inicio}', [FornecedorController::class, 'pdf_fornecedor'])->name('pdf_fornecedor');
         Route::get('carteira_cheque_total', [ChequeController::class, 'carteira_cheque_total'])->name('carteira_cheque_total');
@@ -111,6 +111,8 @@ Route::group(['middleware' => ['auth']], function() {
         Route::resource('conta_corrente_anexo', ContaCorrenteAnexoController::class)->only([
             'index', 'create', 'store', 'destroy'
         ]);
+
+
         Route::get('consulta_cheque', [ChequeController::class, 'consulta_cheque'])->name('consulta_cheque');
         Route::get('consulta_parcela_pagamento', [ChequeController::class, 'consulta_parcela_pagamento'])->name('consulta_parcela_pagamento');
         Route::get('procurar_pagamento', [ChequeController::class, 'procurar_pagamento'])->name('procurar_pagamento');

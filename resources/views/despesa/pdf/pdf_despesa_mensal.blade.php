@@ -21,12 +21,15 @@
         text-align: center;
     }
     th {
-        background-color:#d6dae0;
+        background-color:#e0e1e2;
         /* color:white; */
     }
 
     h5, h3 {
         text-align: center;
+    }
+    .data, .valor {
+        width: 25%;
     }
 </style>
 <body>
@@ -38,7 +41,7 @@
                 <tr>
                     <th colspan=3>
                         {{ $local->where('id', $key)->first()->nome }}
-                        (@moeda( $despesas->where('local_id', $key)->sum('valor')))
+                        {{-- (@moeda( $despesas->where('local_id', $key)->sum('valor'))) --}}
                     </th>
                 </tr>
                 {{-- <tr>
@@ -50,9 +53,9 @@
             <tbody>
                 @forelse ($despesas->where('local_id', $key) as $despesa)
                     <tr>
-                        <td>@data($despesa->data_vencimento)</td>
+                        <td class='data'>@data($despesa->data_vencimento)</td>
                         <td class='nome'>{{$despesa->nome}}</td>
-                        <td>@moeda($despesa->valor)</td>
+                        <td class='valor'>@moeda($despesa->valor)</td>
                     </tr>
                 @empty
                     <tr>
@@ -60,12 +63,12 @@
                     </tr>
                 @endforelse
             </tbody>
-            {{-- <tfoot>
+            <tfoot>
                 <tr>
-                    <td colspan=2>Total</td>
-                    <td>@moeda( $despesas->where('local_id', $key)->sum('valor') )</td>
+                    <th colspan=2>Total</th>
+                    <th>@moeda( $despesas->where('local_id', $key)->sum('valor') )</th>
                 </tr>
-            </tfoot> --}}
+            </tfoot>
         </table>
     @endforeach
     <h3>Total Geral: @moeda($despesas->sum('valor'))</h3>

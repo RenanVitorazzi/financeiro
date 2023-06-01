@@ -21,12 +21,15 @@
         text-align: center;
     }
     th {
-        background-color:#d6dae0;
+        background-color:#e0e1e2;
         /* color:white; */
     }
 
     h5, h3 {
         text-align: center;
+    }
+    .data, .valor {
+        width: 25%;
     }
 </style>
 <body>
@@ -39,7 +42,7 @@
                     <th colspan=3>
                         <?php echo e($local->where('id', $key)->first()->nome); ?>
 
-                        (<?php echo 'R$ ' . number_format($despesas->where('local_id', $key)->sum('valor'), 2, ',', '.'); ?>)
+                        
                     </th>
                 </tr>
                 
@@ -47,9 +50,9 @@
             <tbody>
                 <?php $__empty_1 = true; $__currentLoopData = $despesas->where('local_id', $key); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $despesa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr>
-                        <td><?php echo date('d/m/Y', strtotime($despesa->data_vencimento)); ?></td>
+                        <td class='data'><?php echo date('d/m/Y', strtotime($despesa->data_vencimento)); ?></td>
                         <td class='nome'><?php echo e($despesa->nome); ?></td>
-                        <td><?php echo 'R$ ' . number_format($despesa->valor, 2, ',', '.'); ?></td>
+                        <td class='valor'><?php echo 'R$ ' . number_format($despesa->valor, 2, ',', '.'); ?></td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
@@ -57,7 +60,12 @@
                     </tr>
                 <?php endif; ?>
             </tbody>
-            
+            <tfoot>
+                <tr>
+                    <th colspan=2>Total</th>
+                    <th><?php echo 'R$ ' . number_format($despesas->where('local_id', $key)->sum('valor'), 2, ',', '.'); ?></th>
+                </tr>
+            </tfoot>
         </table>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     <h3>Total Geral: <?php echo 'R$ ' . number_format($despesas->sum('valor'), 2, ',', '.'); ?></h3>

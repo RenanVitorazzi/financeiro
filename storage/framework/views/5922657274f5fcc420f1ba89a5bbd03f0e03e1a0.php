@@ -48,17 +48,16 @@
             <tr>
                 <th rowspan=2>Data</th>
                 <th rowspan=2>Descrição</th>
-                <th colspan=2>Peso</th>
-                <th colspan=2>Fator</th>
-                <th colspan=2>Saldo</th>
+                <th colspan=3>Peso</th>
+                <th colspan=3>Fator</th>
             </tr>
             <tr>
-                <th>Crédito</th>
                 <th>Débito</th>
                 <th>Crédito</th>
+                <th>Saldo</th>
                 <th>Débito</th>
-                <th>Peso</th>
-                <th>Fator</th>
+                <th>Crédito</th>
+                <th>Saldo</th>
             </tr>
          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -86,13 +85,16 @@
 
                                 <?php echo e($lancamento->observacao_fornecedor); ?>
 
+                            <?php else: ?>
+                                <?php echo e($lancamento->observacao); ?>
+
                             <?php endif; ?>
                         </td>
-                        <td class='peso'></td>
                         <td class='peso'><?php echo number_format($lancamento->peso, 2, ',', '.'); ?></td>
-                        <td></td>
-                        <td><?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
+                        <td class='peso'></td>
                         <td class='peso'><?php echo number_format($lancamento->saldo_peso, 2, ',', '.'); ?></td>
+                        <td><?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
+                        <td></td>
                         <td><?php echo number_format($lancamento->saldo_fator, 1, ',', '.'); ?></td>
                     </tr>
                 <?php elseif($lancamento->balanco_estoque == 'Crédito'): ?>
@@ -107,21 +109,22 @@
                                 <?php echo e($lancamento->observacao_representante); ?>
 
                             <?php elseif($lancamento->fornecedor_id): ?>
-                                <?php echo e($lancamento->balanco_fornecedor == 'Débito' ? 'Compra' : 'Devolução'); ?>
+                                <?php echo e($lancamento->balanco_fornecedor == 'Débito' ? 'COMPRA' : 'DEVOLUÇÃO'); ?>
 
                                 <?php echo e($lancamento->nome_fornecedor); ?>
 
                                 <?php echo e($lancamento->observacao_fornecedor); ?>
 
                             <?php else: ?>
-                                Início registro
+                                <?php echo e($lancamento->observacao); ?>
+
                             <?php endif; ?>
                         </td>
-                        <td class='peso'><?php echo number_format($lancamento->peso, 2, ',', '.'); ?></td>
                         <td class='peso'></td>
-                        <td><?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
-                        <td></td>
+                        <td class='peso'><?php echo number_format($lancamento->peso, 2, ',', '.'); ?></td>
                         <td class='peso'><?php echo number_format($lancamento->saldo_peso, 2, ',', '.'); ?></td>
+                        <td></td>
+                        <td><?php echo number_format($lancamento->fator, 1, ',', '.'); ?></td>
                         <td><?php echo number_format($lancamento->saldo_fator, 1, ',', '.'); ?></td>
                     </tr>
                 <?php endif; ?>

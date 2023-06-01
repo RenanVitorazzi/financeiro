@@ -33,6 +33,7 @@ class AdicionarEstoqueRequest extends FormRequest
             "balanco" => ["required", Rule::in($balanco)],
             "tabela" => ["nullable"],
             "conta_corrente_id" => ["nullable"],
+            "observacao" => ["nullable"],
         ];
     }
 }
